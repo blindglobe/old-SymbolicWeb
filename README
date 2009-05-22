@@ -1,0 +1,27 @@
+ __.        .     .    .  .   .  
+(__   .._ _ |_  _ |* _.|  | _ |_ 
+.__)\_|[ | )[_)(_)||(_.|/\|(/,[_)
+====._|==========================> README
+
+
+
+Authors?        See the file AUTHORS.
+License?        See the file LICENCE.
+How to install? See the file INSTALL (this file also mentions supported Lisps, browsers etc.).
+How to use?     See the file TUTORIAL.
+Any examples?   See the examples/ directory.
+Bugs?           See http://code.google.com/p/symbolicweb/issues/
+
+
+A forum can be found here:
+  http://groups.google.com/group/symbolicweb (with mailing-list addr. symbolicweb@googlegroups.com )
+
+  
+An IRC channel can be found at:
+  #symbolicweb on chat.freenode.net
+
+
+For now, the best way to get help is just to ask on IRC or on the forum.
+There will be more documentation, examples and tutorials later (promise).
+If there is no immediate answer on the IRC channel, post your question on the
+forum.

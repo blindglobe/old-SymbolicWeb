@@ -1,0 +1,64 @@
+UPDATE-CACHE-ONLY-P
+===================
+
+This name is used several places, a better name would be SERVER-ONLY-P.
+
+
+
+Repetition
+==========
+
+* In INITIALIZE-INSTANCE methods for widgets things like:
+
+    (unless (slot-boundp span 'html)
+      (setf (slot-value span 'html)
+            ...))
+
+            
+..is repeated alot.
+
+
+
+Repetition of code in RENDER methods for CONTAINER subclasses
+=============================================================
+
+The RENDER method for subclasses of CONTAINER has some code repetition.
+
+
+
+More repetition of code
+=======================
+
+Patterns like these happen in places that deal with the :ON-STATE-CHANGE,
+:ON-ADD-FN, :ON-REMOVE-FN,:ON-RENDER-FN, :ON-VISIBILITY-CHANGE-FN initargs:
+
+(defmethod initialize-instance :after ((state-propagation state-propagation) &key
+                                       (on-state-change-fn nil on-state-change-fn-supplied-p))
+  (when (and on-state-change-fn-supplied-p
+             (or (functionp on-state-change-fn)
+                 (error ":ON-STATE-CHANGE-FN must be supplied with a function; got ~A" on-state-change-fn)))
+    (push on-state-change-fn (on-state-change-fns-of state-propagation))))
+
+
+    
+Redesign low-level protocol
+===========================
+
+(Ok, this reads like nonsense .. ignore it if you wish .. i've started on
+something in the src/node/ directory though)
+
+Don't use words like "AJAX" and "Comet". I'm currently (04/20/2008) working
+on a HTTP-client that is not a web-browser (libcurl) and does not have
+JS available.
+
+Instead of using words like "server" and "client", use the word "peer". Which
+one that actually is a server or is a client should not matter. Each have
+the same API; both can listen for incomming messages or events, and both
+can send messages or initiate events regardless of whether they are a
+server or a client.
+
+Don't send JS in return when "talking about" the communication scheme.
+Instead treat the "JS server" at the browser as if it could be any type
+of server (libcurl and a C program for instance). It, whether it is JS
+or a C program or a Lisp program, should instead parse the URL-encoded
+GET and/or POST variables and take action based on that.

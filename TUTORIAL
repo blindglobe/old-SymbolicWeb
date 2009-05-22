@@ -1,0 +1,68 @@
+ __.        .     .    .  .   .  
+(__   .._ _ |_  _ |* _.|  | _ |_ 
+.__)\_|[ | )[_)(_)||(_.|/\|(/,[_)
+====._|==========================> TUTORIAL
+
+
+
+After installing, see INSTALL, and compiling via (require :symbolicweb),
+do:
+
+  CL-USER> (in-package :sw)
+  #<PACKAGE "SYMBOLICWEB">
+  SW> (start-sw)
+
+
+START-SW will bind the server instance to *SERVER* the server will
+listen for connections on port 6001 by default.
+
+We need some sort of (preferably) blank application as a starting point for us to
+play around in the REPL:
+
+  SW> (load "/home/lnostdal/programming/lisp/symbolicweb/src/empty-page.lisp")
+
+
+..then direct your browser to http://symbolicweb-local.org:6001/ .. you'll see
+a blank page.
+
+Now try this while keeping an eye on your browser as you go along:
+
+  SW> (root)
+  #<CONTAINER :ID "sw-root" :CHILDREN NIL>
+  SW> (add (mk-button nil) (root))
+  #<BUTTON :ID "BUTTON-6" :CHILDREN NIL>
+
+  
+An "empty" button will be visible in the upper left corner of the page.
+  
+  SW> (children-of (root))
+  (#<BUTTON :ID "BUTTON-6" :CHILDREN NIL>)
+
+  
+Let's store a reference to the button in a variable for easy access later
+(I'm skipping the REPL-prompts now):
+
+  (defparameter *button* (child-of (root)))
+
+  (add (mk-span "World says hi!")
+       *button*)
+
+  (setf (on-click-of *button*)
+        (mk-cb (button)
+          (declare (ignore button))
+          (write-line "World Clicked!")))
+
+          
+ Try clicking the button; you'll get a message in the REPL.
+
+  (setf (background-color-of *button*) "red") ;; CSS
+
+  (children-of *button*)
+
+  (html-of (child-of *button*)) ;; Or just (html-of *button*)
+
+  (setf (html-of (child-of *button*)) ;; Or just (setf (html-of *button*) "World says bye!")
+        "World says bye!")
+
+
+That's it for now; see the README file for ways to get help/support.

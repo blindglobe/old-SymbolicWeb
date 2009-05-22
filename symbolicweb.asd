@@ -1,0 +1,95 @@
+;;;; http://nostdal.org/ ;;;;
+
+
+(defsystem symbolicweb
+  :description "SymbolicWeb"
+  :author "See the file AUTHORS"
+  :licence "See the file LICENSE"
+
+  :depends-on (:sw-http
+               ;;:sw-db
+               :sw-mvc
+               :cl-utilities
+               :alexandria
+               :cl-who
+               :aromyxo
+               :symbolicweb-jquery ;; Default JS generator backend.
+               )
+  
+  :serial t
+  :components
+  ((:module src
+    :serial t
+    :components
+    ((:file "package")
+     (:file "class-bootstrap")
+     (:file "macro-bootstrap")
+     (:file "specials")
+     (:file "config-compilation")
+     (:file "config")
+     (:file "util")
+     (:file "code")
+     (:file "id-mixin")
+     (:file "server")
+     (:file "object")
+     (:file "base-classes")
+     (:file "viewport")
+     
+     (:module js
+       :serial t
+       :components
+       ((:file "util")
+        ))
+
+     (:module widgets
+       :serial t
+       :components
+       (#|(:file "form")|#
+        (:file "dom-cache")
+        (:file "widget")
+        ;;(:file "manipulation")
+        (:file "attributes")
+        (:file "css")
+        (:file "events")
+        (:file "html-element")
+        (:file "container")
+        #|
+        (:file "container-with-1-active-item")
+        (:file "html-elements")
+        (:file "table-container")
+        (:file "html-container")
+        (:file "location-callback")
+        (:file "location-container")
+        (:file "spin-button")
+        (:file "text-input")
+        (:file "text-area")
+        (:file "button")
+        (:file "toggle-button")
+        (:file "radio-button")
+        (:file "checkbox")
+        (:file "link")
+        (:file "image")
+        (:file "slider")
+        (:file "cursor")
+        (:file "combo-box")
+        (:file "tab")
+        (:file "window")
+        (:file "alert-box")
+        |#
+        ))
+     
+     (:file "address-bar")
+     (:file "application")
+     (:file "server-sw-http")
+     (:file "manipulation")
+     (:file "comet")
+     (:file "ajax")
+     ;;(:file "pagination")
+     ))
+   ))
+
+
+
+     
+
+

@@ -1,0 +1,276 @@
+ __.        .     .    .  .   .  
+(__   .._ _ |_  _ |* _.|  | _ |_ 
+.__)\_|[ | )[_)(_)||(_.|/\|(/,[_)
+====._|==========================> INSTALL
+
+
+Requirements
+============
+
+  * SBCL x86 or x86-64 on Linux with thread support for SBCL enabled.
+    Details about enabling thread support in SBCL is explained later in this
+    file.
+
+    SBCL on Mac OS X used to have problems with thread support. Some reports
+    seem to indicate that this has improved, but Linux is probably still a
+    safer bet.
+
+    Versions of SBCL older than 1.0.23.2 are known to not work (yes, really).
+
+
+  * SymbolicWeb is designed to run behind a proxy like Lighttpd. SW deals with
+    the dynamic AJAX and Comet stuff, while Lighttpd deals with the static
+    stuff. It is possible to play around with SW witout a proxy though; TUTORIAL
+    does this.
+    Configuration of Lighttpd is shown later in this file.
+
+    
+  * If you need to break the 2 connection limit of HTTP, see the
+    GENERATE-DYNAMIC-SUBDOMAIN method in src/application.lisp.
+    See the end of this file for requirements wrt. DNS in this context.
+
+
+    
+Browser/client support:
+
+  * Firefox 2.x and 3.x: Should work 100%.
+  
+  * IE 6.x, IE 7.x, IE8.x: Should work 100%.
+  
+  * Safari/Chrome/webkit: Needs more work on the URL/history/back-button support
+    stuff. I know how to fix this but have not had the time to do so (mail me
+    if you want to fix this).
+
+  * Opera: Not really. The fixes needed are isolated in sw-ajax.js.
+    Update; the new Opera 10 seems to have what it takes to fully support
+    URL/history.
+  
+
+
+First steps
+===========
+
+  darcs get http://common-lisp.net/~lnostdal/programming/lisp/symbolicweb/
+  darcs get http://common-lisp.net/~lnostdal/programming/lisp/aromyxo/
+  darcs get http://common-lisp.net/~lnostdal/programming/lisp/sw-http/
+  git clone git://git.b9.com/md5.git
+  ...etc.  (TODO: List all dependencies here ..)
+
+
+NOTE: Do not bother installing libraries via ASDF-INSTALL as 99% of these are
+      too old. Pull from darcs, git, svn and cvs. If something does not compile
+      or work with the lastest version, it is a bug. If something does not work
+      with a version installed via ASDF-INSTALL, it is not a bug.
+
+      
+It is possible to build this using cl-build by adding this to your wnpp-projects
+file:
+
+  # SymbolicWeb
+  symbolicweb get_darcs http://common-lisp.net/~lnostdal/programming/lisp/symbolicweb/
+  aromyxo get_darcs http://common-lisp.net/~lnostdal/programming/lisp/aromyxo/
+  sw-http get_darcs http://common-lisp.net/~lnostdal/programming/lisp/sw-http/
+  
+
+There is a *SERVER-DEFAULT-STATIC-DATA-FS-PATH* in src/config.lisp. By default
+it points to ~/symbolicweb-data and you can create a symlink there which points
+to the /data directory of your local SymbolicWeb source tree, or you can adjust
+the variable directly.
+
+
+
+.asd-files
+==========
+
+These need to be symlinked to from ~/.sbcl/systems/ as usual.
+
+For SymbolicWeb:
+
+  symbolicweb/symbolicweb.asd
+  symbolicweb/symbolicweb-jquery.asd
+
+  
+For Aromyxo:
+
+  aromyxo/am-util.asd
+  aromyxo/am-conc.asd
+  aromyxo/am-web.asd
+
+
+
+Firebug
+=======
+
+Firebug is nearly essential to be able to see what is going on. If things
+are not configured correctly they might fail silently on the client and
+the server cannot know that this is happening.
+However, if you're using FireBug you'll see something like:
+
+  "$ is not defined [Break on this error] $(function(){"
+
+
+..if it can't find jQuery for instance.
+
+
+
+Compiling
+=========
+
+Ok, just start compiling by doing (require :symbolicweb). If it complains, notice
+what the error is and select the ABORT restart. Solve the problem (add the missing
+library etc.) then do (require :symbolicweb) again. If you press CONTINUE you
+will end up with erroneous .fasl files which you'll probably have to delete
+manually to trigger a re-compile after you've fixed the problem.
+
+Once things seem ok, continue with the TUTORIAL file.
+
+
+
+Compile SBCL with thread support
+================================
+
+If you're not getting:
+
+  CL-USER> (find :sb-thread *features*)
+  :SB-THREAD
+
+
+..then add a file customize-target-features.lisp in the root of SBCL's
+source tree:
+
+  (lambda (features)
+    (flet ((enable (x)
+             (pushnew x features))
+           (disable (x)
+             (setf features (remove x features))))
+
+      (enable :sb-thread)
+    ))
+
+
+..and recompile SBCL. You can find the SBCL source here:
+
+  http://sourceforge.net/project/showfiles.php?group_id=1373
+
+  
+..the filename looks something like: sbcl-1.0.16-source.tar.bz2
+
+
+
+Setup Bind for support for wildard subdomains for localhost
+===========================================================
+
+This has been tested with Debian Etch, Debian Lenny and Ubuntu 8.04:
+
+
+  aptitude install bind   (on Ubuntu, bind9 seems to be the name of the pakcage)
+
+
+Place this in /etc/bind/named.conf.local
+
+zone "symbolicweb-local.org" {
+      type master;
+      file "/etc/bind/symbolicweb-local.org";
+};
+
+
+Create a new file /etc/bind/symbolicweb-local.org and place this in it:
+
+$TTL    604800
+@       IN      SOA     ns1.symbolicweb-local.org. root.symbolicweb-local.org. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns1.symbolicweb-local.org.
+@       IN      A       127.0.0.1
+
+*.symbolicweb-local.org. IN A 127.0.0.1
+
+  
+Add this to the start of /etc/resolv.conf
+
+nameserver 127.0.0.1
+
+
+To make sure the /etc/resolv.conf file will have 127.0.0.1 as nameserver in the
+future, add this to /etc/dhcp3/dhclient.conf (make sure you place it after the
+"request" line!):
+
+prepend domain-name-servers 127.0.0.1;
+
+
+Restart bind and networking:
+
+  /etc/init.d/bind restart    (or bind9 if you're running Ubuntu)
+  /etc/init.d/networking restart
+
+
+Confirm that it works:
+
+  lars@ibmr52:~$ nslookup symbolicweb-local.org
+  Server:         127.0.0.1
+  Address:        127.0.0.1#53
+
+  Name:   symbolicweb-local.org
+  Address: 127.0.0.1
+
+  lars@ibmr52:~$ nslookup somethingrandom.symbolicweb-local.org
+  Server:         127.0.0.1
+  Address:        127.0.0.1#53
+
+  Name:   somethingrandom.symbolicweb-local.org
+  Address: 127.0.0.1
+
+
+  
+Configuring a proxy in this context
+===================================
+
+
+Lighttpd 1.4.x
+==============
+
+  nostdal:/etc/lighttpd# file conf-enabled/10-proxy.conf 
+  conf-enabled/10-proxy.conf: symbolic link to `/etc/lighttpd/conf-available/10-proxy.conf'
+
+
+10.proxy.conf contains entries like these:
+
+  $HTTP["host"] =~ "^(.+\.)?sw\.nostdal\.org$" {
+    proxy.server = ("" => (("host" => "127.0.0.1", "port" => 6001)))
+  }
+
+
+Here the SymbolicWeb server is running on port 6001 and we want all requests to
+*.sw.nostdal.org to be handled by this server.
+
+Further, SW:*SERVER-CLOSE-CONNECTION-P* must be set to T. If it isn't, the
+requests will "hang".
+
+
+Lighttpd 1.5.x
+==============
+
+With no guarantees with regards to stability etc. you'll find a .deb here:
+
+  http://nostdal.org/~lnostdal/programming/c/lighttpd-debian/
+
+  
+It can be installed by doing:
+
+  dpkg -i lighttpd_1.5.0_i386.deb
+
+  
+If you want to handle things yourself but would like to see a possible
+configuration of 1.5.x, see:
+
+  http://nostdal.org/~lnostdal/programming/c/lighttpd/symbolicweb/lighttpd.conf
+
+  
+Here the SymbolicWeb server is running on port 6001 and we want all requests to
+sw.yourdomain.org to be handled by this server.
+
+For 1.5.x, SW:*SERVER-CLOSE-CONNECTION-P* can (or should..) be NIL.

@@ -1,0 +1,232 @@
+;;;; http://nostdal.org/ ;;;;
+
+(in-package #:sw)
+
+
+(declaim (optimize speed))
+
+(class-forward-reference dom-attribute-class)
+
+
+(defclass widget (self-ref
+                  widget-base
+                  dom-mirror)
+  ((shtml :initarg :shtml
+          :documentation "
+\"Static\" outer HTML shell or wrapping of a widget. This HTML code usually
+maintains or contains the ID attribute (stored in the ID-slot of the OBJECT
+parent class of this class) so the server and client \"versions\" of the
+widget can communicate or refer to each other.
+See the SHTML-OF method.")
+   
+   (viewports :reader viewports-of
+              :type hash-table
+              :initform (make-hash-table :test #'equal :weakness :value :synchronized t)
+              :documentation "
+The viewports, all browser tabs/windows regardless of user/session, the widget is part of
+or visible in.")
+
+   (visible-p :initform nil
+              :documentation "
+Use/see the VISIBLE-P-OF method.")
+
+   #|(on-visibility-change-fns :accessor on-visibility-change-fns-of
+                             :type list
+                             :initform nil
+                             :documentation "
+A list of functions called when the widget's visibility changes. When a widget
+goes from visible to non-visible, these functions are called before the JS-code
+to remove the widget on the client-end has been added to the outgoing HTTP
+response and after the functions in the ON-CNT-REMOVE-FNS and ON-REMOVE-FNS
+slots. When a widget goes from non-visible to visible, these functions are
+called after the JS-code to add the widget on the client-end has been added to
+the outgoing HTTP response and before the functions in the ON-RENDER-FNS slot
+have been called. Create a function of the right form by using the
+MK-ON-VISIBILITY-CHANGE-FN macro and pass it to the :ON-VISIBILTY-CHANGE-FN
+initarg to append a callback to this slot.")|#
+
+   #|(on-render-fns :accessor on-render-fns-of
+                  :type list
+                  :initform nil
+                  :documentation "
+A list of functions called when the widget is being rendered. These are called
+after the (RENDER WIDGET) main method and before the functions in the
+ON-VISIBILITY-CHANGE-FNS slot. Create a function of the right form by using the
+MK-ON-RENDER-FN macro and pass it to the :ON-RENDER-FN initarg to append
+callbacks to this slot.")|#)
+
+  (:metaclass mvc-stm-class))
+
+
+(defmethod initialize-instance :around ((widget widget) &key)
+  ;; Let the RENDER method send stuff to the client when things are ready instead.
+  (with-code-block (:execute-p nil)
+    (let ((*currently-constructing-widget* widget)
+          (*creating-html-container-p* nil)) ;; To avoid SHTML-OF to screw up when nesting WITH-HTML-CONTAINER type stuff.
+      (call-next-method))))
+
+
+(defmethod initialize-instance :after ((widget widget) &key
+                                       (on-visibility-change-fn nil on-visibility-change-fn-supplied-p)
+                                       (on-render-fn nil on-render-fn-supplied-p))
+  (declare (optimize speed))
+  #|(when on-render-fn-supplied-p
+    (push (ensure-function on-render-fn) (on-render-fns-of widget)))|#
+  #|(when on-visibility-change-fn-supplied-p
+    (push (ensure-function on-visibility-change-fn) (on-visibility-change-fns-of widget)))|#)
+
+
+
+#|
+(defmethod do-visibility-change ((widget widget) new-state)
+  (dolist (on-visibility-change-fn (on-visibility-change-fns-of widget))
+    (funcall on-visibility-change-fn widget new-state on-visibility-change-fn)))
+
+
+(defmacro mk-on-visibility-change-fn ((widget-sym new-state-sym &key (on-visibility-change-fn-sym
+                                                                      'on-visibility-change-fn
+                                                                      on-visibility-change-fn-sym-supplied-p))
+                                      &body body)
+  "See the doc-string for the ON-VISIBILITY-CHANGE-FN slot in WIDGET."
+  `(lambda (,widget-sym ,new-state-sym ,on-visibility-change-fn-sym)
+     ,(unless on-visibility-change-fn-sym-supplied-p
+       `(declare (ignorable ,on-visibility-change-fn-sym)))
+     ,@body))
+|#
+
+
+#.(maybe-inline 'currently-constructing-p)
+(defun currently-constructing-p (widget)
+  (declare (type widget widget))
+  (equal widget *currently-constructing-widget*))
+
+
+(defmethod shtml-of ((widget widget))
+  (when *creating-html-container-p*
+    (push widget *html-container-children*))
+  (with-slots (shtml) widget
+    (cond
+      ((stringp shtml)
+       shtml)
+      
+      ((ensure-function shtml)
+       (funcall shtml widget)))))
+
+
+(defun html<- (obj widget)
+  (declare (type widget widget))
+  (the string
+    (values
+     (cond
+       ((stringp obj) obj)
+       
+       ((ignore-errors (ensure-function obj))
+        (html<- (funcall obj widget) widget))
+
+       (t (princ-to-string obj))))))
+
+
+(defmacro defwidget (name parents &body body)
+  `(progn
+     (defclass ,name ,parents
+       ,@body)
+     
+     (declaim (inline ,(mksymf name '-p)))
+     (defun ,(mksymf name '-p) (object)
+         (typep object ',name))
+     
+     (finalize-inheritance (find-class ',name))))
+
+
+(declaim (inline widget-p))
+(defun widget-p (object)
+  (typep object 'widget))
+
+
+(defmethod visible-p-of ((widget widget) &key
+                         (app nil app-supplied-p) (viewport nil viewport-supplied-p)
+                         real-check-p)
+  "If VIEWPORT is supplied this will determine whether WIDGET is visible in that viewport.
+If APP is supplied this will determine whether WIDGET is visible within any of
+the viewports within that session.
+If neither APP nor VIEWPORT is supplied this will determine wheter WIDGET is visible
+in any session in any viewport."
+  (declare (ignore app)
+           (optimize speed))
+  (when app-supplied-p
+    (error "TODO: Not implemented yet."))
+  (if real-check-p
+      (if (and (visible-p-of widget)
+               (zerop (hash-table-count (viewports-of widget))))
+        ;; WIDGET isn't part of any viewport anymore.
+        (prog1 (nilf (slot-value widget 'visible-p))
+          #|(do-visibility-change widget nil)|#)
+        t)
+      (and (slot-value widget 'visible-p)
+           (if viewport-supplied-p
+               (and (visible-p-of viewport)
+                    ;; The widget and viewport supplied is visible, but is the widget really part of this viewport?
+                    (gethash (id-of viewport) (viewports-of widget)))
+               t))))
+
+
+(defmethod render ((widget widget))
+  #|(warn "~A has no RENDER method; using an empty one." widget)|#
+  (render-widget widget (formula-of (model-of widget))))
+(export 'render)
+
+
+#|(defmethod render :after ((widget widget))
+  (dolist (on-render-fn (on-render-fns-of widget))
+    (funcall on-render-fn widget on-render-fn)))|#
+
+
+#|(defmacro mk-on-render-fn ((widget-sym &key (on-render-fn-sym 'on-render-fn on-render-fn-supplied-p)) &body body)
+  "See the doc-string for the ON-RENDER-FNS slot in WIDGET."
+  `(lambda (,widget-sym ,on-render-fn-sym)
+     ,(unless on-render-fn-supplied-p
+       `(declare (ignorable ,on-render-fn-sym)))
+     ,@body))|#
+
+
+(defmethod focus ((widget widget))
+  (if *js-code-only-p*
+      (js-focus (id-of widget))
+      (run (js-focus (id-of widget)) widget)))
+
+
+(defmethod scroll-to-bottom ((widget widget))
+  (if *js-code-only-p*
+      (js-scroll-to-bottom (id-of widget))
+      (run (js-scroll-to-bottom (id-of widget)) widget)))
+
+
+#.(maybe-inline 'for-each-viewport-of-widget)
+(defun for-each-viewport-of-widget (widget fn)
+  "FN is a function that takes one argument; the viewport.
+Also see FOR-EACH-VIEWPORT-IN-APP."
+  (declare (type widget widget)
+           (type (function (viewport)) fn))
+  (maphash (lambda (%not-used viewport)
+             (declare (ignore %not-used)
+                      (type viewport viewport))
+             (funcall fn viewport))
+           (viewports-of widget)))
+
+
+(defmethod shared-p-of ((widget widget))
+  "Returns T if widget is visible in multiple contexts.
+This might not be 100% accurate; it might return T when the widget is only
+visible in one or even no context."
+  (declare (optimize speed)
+           (inline visible-p-of))
+  (and (visible-p-of widget)
+       (< 1 (hash-table-count (viewports-of widget)))))
+
+
+(defmethod remove-widget-from-viewport ((widget widget) (viewport viewport))
+  ;; VIEWPORT -/-> WIDGET.
+  (remhash (id-of widget) (widgets-of viewport))
+  ;; WIDGET -/-> VIEWPORT.
+  (remhash (id-of viewport) (viewports-of widget))
+  (visible-p-of widget :real-check-p t))

@@ -1,0 +1,151 @@
+;;;; http://nostdal.org/ ;;;;
+
+(in-package #:sw)
+
+
+(defclass application (id-mixin locked-object)
+  ((server :reader server-of
+           :type server)
+   
+   (cookie-value :reader cookie-value-of :initarg :cookie-value
+                 :type string
+                 :initform (error ":COOKIE-VALUE must be supplied."))
+
+   (cookie-expires :reader cookie-expires-of
+                   :type integer)
+
+   (static-data-subdomain :accessor static-data-subdomain-of
+                          :type (or string null))
+
+   (static-data-fs-path :accessor static-data-fs-path-of
+                        :type string)
+   
+   (initialized-p :reader initialized-p-of
+                  :documentation "Has the MAIN method been executed?"
+                  :initform nil)
+
+   (widgets :reader widgets-of
+            :type hash-table
+            :initform (make-hash-table :test #'equal :synchronized t :weakness :value)
+            :documentation "
+This contains all widgets currently or recently active or visible in a session.
+It is not 100% accurate; it is a weak hash, and some of these widgets might not
+have been GCed yet even though they are not active or visible anymore.")
+   
+   (viewports :reader viewports-of
+              :type hash-table
+              :initform (make-hash-table :test #'equal :synchronized t)
+              :documentation "
+This hash-table contains instances of VIEWPORT; server side representations of
+browser windows or tabs.")
+
+   (last-ping-time :accessor last-ping-time-of
+                   :type integer
+                   :initform (get-universal-time))
+   
+   (last-activity-time :accessor last-activity-time-of
+                       :documentation "
+Last time we had any real user _or_ server (server push) activity in the session."
+                       
+                       :initform (get-universal-time))
+   (last-user-activity-time :accessor last-user-activity-time-of
+                            :initform (get-universal-time)
+                            :documentation "
+Last time we had any real user (DOM event or page refresh) activity in the session.")
+
+   (http-meta-author :accessor http-meta-author-of
+                     :initform "SymbolicWeb: http://nostdal.org/")))
+
+
+(defmethod initialize-instance :around ((app application) &key
+                                        (server (error ":SERVER needed."))
+                                        (static-data-subdomain (static-data-subdomain-of server))
+                                        (static-data-fs-path (static-data-fs-path-of server))
+                                        (cookie-expires (cookie-expires-of server)))
+  (let ((*app* app)) 
+    (setf (slot-value app 'server) server
+          (slot-value app 'static-data-subdomain) static-data-subdomain
+          (slot-value app 'static-data-fs-path) static-data-fs-path
+          (slot-value app 'cookie-expires) cookie-expires)
+    (call-next-method)))
+
+
+(defmethod initialize-instance :after ((app application) &key)
+  (on-session-start app))
+
+
+(defmethod generate-dynamic-subdomain ((app application))
+  ;; To break the 2 connection limit of HTTP do something like
+  ;;   (catstr "sw.dyn-" (generate-id))
+  ;; ..here (in your application subclass).
+  nil)
+
+
+(defmethod visible-p-of ((app application) &key)
+  (> *app-visible-p-timeout*
+     (- (get-universal-time) (last-ping-time-of app))))
+
+
+(defmethod on-session-start ((app application))
+  "Called before *ROOT* has been instantiated."
+  (format t "session started: ~A (id: ~A)~%" app (id-of app)))
+
+
+(defmethod on-session-end ((app application))
+  (format t "session end: ~A (id: ~A)~%" app (id-of app)))
+
+
+(defmethod on-session-timeout ((app application))
+  "Called by HT."
+  (format t "session timeout: ~A (id: ~A)~%" app (id-of app))
+  (on-session-end app))
+
+
+(defmacro defapp (name parents slots &rest options)
+  `(progn
+     (defclass ,name ,(or parents '(application))
+       (,@slots)
+       ,@options)))
+
+
+(defmethod main ((app application))
+  (declare (ignore app)))
+
+
+(defmethod render ((app application))
+  (with-output-to-string (ss)
+    ;; :PROLOGUE set to T generates this (needed to trigger "standards mode" in IE7!):
+    ;; <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
+    (with-html-output (ss ss :prologue t)
+      (:html
+       (:head
+        (:meta :name "Author" :content (http-meta-author-of app))
+        (:meta :http-equiv "X-UA-Compatible" :content "IE=edge") ;; For IE8 and up.
+        ;; TODO: Move this to a slot in APPLICATION.
+        (:style :type "text/css"
+          "html, body, #sw-root {"
+          "  position: absolute; overflow: hidden;"
+          "  height: 100%; width: 100%;"
+          "  margin: 0; padding: 0; border: 0;"
+          "}"))
+
+       (:body
+        ;; NOTE/TODO: Browsers tend to add scrollbars for sub-pixel errors in their own rendering; this will probably be set to "hidden" later for that reason; it'll force the user to be more explicit in what he wants instead.
+        (:div :id "sw-root" :style "overflow: auto;") 
+        
+        (:img :id "sw-loading-spinner" :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"
+              :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
+
+        (:a :accesskey 1 :href "javascript:swTerminateSession();")
+        (:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")
+              
+        (:noscript "JavaScript needs to be enabled.")
+        (str (js-sw-headers app)))))))
+
+
+(defmethod remove ((app application) &optional (server *server*))
+  (declare (server server))
+  (with-each-viewport-in-app (:app app)
+    (remove viewport app))
+  (remhash (id-of app) (id->app-of server))
+  (remhash (cookie-value-of app) (cookie-value->app-of server)))

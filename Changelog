@@ -1,0 +1,1843 @@
+01.15.2009 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Upgraded to jQuery-1.3.
+	  This seems to have improved performance a bit.
+
+	* Most of the broken examples are now fixed.
+
+
+
+01.07.2009 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Bordeaux-Threads mucks up the *RANDOM-STATE* variable ..
+	  I've made a quick fix for this; pull Aromyxo and make sure you remove
+	  fasls before recompiling.
+
+
+
+12.24.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* URL or browser history support should be back online.
+	  examples/history.lisp has been updated.
+
+
+
+12.23.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Bug fix: Safari had a meltdown on some of the JavaScript code.
+
+
+
+12.10.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Versions of SBCL older than 1.0.23.2 has a nasty bug in
+	  sb-ext:string-to-octets. The INSTALL file has been updated and now
+	  mentions this.
+
+
+
+12.08.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* INSTALL: Added link to a Lighttpd-1.5.x .deb and a suggested
+	  configuration of Lighttpd-1.5.x.
+
+	* SW:*SERVER-CLOSE-CONNECTION-P* is now NIL by default.
+	  Some proxies do not like this, but INSTALL explains this.
+
+
+
+12.07.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* OPTIMIZATION: The same HTTP header octets are no longer generated over
+	  and over again for what is static content anyway.
+	  Pull SW-HTTP and Aromyxo before compiling.
+
+
+
+12.05.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Migrated from Hunchentoot to SW-HTTP.
+	  See: http://groups.google.com/group/symbolicweb/web/hunchentoot----sw-http
+
+	* INSTALL and TUTORIAL files have been updated.
+
+
+
+12.01.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* The default RENDER method for applications generate the stuff needed
+	  for IE to run in "standards mode" now.
+
+
+
+11.30.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Bugfix: *REQUEST-TYPE* was not converted to keywords like before,
+	  this is turn caused stuff in viewport.lisp to "wake up" the comet-
+	  machinery way to soon and waste extra round-trips client/server for
+	  nothing. This fix should improve performance quite a bit in some
+	  cases.
+
+
+
+11.27.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* FILTERED-MODEL and FILTERED-CONTAINER-MODEL: New classes/features.
+	  I've updated examples/mvc-container.lisp now; it shows how these
+	  things can be used. All this MVC-stuff Still needs more work and
+	  testing.
+
+
+
+11.26.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* MVC support for COMBO-BOX widget.
+
+
+
+11.24.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* SECURITY BUG: By default, SW should set *RANDOM-STATE* to something,
+	  well, random. If you need the previous behavior (debugging?) see
+	  config.lisp. Also, the session/cookie ID is generated with data from
+	  /dev/urandom.
+
+	* CHANGED-P-OF: Method added to CHECKBOX widget.
+
+	* WINDOW: Very simple widget added. SHOW-WINDOW function has been added
+	  and exported also.
+
+
+
+11.17.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* WITH-EACH-VIEWPORT-IN-SERVER: New macro added.
+
+
+
+11.13.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* *COMPILATION-INLINING-P*: New variable which controls much of the
+	  inlining done while compiling SW. I'm building with safety and debug
+	  proclaimed to 3 which results in quite long build times when this
+	  variable is T: "394.908 seconds of real time" (6.5 minutes) vs.
+	  "83.245 seconds of real time" (1 minute..) when it is NIL. It has
+	  been set to NIL by default.
+
+
+
+11.11.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* API-change: HTML-CONTAINER no longer assign default actions for
+	  ON-CNT-ADD and ON-CNT-REMOVE events; the :ADD-DEFAULT-CONTAINER-FNS-P
+	  initarg is NIL by default instead of T.
+
+	* API-change: All events by default trigger the browsers default event
+	  handler after handling the user-defined event.
+
+	* BROWSER-DEFAULT-ACTION-P: New feature and keyarg for events. It controls
+	  whether the browsers default event handler is to fire or not.
+
+	* FORM and FORM-ELEMENT: New classes/features. These enables one to
+	  setup a relation between a form and a set of widgets and determine
+	  whether these widgets, or form-elements, have valid values and deal
+	  with this in various ways if this is not the case. See the source code
+	  for now. An example will come later; in general all examples in SW need
+	  updates/fixes at this point.
+
+
+
+11.10.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Back to using a hash-table for storage of DOM attributes,
+	  CSS-properties and event-bindings. Things should be faster and take
+	  up less space.
+
+	* TABINDEX: New attribute.
+
+
+
+11.08.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added better support for serving of static content without use of
+	  subdomain:
+
+	    (start-sw :port 5001 :static-data-subdomain nil :static-data-path "/sw-static")
+
+
+	..see server.lisp for other keyargs; in particular STATIC-DATA-FS-PATH.
+
+
+
+11.07.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* SET-LOADING-P: New function/feature. Setting this to T will change
+	  the mouse-cursor to an hourglass (or similar).
+
+
+
+11.03.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* TUTORIAL: Updated to reflect recent changes.
+
+	* The default RENDER method for applications has the HTML accesskey `1'
+	  bound to a mechanism that triggers a delete of the session.
+	  `2' triggers the display of a dialog with session information.
+	  (Alt-Shift-1 and Alt-Shift-2 in Firefox).
+
+	* SERVER: New class. HUNCHENTOOT-SERVER is also new. This stuff will
+	  make it easier to deal with static files and data.
+
+	* API-change: DEFURI has been removed; SET-URI is its replacement.
+
+	* GET-WIDGET deprecated; use GET-OBJ instead.
+
+	* GET-OBJ added.
+
+
+
+11.03.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* ALERT-BOX: New widget. Very simple.
+
+
+
+10.31.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Rename of class VIEW and everything "view" to VIEWPORT.
+
+
+
+10.20.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* I've converted a lot of low-level stuff from methods to functions,
+	  declaimed them to be inline and added declarations for speed. This
+	  increases compile-time by quite a bit so some way to control
+	  declarations needs to be added later.
+
+	* Moved all the "model-related" code from widgets/container.lisp to
+	  models.lisp.
+
+
+
+10.19.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added support for "weak callbacks" which enables state or
+	  data-propagation to objects that might be GCed without the
+	  source-object having to deal or think about this. Note that you should
+	  still remove callbacks explicitly using REMOVE-CB when this is
+	  possible as this improves the performance of your application and
+	  lessens the load on the server. This is currently implemented as
+	  weak hash-tables in models.lisp.
+
+	* ADD-CB and REMOVE-CB methods added. Use these to add or remove
+	  callbacks to widgets instead of manipulating the ON-ADD-FNS etc.
+	  slots directly.
+
+	* Moved lots of stuff from widgets/container.lisp and
+	  widgets/widget.lisp to models.lisp
+
+
+
+10.17.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* TAB: MK-TAB-PANE accepts a function for its CONTENT argument now.
+
+
+
+10.16.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* CONTAINER: Adding or removing multiple children in one go is dealt
+	  with more correctly in context of the ON-CNT-ADD-FNS and
+	  ON-CNT-REMOVE-FNS stuff.
+
+
+
+10.15.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* New feature for MK-ON-REMOVE-FN, MK-ON-ADD-FN callback generation
+	  macros; these now accept a ONCE-ONLY-P keyarg which if supplied with
+	  T will make the callback remove itself automatically from the
+	  ON-***-FNS slot when called.
+
+	* COMBO-BOX: (SETF ACTIVE-ITEM-OF) now also accepts value-designators
+	  (what was supplied as VALUE parameter when calling MK-CB-ITEM) instead
+	   of only direct CB-ITEM instances.
+
+
+
+10.14.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* ON-ADD-FN and ON-REMOVE-FN slots/feature added to WIDGET.
+
+	* ON-ADD-FN and ON-REMOVE-FN type stuff related to CONTAINER has been
+	  renamed to ON-CNT-ADD-FN and ON-CNT-REMOVE-FN.
+
+	* CONTAINER: Better and more complete doc-strings, and a couple of bug-
+	  fixes.
+
+	* WIDGET: Better and more complete doc-strings.
+
+
+
+10.13.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* WIDGET: ON-RENDER-FNS slot added/refactored. See its docstring.
+	  MK-ON-RENDER-FN helper-macro added.
+
+	* WIDGET: ON-VISIBILITY-CHANGE-FNS slot added/refactored. See its
+	  docstring. MK-ON-VISIBILITY-CHANGE-FN helper-macro added.
+
+	* COMBO-BOX: New method; (VALUE-OF COMBO-BOX). It returns the value part
+	  (what was supplied for the VALUE argument when calling MK-CB-ITEM) of
+	  the currently active or selected CB-ITEM.
+
+
+
+10.12.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* TEXT-INPUT: ON-CHANGE event is supplied with a value T by default now.
+	  This makes sense in about 90% of all user-cases; supply NIL for the
+	  old behavior.
+
+	* TEXT-AREA: New widget. Basically a simple wrapper around the standard
+	  HTML TEXTAREA tag.
+
+	* HTML-CONTAINER: Now includes bound slots from superclasses when
+	  AUTOMATICALLY-ASSIGN-CHILDREN-P is T. Pull Aromyxo before
+	  re-compiling.
+
+
+
+10.11.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* GET-WIDGET: New method/feature. Handy in the REPL.
+
+	* MK-ON-ADD-FN and MK-ON-REMOVE-FN helper macros added. They can be used
+	  in context of the :ON-ADD-FN and :ON-REMOVE-FN initargs for CONTAINER.
+
+	* MK-CB helper macro added. This can be used when creating callbacks for
+	  DOM events. examples/chat.lisp has been updated to show this in use;
+	  I'll update the other examples later. It also binds the current
+	  instance to SELF. From the doc-string:
+
+	  This also binds the current instance to SELF which enables one to do things like:
+
+	    (defwidget add-user-dialog (html-container)
+	        ((save-btn :reader save-btn-of
+                           :initform (mk-button "Save and add user"
+                                                :on-click (mk-cb (button)
+                                                            (declare (ignore button))
+                                                            (save self))))))
+
+  	    (defmethod save ((add-user-dialog add-user-dialog))
+	        (write-line \"save!\"))
+
+
+
+10.10.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* CONTAINER and HTML-CONTAINER: Much better doc-strings has been added.
+
+	* CONTAINER: ON-ADD-FN / ON-REMOVE-FN machinery has been improved.
+
+	* HTML-CONTAINER: Adding and removing widgets will now update the client
+	  correctly, and/or it is possible to specify _how_ the client is to
+	  update when these events occur.
+
+	* HTML-CONTAINER: New feature; AUTOMATICALLY-ASSIGN-CHILDREN-P.
+	  It allows one to control whether slots in a HTML-CONTAINER
+	  automatically are assigned as children, and whether the GENERATE-HTML
+	  method also assigns children automatically.
+
+
+
+10.09.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Removed as much of the am-conc usage as I could and replaced it
+	  with use of bordeaux-threads. Pull Aromyxo and remove fasls before
+	  building.
+
+	* Thread-safety mechanisms of code simplified (and improved, I hope)
+	  a great deal. I'm leaving a bit more up to the application developer;
+	  the examples have been updated (chat.lisp and phidgets-888.lisp).
+
+	  The biggest change is that container widgets no longer do any
+	  automatic locking; see the changes in chat.lisp for what this will
+	  mean for application-code.
+
+	* LOCKED-OBJECT: New utility/helper class. Application developers can
+	  use WITH-LOCKED-OBJECT to make sure access to a widget will be safe
+	  wrt. cases where an event from the client might concurrently access
+	  and manipulate the widget.
+
+	* CONTAINER: Slot and initarg HTML-ELEMENT-TYPE renamed to ELEMENT-TYPE.
+
+	* Got rid of some of the shtml vs. html vs. html-content mess.
+
+	* TAB: New widget added.
+
+	* API-breakage: Event callbacks has the widget as the first non-keyarg
+	  argument (again ..). This means setting up callbacks looks something
+	  like this:
+
+	   (setf (on-click-of button)
+	         (lambda (button &key)
+	           (write-line "button was clicked!")))
+
+	  ..to avoid the warning from SBCL about unused arguments, you can add
+	  declarations as usual or use the iambda helper macro:
+
+	   (setf (on-click-of button)
+	         (iambda
+	           (write-line "button was clicked")))
+
+
+
+10.08.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Pull Aromyxo before re-compiling! There has been some API-breaking
+	  changes; the examples have been updated.
+
+	* Huge cleanups in widgets/dom-cache.lisp. SLIDER is still broken
+	  after these changes; I will fix this later.
+
+	  Attribute, CSS and event data is stored in slots instead of in a hash-
+	  table in WIDGET. This should solve some annoying problems and make
+	  things _very_ flexible, as a bonus things are a lot simpler too.
+
+	* Got rid of the dependency on "defclazz" too.
+
+	* Small change to COMBO-BOX API.
+
+
+
+10.07.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* CONTAINER-WITH-1-ACTIVE-ITEM: New widget or "helper widget" added.
+	  It maintains a common pattern where one would like to have only 1
+	  active item in a CONTAINER at a time. Examples are COMBO-BOX or TAB
+	  widgets. [widgets/container-with-1-active-item.lisp]
+
+	* STATE-PROPAGATION: New class. Used by widgets which maintains some
+	  sort of state and would like to signal others about changes in this
+	  state. [state-propagation.lisp]
+
+
+
+10.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* COMBO-BOX: New widget added.
+
+	* CONTAINER: New features; ON-ADD-FN, ON-REMOVE-FN and TYPE-CHECK-FN
+          slots added. See their doc-strings.
+
+	* HTMLIZE: New function added (and exported).
+
+	* Arguments passed to ON-STATE-CHANGE callbacks (widget.lisp)
+	  have changed.
+
+	* *CURRENT-EVENT-WIDGET*: New special variable. This will be bound to
+	  the server side widget instance that had an event triggered for it.
+
+
+
+10.05.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* (SETF (ON-CHANGE-OF TEXT-INPUT) T) and
+	  (SETF (ON-ENTERPRESS-OF TEXT-INPUT) T)
+	  ..should work as expected now.
+
+
+
+09.25.2008 Lars Rune Nøstdal
+	
+	* Added missing attribute 'class' via accessor CSS-CLASS-OF.
+	
+
+	
+09.20.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* SPIN-BUTTON: Bug fix; added support for missing initargs.
+	  Thanks "budden"!
+	
+
+	
+09.13.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* sw-ajax.js: swComet doesn't create as much garbage (new closures) on
+	  each round-trip now.
+	
+
+	
+09.12.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Fixed some potential bugs in the WITH-HTML-CONTAINER macro.
+	  Thanks for the note "budden"!
+	
+	
+
+09.11.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Removed the thread-spawning in ajax.lisp.
+
+	* Code in code.lisp, view.lisp and comet.lisp cons less.
+	
+	* Added queue to AJAX requests (client side events).
+	  Note that this only guarantees sequence of delivery at the server end;
+	  not the other way around.
+
+
+	
+09.10.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* PAGINATION: (SETF (CURRENT-PAGE-OF PAGINATION) ..) now throws an error
+	  PAGINATION-OUT-OF-BOUNDS if the PAGE-NUM argument is out of bounds.
+	  No change is made and no ON-* event/callback is triggered in this case.
+
+	* TEXT-INPUT: *OLD-VALUE* is now bound while the ON-ENTERPRESS handler
+	  runs.
+
+	* *OLD-VALUE* exported.
+
+	* PAGINATION: New exported method; (FORCE-UPDATE PAGINATION).
+
+	* PAGINATION: New slot ON-PAGE-CHANGE-FN.
+
+	* PAGINATION: Added some missing initargs.
+
+	
+
+09.02.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* PAGINATION: TOTAL-NUM-ENTRIES should be 0 at the start and reader is
+	  exported.
+
+	
+
+08.25.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* TOGGLE-BUTTON: User defined handler for ON-STATE-CHANGE now has a
+	  non-local exit (CATCH tag) ABORT-STATE-CHANGE which can be
+	  triggered by THROW.
+
+	
+
+08.23.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* ON-VISIBILITY-CHANGE will be called when sessions/views time out now.
+
+	* Added (REMOVE VIEW) method. Probably only useful for internal stuff
+	  in SW.
+	
+
+	
+08.22.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* New exported method: INSERT (in container.lisp).
+	  It takes keyargs :BEFORE or :AFTER.
+
+	* TEXT-INPUT now accepts T as argument for :ON-CHANGE.
+	  This will make any DOM 'onchange' event trigger a sync of the server
+	  side value attribute with the client side one.
+
+	
+	
+08.21.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* New exported functions: OPREPEND and OADD (from container.lisp). Also,
+	  the old PREPEND and ADD methods will use OPREPEND and OADD when the
+	  second argument is a WIDGET (not a CONTAINER).
+	  See their docsstrings for details.
+
+	
+	
+08.20.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added very simple code that checks if cookies are enabled.
+
+	* Bugfix: Quote the default symbol for WITH-EACH-VIEW-IN-APP.
+
+	* New exported method: (SHARED-P-OF WIDGET). It returns T when widget is
+	  visible in multiple contexts (browsers, windows or tabs). See the
+	  docstring for details.
+
+
+	
+08.18.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* PAGINATION is now "urlizable"; page number can be serialized to the
+	  URL, then serialized back again. Code still needs more work, but it
+	  works for simple stuff.
+
+	* The ID slot is bound earlier in OBJECT now. This helps with regards to
+	  error messages and debugging.
+
+	
+
+08.16.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* The STATE<-URI-VALUE method now takes a third argument
+	  FROM-BROWSER-HISTORY-P. If T the change came from the user
+	  manipulating the back/forward buttons in the browser. If NIL the
+	  change came from a page load or page refresh.
+	  
+	
+
+08.15.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added :VALUE-MARSHALLER support while extracting JS code:
+
+	    > (js-code-of (nilf (checked-p-of (mk-checkbox t))))
+	    "$(\"#checkbox-566\").attr(\"checked\", decodeURIComponent(\"\"));"
+	    > (js-code-of (tf (checked-p-of (mk-checkbox t))))
+	    "$(\"#checkbox-567\").attr(\"checked\", decodeURIComponent(\"checked\"));"
+
+	* ADDRESS-BAR has had some bugfixing and addition of features.
+	  See examples/checkbox.lisp, which has been updated.
+	
+	
+
+08.14.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Bug fix: RUN can return values from the client again now.
+	  Thanks for the report, Jim Prewett!
+	
+	
+	
+08.13.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* HTML-ELEMENT: Should be (more) thread-safe now.
+
+	* Added declarations to optimize for speed in comet.lisp and in the
+	  CONTAINER and HTML-ELEMENT widgets. This reduces overal consing by
+	  about 50%.
+
+	* Supplying a :DISPLAY initarg (CSS) for CONTAINER and HTML-ELEMENT type
+	  widgets will generate correct HTML now.
+
+	* CONTAINER and HTML-CONTAINER: Bugs fixed.
+
+	* Made PRINT-OBJECT for a couple of widgets look a bit better.
+
+	* The INSTALL and TUTORIAL files have been updated to reflect the changes
+	  below.
+
+	* API change: JS-SW-HEADERS requires an instance of APPLICATION as
+	  argument now.
+
+	* APPLICATION: New initarg :USE-DNS-SERVER-P.
+
+	* Client side JavaScript will attempt to work even though the user isn't
+	  making a request to a host that supports subdomains now.
+
+	* Event bootstrap code is a bit "safer" (it doesn't break the code in
+	  TUTORIAL anymore x)). A FIXME has been added to widgets/events.lisp.
+
+	* Removed HTML-ID-OF and the old HTML-ID<-JS-ID function, and got rid
+	  of the "ID confusion" wrt. jQuery requiring a # character prefix to
+	  refer to "widgets" at the client end.
+	  This trades a little flexibility for simplicity; ID-OF is used
+	  everywhere now.
+
+	* New exported method: ON-VISIBILITY-CHANGE-OF (SETFable).
+
+	* PAGINATION is now "urlizable", and any object (not just widgets) can
+	  be serialized or "urlized" via the ADDRESS-BAR API (address-bar.lisp)
+	  now. The objects must implement the URI-VALUE<-STATE,
+	  STATE<-URI-VALUE and URLIZED-P-OF methods to be "urlizable".
+
+	* (VISIBLE-P-OF WIDGET): Simpler, faster.
+
+	
+
+08.10.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	
+	* The :URLIZED-P keyarg accepts a new value :NO-HISTORY. Take a look at
+	  examples/checkbox.lisp to see this in effect. As a note; this is
+	  useful when you don't want to add, say, pagination to the browser
+	  history but still would like to enable to user to link to the page.
+
+	* HTML-ELEMENT is now "urlizable".
+
+
+	
+08.09.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Made SPIN-BUTTON use the ON-STATE-CHANGE mechanizm and updated
+	  examples/spin-button.lisp.
+
+	* Moved ON-STATE-CHANGE type stuff to a centralized location in WIDGET.
+	  Updated the checkbox.lisp and radio-button.lisp widgets and examples
+	  to reflect this.
+	
+	* Fixed brokenness in MK-LABEL. x)
+	
+
+	
+08.08.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* ADDRESS-BAR: "Urlized" widgets no longer have to be part of a VIEW.
+	  Just add them to the address bar ("the URL") using the
+	  ADD-TO-ADDRESS-BAR method. examples/views.lisp has been updated and
+	  shows this in action.
+
+	* HTML-ELEMENT: Sends more data to the client in "one go" now.
+	  This should improve performance and reduce bandwidth usage.
+
+	* API change: WITH-HTML-CONTAINER now wraps the HTML argument in a WHO
+	  macro. See the examples.
+
+	* New function: MK-LABEL. See examples/checkbox.lisp or
+	  examples/radio-button.lisp for usage.
+
+	* New non-local exit (CATCH tag), CANCEL-SETTER, available for "setters"
+	  (attributes, css and events). I use it in the (SETF CHECKED-P-OF) :BEFORE
+	  method in widgets/checkbox.lisp; it should probably be put to use
+	  elsewhere also.
+
+	* CHECKBOX is now "urlizable".
+
+	* New config option: +ADD-NEWLINES-TO-JS-CODE-P+.
+	
+	* MK-WHOD and MK-WHOS has had their arguments reversed; it looks better.
+
+	* Fixed a couple of WTFs in code.lisp ..
+
+	* Removed IE8 from supported browsers; it's still too much of a moving
+	  target.
+
+	* Added PRINT-OBJECT methods to the WIDGET, HTML-ELEMENT, ADDRESS-BAR,
+	  VIEW and APPLICATION classes.
+
+	* New exported function: ADDRESS-BAR.
+	
+
+	
+08.07.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added new (very simple) example in examples/checkbox.lisp and fixed
+	  some problems in widgets/checkbox.lisp.
+	  Thanks Xiangjun Wu!
+
+	* New exported function REAL-HTML-OF:
+	
+	    > (real-html-of (mk-h1 "Hello World"))
+	    "<h1 id='html-element-12'>Hello World</h1>"
+	    > (html-of (mk-h1 "Hello World"))
+	    "Hello World"
+
+	* New exported function MK-STATIC-URL and new slot
+	  STATIC-STORAGE-URL in the APPLICATION class.
+
+	
+
+08.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Checked against latest versions of CFFI and CL-PPCRE.
+
+	* WIDGET: ON-RENDER slot etc. accepts a single function as argument now;
+	  it doesn't have to be a list of functions.
+
+	* Renamed MK-WHO to MK-WHOD and added MK-WHOS. These are now DIV and SPAN
+	  "versions" of the wrappers around CL-WHO.
+
+	* The HTML element wrappers generated in html-elements.lisp no longer
+	  create instances of CONTAINER, but instead instances of the simpler
+	  HTML-ELEMENT.
+	  This should generate not-so-messy and incorrect HTML, and make things
+	  faster.
+
+	* Removed the SPAN widget. It is replaced by more general HTML-ELEMENT
+	  widget. The MK-SPAN function is still around (in html-elements.lisp).
+
+	* Calls to RUN (and there are a lot of them) do not generate JS code
+	  calls to $.swRun anymore. This removes client-side error checking and
+	  transportation of client-side exceptions back to the server; use
+	  Firebug instead. To re-enable the "old way",
+	  set *TRANSPORT-CLIENT-SIDE-EXCEPTIONS-TO-SERVER-P* to T (while
+	  debugging under IE for instance).
+	  This should improve performance.	  
+
+	* New exported functions: FADE-IN and FADE-OUT. They are small wrappers
+	  around the jQuery effect functions.
+
+	* New exported macro MK-WHO. It's creates instances of DIV with the HTML
+	  part defaulting to CL-WHO content:
+
+	    (mk-who ((:h1 "Hello World")) :background-color "red")
+	
+	    (fade-in (setf (child-of *root*) (mk-who ((:h1 "Fancy")) :display "none")))
+	
+	* Added a silly workaround for ADDRESS-BAR. When serializing from URL to
+	  widget state, make sure widgets like LOCATION-CALLBACK and
+	  LOCATION-CONTAINER are serialized last. I added a FIXME note because
+	  this needs more thought ..
+
+	* Changes to pagination code (src/pagination.lisp). TODO: Add example!
+
+	* New function ADD-CURSOR-RECORDING-TO and an early start of a new
+	  "utility widget": CURSOR. Not complete yet, but it allows one to get
+	  a reading of where the mouse cursor is at the client. This could be
+	  useful or interesting in a shared widget scenario as mentioned
+	  briefly here:
+	  http://groups.google.com/group/symbolicweb/browse_frm/thread/3a52427b442dec75
+	  This thing isn't complete yet ..
+
+
+
+08.05.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Bug fix: ' characters handled correctly in Firefox when urlizing now.
+
+	* Bug fix: SPIN-BUTTON bootstraps proper when *VIEW* is NIL now
+	  (when storing the widget in a :ALLOCATION :CLASS slot).
+
+	
+	
+08.04.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* NOTE: There has been changes in Aromyxo; pull it before compiling SW.
+
+	* New exported function MK-HREF. I'll add an example showing how it can
+	  be used later.
+
+	* TEXT-INPUT: Event handlers for ON-ENTERPRESS will be provided with a
+	  key-arg :VALUE by default now. Also, setting :ON-ENTERPRESS to T on
+	  construction will setup a default handler (see the initialize-instance
+	  method in widgets/text-input.lisp).
+
+	* New example: examples/urlizing.lisp. Shows serialization of state from
+	  TEXT-INPUT widgets to URL. This should handle unicode now.
+
+	* examples/history.lisp is a bit more interesting.
+
+	* Bug fix: Callbacks for widgets with the same ID works as they should
+	  now. The solution was to move the storage of callbacks into the VIEW
+	  class.
+
+	* Minor fix to INSTALL file. Thanks 'budden'!
+
+	* TEXT-INPUT: New exported method CHANGED-P-OF.
+
+	* ADDRESS-BAR: Supplying ADD-TO-ADDRESS-BAR OR REMOVE-FROM-ADDRESS-BAR
+	  with :REPLACE-P T after it has been supplied with NIL in a previous
+	  call is now handled  correctly; it is ignored and an history entry
+	  will be added at the client.
+
+	* ADDRESS-BAR: The STATE<-URI-VALUE method will now recieve an empty
+	  string (as sent from the client) instead of being converted to a NIL.
+	  This is simpler; we'll let each widget deal with this themselves
+	  instead.
+
+	* ADDRESS-BAR: Client side code (javascript/sw/sw-ajax.js) should handle
+	  unicode much better now.
+
+	* New exported macro: WITH-JS-CODE-ONLY.
+
+
+
+07.29.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	
+	* New example in examples/empty-page-without-dns-server.lisp
+	  It shows how to run applications on SW without a DNS server installed.
+
+	
+
+07.28.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Firefox 2.x and 3.x is no longer stuck in an "always loading" mode.
+
+	* Added and exported functions like WIDGET-P CONTAINER-P BUTTON-P
+	  etc. ..
+
+	* APPLICATION now has a member WIDGETS (weak hash table).
+
+	* It is again possible to manipulate widgets that are not part of the
+	  current view (but they must be part of the current session) via the
+	  URL again. This makes sense in some scenarios.
+	
+
+	
+07.27.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* NOTE: Big change wrt. what is needed to run SymbolicWeb for tab/window
+	  support in browsers; breaking free of the 2 connection limit of HTTP.
+	  Short version is that you need to run Bind or a similar DNS server
+	  on your localhost to do development there. Slightly longer version
+	  explaining how to set this up and why this is needed is explained in
+	  the INSTALL file (see the `Requirements' section).
+
+	* API change: *SW-HEADERS* removed in place for JS-SW-HEADERS function.
+	  Grep the examples/ directory for usage.
+
+	* API change: New method RENDER-VIEW exported and is required to use
+	  in most scenarios. See the examples, which are updated to reflect this.
+	  The reason for this is related to the tab/window support.
+
+	* API change: MK-LOCATION-CALLBACK now expect a list of conses for its
+	  CALLBACKS argument. In general, the CALLBACKS slot in LOCATION-CALLBACK
+	  must contain a list of conses.
+
+	* API change: MK-HTML-CONTAINER. See its new definition in
+	  widgets/html-container.lisp
+
+	* New syntax extension for CL-WHO. The :SW tag has special use or
+	  meaning. See examples/counter.lisp
+
+	* New exported macro: WITH-HTML-CONTAINER. See usage in
+	  examples/counter.lisp
+	
+	* CONTAINER now uses DIV as default HTML-ELEMENT-TYPE.
+
+	* New exported functions:
+
+	    MK-DIV MK-P MK-B MK-H1 to MK-H6 MK-STRONG MK-EM MK-U MK-UL and MK-LI.
+
+	  They create instances of CONTAINER. The methods (HTML-OF CONTAINER)
+	  and (SETF (HTML-OF CONTAINER) ..) have also been added. This can be
+	  used like this:
+
+	    SW> (let ((some-p (mk-p "Hello World")))
+                  (setf (html-of some-p) (reverse (html-of some-p)))
+                  (html-of some-p))
+            "dlroW olleH"
+
+	* New exported functions: WIDGET-P and CHILDREN-P.
+	
+	* SW now wakes up the "comet channel" as late as possible, see
+	  (SETF RESPONSE-DATA-OF) :AFTER in view.lisp.
+	  This improves performance, and reduces the number of round-trips
+	  triggered.
+
+	* New exported method: (PREPEND-TO CONTAINER WIDGET).
+
+	* New exported variable: *CREATING-NEW-VIEW-P*. It T whenever the user
+	  has requested or created a new browser tab or window. Probably only
+	  useful when creating new widgets.
+
+	* New exported macros: WITH-EACH-VIEW-IN-APP and WITH-EACH-VIEW-OF-WIDGET.
+	
+	* New exported function: FOR-EACH-VIEW-IN-APP and FOR-EACH-VIEW-OF-WIDGET.
+
+	* New exported function FIND-VIEW.
+
+	* The function APP has been renamed to FIND-APP.
+
+	* New exported variable: *VIEW*. It's bound to the view instance of the
+	  current request.
+
+	* New exported variables: *AUTO-SET-APP-P* and *AUTO-SET-VIEW-P*.
+	  They are both T by default, which will cause *APP* and *VIEW* to be
+	  bound to the last active session and view respectively. This is useful
+	  while doing development.
+
+	
+
+07.21.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* All event callbacks now recieve a new key arg :WIDGET.
+
+	* New widget SLIDER added by Stas Boukarev <stassats@gmail.com>
+	  Example also added in examples/slider.lisp.
+	  Thanks!
+
+	
+
+07.08.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* New exported reader: (HTML-ID-OF WIDGET). See its doc-string.
+
+	* New exported reader: (WIDGETS-OF APPLICATION). It contains a hash of
+	  all currently active and visible widgets in the session.
+
+	* Added NOSCRIPT to examples as suggested by "SoupDragon".
+
+	* Added html label to examples/radio-button.lisp as suggested by
+	  "SoupDragon".
+
+	
+
+07.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* TRIGGER accepts server-side arguments allowing one to fake a call from
+	  the client that includes arguments also.
+
+	* New exported reader: (HAS-CLIENT-SIDE-SIDE-EFFECTS-P-OF CALLBACK-BOX).
+	  It's probably most useful for internal code; TRIGGER can use it to
+	  avoid a not needed round-trip to the client in some cases.
+
+	    (has-client-side-side-effects-p-of (on-click-of some-button))
+	     => T or NIL
+
+	* New exported accessor: (ON-RENDER-OF WIDGET). See its doc string.
+
+	* New exported method: (NUM-CHILDREN-OF CONTAINER).
+	  It's faster than doing things like:
+	    (length (children-of container))
+
+	  ..when there are many children and you do it often.
+
+	* New CSS property: OVERFLOW. This exports the SETFable method
+	  OVERFLOW-OF.
+
+	* New exported method: (SCROLL-TO-BOTTOM WIDGET).
+
+	* New exported method: (FOCUS WIDGET).
+
+	* New exported method: (ON-REFRESH APPLICATION). It is useful in
+	  combination with FOCUS if you want to make sure a certain widget has
+	  focus when the page is loaded or refreshed.
+
+	* New exported macro: WITH-JS-CODE-FROM. See its docstring for an
+	  example of usage.
+
+	
+	
+07.04.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Using minified jQuery file by default now.
+
+	* Added DISABLED-P attribute for BUTTON and TEXT-INPUT widgets.
+
+	* Navigation (back/forward button in browser), history and
+	  referenceability works in IE7 and IE8 now.
+
+	* Added :VALUE-MARSHALLER in dom-cache.lisp. It's currently used by
+	  button.lisp and text-input.lisp for their DISABLED-P etc. attributes,
+	  and will come in handy later too.
+
+	
+
+06.22.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Possible to do this now:
+
+	  (add-to *root* (mk-span (iambda (random 10000))))
+
+	
+
+06.20.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Fixed regression; forgot to use 'encodeURIComponent' in
+	  :CALLBACK-DATA for events. Thank you for reporting this
+	  Ismaël Ruau!
+
+	* Did some testing on Internet Explorer 8 and made some changes to
+	  the URL handling code.
+
+	
+	
+06.19.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	
+	* New exported macros; WITH-LOCKED-WIDGET and WITH-LOCKED-WIDGETS.
+	  Will probably need these later when cleaning up for thread-safety.
+	
+	* TEXT-INPUT widget is now "urlizable".
+
+	* New exported method (SETF URLIZED-P-OF).
+	
+	* New exported function ADD-HISTORY-ENTRY. It forces the current state
+	  to be "added to" the browser history.
+
+	* Made the "urlize" API and implementation simpler and a bit less
+	  stupid.
+	
+	* SPAN now accepts a function/method for its :HTML initarg.
+	  HTML-CONTAINER is a subclass of SPAN now so this applies to it to.
+
+	* New special variable *OLD-VALUE*. It is bound while SETFing a slot
+	  defined by the dom-cache machinery. This enables one to do things like:
+
+	    (defmethod (setf value-of) :after (new-value (text-input text-input)
+	                                      &key &allow-other-keys)
+	      (unless (equal *old-value* new-value)
+	        (update-something-based-on-real-change-in text-input)))
+	
+
+	
+06.16.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added beginnings of a new example in examples/many-shared-widgets.lisp.
+
+	* Made significant changes to the bootstrapping of a SW page.
+
+	* Fixed bugs in container widget. It should work more correctly in
+	  shared widget scenarios now.
+
+	* Made SPIN-BUTTON example a bit more interesting.
+
+	* New exported method ADD-TO. it works the same as ADD* but has a better
+	  name IMHO.
+	
+	* Made SPIN-BUTTON inline (the CSS "display" property) by default.
+	  This makes sense seeing as it inherits from the SPAN widget (via the
+	  HTML-CONTAINER widget) which is inline by default.
+
+	
+
+06.15.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* The SPIN-BUTTON widget now accepts user input directly via its
+	  TEXT-INPUT widget by default. It uses the function in its
+	  PARSE-NUMBER-FN slot to parse the returned string into a number.
+
+	* Added new example for SPIN-BUTTON widget in
+	  examples/spin-button.lisp
+
+	* Added DISABLED-P-OF and READONLY-P-OF methods to TEXT-INPUT widget.
+
+	* Added new example for RADIO-BUTTON widget in
+	  examples/radio-button.lisp
+
+	* New exported functions MK-RADIO-BUTTON and MK-RADIO-BUTTONS.
+
+	* CSS attributes/properties now accept other value types besides
+	  strings.
+
+
+	
+06.14.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added PASSWORD-P slot and initarg for TEXT-INPUT widget4.
+
+	* New ON-ENTERPRESS-OF methods added for TEXT-INPUT. This simplifies the
+	  code in examples/chat.lisp a bit.
+
+	* New example in examples/login.lisp
+
+	* Made :JS-BEFORE and :JS-AFTER initargs work with events that has JS
+	  supplied for "value" (where lisp side callback/function would normally
+	  go). See the new examples/login.lisp for usage.
+
+	* Attributes can now be set to other values than string types.
+	  An example of this in action is shown in the new SPIN-BUTTON widget.
+
+	* Some incompatible changes to HTML-CONTAINER.
+	  See examples/phidgets-888.lisp for usage, but basically just use
+	  (SETF (HTML-OF html-container-instance) ...) instead of defining a
+	  GENERATE-HTML method.
+
+	* New widget: SPIN-BUTTON added
+	  (with help from "Prabuinet"; thank you!)
+
+	
+
+06.08.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* JS-CODE-OF now works with HTML-OF and (SETF HTML-OF).
+
+	* New slot CHANGE-TEST-FN in LOCATION-CALLBACK widget.
+
+	
+	
+06.07.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* New widget and feature: LOCATION-CALLBACK.
+	  See new file examples/location-callback.lisp for usage.
+
+	* *ROOT* is now a symbol macro.
+
+	* New widget and feature: LOCATION-CONTAINER.
+	  See new file examples/location.lisp for usage.
+
+	* New method: (ADD* CONTAINER &rest WIDGETS). It is used in
+	  examples/location.lisp.
+	
+
+	
+06.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Entries in the dom-cache internals can be removed entirely now.
+	  This applies in particular when doing things like:
+
+	    (setf (on-click-of something) nil)
+
+	* Added support for specifying JS code as "callback" instead of a
+	  server-side callback function. An example of doing this is shown
+	  here:
+
+	    http://groups.google.com/group/comp.lang.lisp/msg/d26a0bbfca0b81d7
+	
+
+	
+06.05.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* STATE<-URI-VALUE no longer does an extra round-trip.
+
+	* Added support for navigation (back/forward button in browser),
+	  history and referenceability in GUIs as described in this thread:
+
+	    http://groups.google.com/group/comp.lang.lisp/msg/f5ebaafee091eda7
+
+	  Only the TOGGLE-BUTTON widget is serialized for now though. I'm just
+	  pushing this early to get it "out there". More work needs to be done
+	  on both the new JS code and Lisp code.
+
+	* Added new example in examples/history.lisp to show the new feature above
+	  in action.
+
+	* Upgraded jQuery to 1.2.6.
+
+	* Renamed WITH-APPS-OF to WITH-VISIBLE-CONTEXTS-OF.
+
+	* Simplified some of the bootstrapping code in hunchentoot.lisp and
+	  application.lisp
+
+	* The MK-*** functions are now declaimed inline.
+
+	
+
+05.31.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* The internally used CSS, EVENT and ATTRIBUTE methods only return
+	  data from the server side cache now. They no longer accept a
+	  :NOWP keyword. This applies for all functions that depend on these
+	  too of course, so this is a major API breaking change.
+	  Rationale is simplicity and speed.
+
+	* Added SW-NODE stuff in node/ for backup purposes really.
+
+	* Some major changes to the RUN methods. They are much simpler now and
+	  make more sense in a shared widget scenario.	  
+
+	* Marked WITH-FLAGS as deprecated. It'll be removed later.
+
+	* Removed src/attributes.lisp and css.lisp as mentioned yesterday.
+	  The attributes.lisp, css.lisp and events.lisp code in widgets/ is
+	  simpler and faster now.
+
+	* RUN in async mode should be faster.
+
+	
+	
+05.30.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Removed src/events.lisp. Next up is src/attributes.lisp and
+	  src/css.lisp. The reason for this is that SW has moved from
+	  a DOM-centric design to a more widget-centric one. This should
+	  have been done a "long" time ago.
+
+	* Storage of callbacks is now done outside the application/session
+	  scope. This makes sense now since widgets can be shared between
+	  multiple sessions. This allows one to do things like:
+
+	    SW> (add (mk-toggle-button (mk-span "hi") :display "block")
+                     (second (children-of (root-widget-of (app "5")))))
+
+	  ..in context of the chat.lisp example for instance.
+
+	
+	
+05.29.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Removed unnecessary locks in CONTAINER and HTML-CONTAINER
+	  constructors.
+
+	* Switched to a widget tree-based locking scheme instead of a pr.
+	  application semi-global type one. Probably slower initially
+	  but scales better.
+
+	* CONTAINER methods now return the added or removed widget instead of
+	  the container. I'm not sure what makes more sense to be honest.
+	  Any suggestions welcome.
+
+	* Minor changes to the locking in widgets/container.lisp.
+
+
+	
+05.28.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* A single widget instance can be shared between multiple
+	  applications/sessions now. This is a killer feature (IMHO)
+	  for things like a chat pane/tab/window. Testing needed ..
+	  
+	* New example added: examples/shared-counter.lisp, and some of the other
+	  examples has been updated to take use of the new shared widget scheme.
+	  The chat.lisp example is interesting.
+
+	* RUN accepts a new keyword :WIDGET. It defaults to (ROOT) which
+	  should make it maintain backward compatibility with already existing
+	  code out there.
+
+	* APP-OF has been renamed to APPS-OF and is now just a slot in the
+	  WIDGET class. This should improve performance.
+
+	* VISIBLE-P-OF does not traverse up the widget hierarchy now. The
+	  visibility of a widget is instead propagated from parent-widgets
+	  to their children when added or removed.
+	  This should improve performance since VISIBLE-P-OF is called
+	  quite often.
+
+	* The (ROOT) function is deprecated in place for the *ROOT* variable.
+	  It has not been removed, but will print a warning message to the REPL
+	  when used.
+
+	* WITH-ALL-APPS is deprecated and will probably be removed in place of
+	  the shared widget feature.
+
+	* Fixed bug in comet.lisp where old pending JS code might be sent on a
+	  page refresh. Also made some of the code in comet.lisp a bit faster.
+
+	* Simplified some of the code in hunchentoot.lisp. This should improve
+	  performance.
+
+
+	
+05.25.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* *ASYNC* is now T by default, globally. I'm not sure about this,
+	  but will try it for a while. Rationale is that I seem to do
+	  (with-flags (:async) ..) a lot. This means that one need to do
+	  this to return values now:
+
+	    (run "return 2 + 3" :async nil) => "4"
+
+	* The SPAN widget now accepts other values than strings for its
+	  (SETF HTML-OF) method. This is beneficial in these cases:	
+
+	    (setf (html-of some-span) 0)
+	    (incf (html-of some-span))
+	    (html-of some-span) => 1
+
+	  I'm considering doing something similar for other things also;
+	  attributes and css. 	
+
+	* New dependency: Alexandria. A lot of stuff has been removed from
+	  am-util because of this. Remember to pull Aromyxo before you do a
+	  recompile.
+
+	* The examples have been updated to reflect the changes in this patch.
+
+	* New method GENERATE-HTML now used to generate HTML for HTML-CONTAINER.
+
+	* New example in examples/counter.lisp.
+
+	* Slots in subclasses of HTML-CONTAINER that instantiates widgets
+	  will now have the HTML-CONTAINER set as parent by default. This
+	  means one do not have to inherit from the SELF-REF class anymore
+	  or specify -SELF- as parent for widgets that are meant to be "part
+	  of" the HTML-CONTAINER.
+
+	* MK-SPAN, MK-BUTTON etc. added for convenience. Other MKxxxx functions
+	  should be added later.
+
+	* Cleaned up some of the mess in the RUN methods in src/code.lisp.
+	  Same with the WITH-CODE-BLOCK macro.
+
+	* Removed the *TO-BE-ADDED-TO-ROOT* stuff in hunchentoot.lisp and
+	  widgets/widget.lisp.
+
+	* CONTAINER widgets now accept a single (atom) as argument for the
+	  :CHILDREN initarg.
+
+	* Removed WITH-CODE, DO-ACK and DO-FAIL from code.lisp.
+
+	* Code created within the dynamic context of WITH-CODE-BLOCK is now
+	  always "async" (*ASYNC* is T) by default. The :ASYNC keyarg for
+	  WITH-CODE-BLOCK instead determines whether the entire block should
+	  be executed as a one-shot async or sync operation.
+
+	
+	
+05.22.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Fixed bugs in src/widgets/container.lisp.
+
+	* Moved .asd file for symbolicweb-query to root of source tree.
+	
+
+	
+05.19.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* New method (APP-OF WIDGET). TODO: It could use some optimization since
+	  it is called quite often because of the changes mentioned in the point
+	  below.
+
+	* Some changes to the internals have been made that allows one to
+	  manipulate widgets in other sessions directly. Each widget now
+	  knows which session or application instance it belongs to.
+
+
+	
+05.17.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Fixed unclear wording in the LICENSE.
+	
+	
+05.16.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Removed some stuff in Aromyxo that is provided by CL-UTILITIES instead
+	  now.
+
+	* Updated the INSTALL file to reflect changes wrt. config-user.lisp.
+
+	* Removed the need for the user to add a config-user.lisp file when
+	  installing/configuring SW.
+
+	* Fixed bug where the package SB-CLTL2 was not loaded as I assumed it
+	  to be.
+
+	
+
+05.11.2008 Ismaël Ruau <ismael@ruau.net>
+
+	* Factorized JS code generated by (run). Thanks wybiral for the tip.
+	  Now (run "return x" :async t) just works, allowing to run the same code
+	  in both async and synchronous modes without consequences.
+
+
+
+05.10.2008 Ismaël Ruau <ismael@ruau.net>
+
+	* Client->Server return values can now be type-marshalled thanks to JSON.
+	  Required very little modifications (mainly in src/code.lisp).
+	  Usage: (run "code" :json t)
+
+	* DOM-Event exceptions ($.swHandleRequest catch block) now use JSON.
+	  TODO: allow the user to catch those errors (higher in the call stack).
+
+	* New dependencies:
+	  - CL-JSON
+	  - PARENSCRIPT
+
+	* Client-side $().sw* moved to $.sw*
+	  Also cleaned sw-ajax.js a bit:
+	  - $().ready(function()  =>  $(function()
+	  - $(document)  =>  $()
+
+
+	
+05.10.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Some very unfinished unit tests added.
+
+	* Fixes wrt. return values when SETFing attribute and CSS properties.
+
+	* REMOVE-ALL returns number of removed widgets again.
+
+	* REMOVE now returns the CONTAINER instance the widget was removed from.
+
+	* (SETF HTML-OF) retuns the new HTML that was set.
+
+
+
+05.09.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* DEFAPP now accepts options for DEFCLAZZ and DEFCLASS.
+
+	
+	
+05.08.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Fixed a potential problem with the LAST-PING-TIME slot in the
+	  APPLICATION class. It might have been updated "too late".	  
+
+	* Added a "Delete session" link for the default empty-page app.
+	  (or to the SW-HEADING function to be exact)
+
+	* (HUNCHENTOOT:NO-CACHE) is now called on initial page load.
+	  This should trigger a proper redraw when users use the forward/back
+	  buttons in the browser.
+
+	* Added a mutex to instantiation of the session/app instance
+	  in src/hunchentoot.lisp just in case ...
+
+	* The examples/phidgets-888.lisp example has been updated. It
+	  makes more sense having just one thread pr. application instance
+	  instead of one pr. PG-888-WIDGET instance.
+
+	* *APP-VISIBLE-P-TIMEOUT* should of course be >
+	  *DEFAULT-LONG-POLL-FREQUENCY*. Thanks for the report Ismaël Ruau!
+
+	* Replaced some use of keyword symbols with uninterned symbols.
+
+	* (VISIBLE-P-OF APPLICATION) method added. See the definition in
+	  src/application.lisp and the *APP-VISIBLE-P-TIMEOUT* variable in
+	  src/config.lisp.
+
+	* SPAN has now "" as default value for the HTML-CONTENTS slot. No need
+	  to supply :HTML "" on construction anymore.
+
+	* Updated the examples/phidgets-888.lisp file. The HTML is no
+	  longer bound to the application instance, which makes more sense.
+
+
+	
+05.07.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added new file TUTORIAL, but nothing much new in it. It is mostly
+	  things that have been moved from the INSTALL file.
+
+	* *SW-HEADERS* is now exported. Accessors generated by stuff in
+	  dom-cache.lisp is also exported by default.
+
+	* Supplying IDs for widgets by using the :ID initarg works better, but
+	  see the TODO in the INITIALIZE-INSTANCE method in widgets.lisp.
+
+
+	
+05.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added INNER-HTML-OF (SETFable). I'm not sure if these are useful, but
+	  I've added them just in case. Things like the SPAN and
+	  the HTML-CONTAINER widgets should maybe be used instead. They are
+	  placed in src/manipulation.lisp. Note that these work vs. raw HTML
+	  and thus they do not maintain state on page refresh etc.
+
+	* Widgets now accept an initarg :PARENT.
+	  :PARENT accepts :ROOT as an argument which will bind it to the root
+	  widget as soon as the root exists or has been instantiated.
+	  See examples/phidgets-888.lisp for usage.
+
+	* Added new widget: HTML-CONTAINER.
+	  See examples/phidgets-888.lisp for an example of usage. This works in
+	  conjunction with SHTML-OF below.  
+
+	* Added (SHTML-OF WIDGET).
+	  See examples/phidgets-888.lisp for an example of how SHTML-OF can
+	  be used. This allows one to combine "normal" HTML with SW widgets
+	  etc. more easily.
+	
+	* Added some slots to the APPLICATION class. HOST, REMOTE-ADDR,
+	  REMOTE-PORT and REAL-REMOTE-ADDR.
+
+	
+
+05.04.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Condition strings are also sent using POST now.
+
+	* Return values when doing things like (RUN "return 3*2;") are now
+	  sent as HTTP POST requests instead of using GET.
+
+	* :CALLBACK-DATA for events now use the HTTP POST method instead of GET.
+
+	* CONTAINER now accepts an initarg :HTML-ELEMENT-TYPE. It can have
+	  two values, :SPAN or :DIV.
+
+	* examples/show-hide-widgets.lisp added.
+
+	* Widgets that setup callbacks can now be instantiated in :INITFORMs
+	  for DEFAPP.
+
+	* src/js/defjsfun.lisp added. It only contains some comments and ideas
+	  for now.
+
+	* CONTAINER now inherits from ALL-EVENTS and ALL-CSS-STYLE-PROPERTIES.
+	  This means that one can style a "container", or really, apply
+	  CSS and events to a span that "contains" other widgets.
+
+	
+
+05.03.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added :JS-BEFORE, :CALLBACK-DATA and :JS-AFTER parameters to the
+	  examples/chat.lisp example.
+
+	* New method (REMOVE APPLICATION). This readies the page for reload,
+	  and attempts to remove the server side session before this happens
+	  triggering the creation of a new session. Just note that this thing
+	  isn't foolprof so do not rely on it for some feature needed in your
+	  application.
+
+	* WITH-ALL-APPS: New initarg :APP-TYPE added. But, some sort of
+	  channel/subscriber scheme needs to be added.
+
+	
+
+05.02.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Removed repetition of code in CHECKBOX, RADIO-BUTTON and TOGGLE-BUTTON.
+
+	* Returning attributes are now no longer url-encoded twice. Thanks
+	  "wybiral".
+
+	* (SETF VISIBILITY-P) has been removed.
+
+	* HTML-OF now works vs. SPAN. It is no longer a reader for the
+	  HTML slot of WIDGET.
+
+	* Removed dependency on custom Hunchentoot version.
+
+	* I've decided to distribute jquery-1.2.3.js with SW instead of
+	  requiring that the user provides it on installation and configuration.
+
+	* TOGGLE-BUTTON doesn't send CSS twice on page refresh now.
+
+	* (WITH-CODE-BLOCK (:EXECUTEP t) ..) is now no longer possible. See
+	  the TODO/NOTE, but I think this makes sense.
+
+	* Widgets added as children via the :CHILDREN initarg for a container
+	  are now set to visible by default (VISIBILITY-P is set to T).
+
+	* Setting VISIBILITY-P of root widget will now give proper
+	  feedback to the user.	
+
+	* Some cleanups wrt. the MAIN method added yesterday.
+
+	* WITH-CODE-BLOCK should now nest better. The scope for testing
+	  whether we already where creating a "code block" was previously
+	  lexically. This is wrong, and it is now dynamic/special instead.
+
+	
+	
+05.01.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Added support for MAIN method when defining applications. See
+	  examples/real-empty-example.lisp.
+	
+	* Added new example examples/real-empty-page.lisp.
+
+	* VISIBILITY-P (SETFable) now works better. Badly needs testing tho.
+	  Next up is re-parenting I think.
+
+	* New functions in the JS API: JS-OAPPEND, JS-OPREPEND
+	  and JS-EMPTY.
+
+	* Setting a containers VISIBLE-P slot to a new value will now
+	  propagate the value to its children.
+
+	* Bug fix: Adding widgets to non-visible CONTAINER instances
+	  should now work as expected, but more testing is needed.
+
+	* Bug fix: Forgot to set parent slot of children added by
+	  initarg :CHILDREN on construction of a CONTAINER.
+
+	* Fixed bug in JS-ACK. Returned values are now url-encoded.
+
+	* New function FULL-RESET. Removes waiting JS in queue to the client,
+	  removes all code-blocks waiting for a response, removes all callbacks,
+	  removes all widgets, then reloads page (page refresh).
+
+	* WINDOW-LOCATION-HREF works again. It is SETFable.
+	
+
+	
+04.30.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Bug in CONTAINER fixed. The VISIBLE-P slot of children added
+	  via the initarg :CHILDREN will now be set to T.
+
+	* WITH-CODE-BLOCK now maintains state of outer EXECUTEP when nested.
+
+	* Must do (run "return 2 * 3") to return values again. Turns out
+	  url-encoding everything so I could check for syntax errors at the
+	  client was very slow (tested on FF2 only).
+
+	* JS-CODE-OF now only supports one form. Ex:
+	    (js-code-of (value-of *some-button*)) => ...
+
+	* Cleaned up a couple of WTFs in attribute.lisp, css.lisp and
+	  events.lisp.
+	
+	* Widgets now know whether they are visible or not, or whether they
+	  "exist" on the client. This state is stored in the VISIBLE-P slot.
+	  JS code is not sent to the client unless the widget is visible.
+	  This improves performance, and fixes some potential problems.
+
+	* Bug fix: http://paste.lisp.org/display/59903#1 will now result in:
+	
+	    (ON-CLICK-OF BUTTON) => #<CALLBACK-BOX {A9037E1}>
+	    (ON-CLICK-OF BUTTON) => #<CALLBACK-BOX {A9037E1}>
+	    clicked!
+
+	
+	
+04.29.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Flow of server-to-client state change for RADIO-BUTTON, TOGGLE-BUTTON
+	  and CHECKBOX added.
+
+	* CHECKBOX widget added.
+
+	* TEXT-INPUT and IMAGE works again.
+
+	* Fixed breakage in src/js/jquery/attribute.lisp
+	  and src/js/jquery/css.lisp.
+
+	* The initarg :CHILDREN now works for CONTAINER and its subclasses.
+
+	* TOGGLE-BUTTON works again, and is a bit faster.
+
+	* Bug fix: Doing things like (run "2 2") fails in a sane way.
+
+	* REPLACE-WITH renamed to REPLACE. This shadows CL:REPLACE.
+	
+	* Things like this works again:
+	    (make-instance 'button :on-click (iambda (write-line "hi")))
+
+	* (SETF CHILDREN-OF) added.
+
+	* New way of dealing with HTML and rendering of the initial page.
+
+	* Yet more small fixes to the INSTALL file.
+
+	
+
+04.27.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	* Fixed bugs when nesting WITH-CODE-BLOCK.
+
+	* The RADIO-BUTTON widget is starting to work, but not finished yet.
+
+	* Fixed bug in (SETF EVENT).
+	
+
+	
+04.25.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	Default mode when rendering the initial	application object is now ASYNC.
+
+	examples/empty-page.lisp is now the default application/page again.
+
+	
+
+04.23.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	
+	* Fixed bug in src/widgets/span.lisp; (SETF HTML-OF).
+	
+	* Updated file INSTALL.
+
+	* Removed compiler note from WITH-CODE-BLOCK.
+
+	* REMOVE-ALL is faster. It removes all client side widgets in a
+	  single HTTP cycle now.
+
+	* BUTTON is now a subclass of CONTAINER.
+	
+
+	
+04.17.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	TOGGLE-BUTTON: New slot ON-STATE-CHANGE-FN
+
+	
+
+04.16.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	New widget: TOGGLE-BUTTON
+
+	RADIO-BUTTON is on hold for a while. So I've commented it out in the
+	.asd file.
+
+	Fixed some issues when using WITH-CODE-BLOCK and JS-CODE-OF. JS-CODE-OF
+	should now work in cases like this:
+
+	SW> (js-code-of (setf (background-color-of *toggle-button*)
+                              "blue")
+                        (setf (color-of *toggle-button*)
+                              "green"))
+	"$(\"#TOGGLE-BUTTON-6\").css(\"background-color\", \"blue\"), $(\"#TOGGLE-BUTTON-6\").css(\"color\", \"green\")"
+
+	HTML-OF from last patch is commented out. I'm really not sure whether
+	we should have this feature, and it had some issues so I've removed it
+	for now.
+
+	
+	
+04.14.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	New widget: RADIO-BUTTON
+	New method: HTML-OF (SETFable).
+
+
+	
+04.13.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	API-change: BIND and UNBIND are gone. Use (SETF EVENT) instead. Supply
+	NIL as value to unbind.
+	
+	New exported methods/functions:
+
+	  * ADD-ATTRIBUTE-TYPE
+	  * REMOVE-ATTRIBUTE-TYPE
+	  * ADD-CSS-TYPE
+	  * REMOVE-CSS-TYPE
+	  * ADD-EVENT-TYPE
+	  * REMOVE-EVENT-TYPE
+	  * EVENT (SETFable)
+
+	ADD-DOM-CACHE-TYPE has been added internally. Not sure if it would make
+	sense exporting it.
+
+	There is still work to be done in src/widgets/dom-cache.lisp, but I've
+	commited this for now.
+
+	
+	
+04.07.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+
+	Fixed bugs in DOM API.
+	
+	New widget: IMAGE. Use it like this:
+	
+	  SW> (add (make-instance 'image :src "http://www.lisperati.com/different.jpg")
+                   (root))
+
+	New widget: LINK. It's a subclass of CONTAINER. Add some children
+	to it to define what the link should look like.
+	
+	Optimization: Removed extra indirection in src/widgets/attributes.lisp,
+	since I cannot think of a reason why this would be needed.
+	
+	WITH-CODE macro added.
+	
+	Fixed bugs in container.lisp. In some cases JS code was executed
+	before the HTML of a widget was added at the client.
+
+	
+	
+04.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	Class CONTAINER: Added methods PREPEND and REPLACE-WITH.
+	Added SET-TITLE function in src/js/util.lisp.
+	PING now accepts an instance of APPLICATION.
+	Moved hook for session timeouts to hunchentoot.lisp
+
+
+
+04.06.2008 Ismaël Ruau <ismael@ruau.net>
+	Cleaned the config files a bit.
+
+	config.lisp:
+		The inline JS in *sw-headers* is now a static file (javascript/sw/sw-ajax.js).
+		Modified the HTTP path variables to remove duplication of "magic values" in the code.
+	
+	Every HT-specific configuration is now in config-hunchentoot.lisp.
+	hunchentoot.lisp:
+		Contains server-management routines and HT's dispatchers (both static and dynamic).
+		START-SW, STOP-SW and RESTART-SW enforce a single HT server (special SW::*HT-SERVER*).
+		START-SW no longer gives an error when a server is already running, only a warning.
+		Moved DEFURI / HANDLE-REQUEST from application.lisp.
+		Factorized out DEFURI's inner LAMBDA into the SW-DYNAMIC-DISPATCHER function.
+
+	Moved the src/empty-page.lisp example out of the way (now examples/basic-example.lisp).
+	Moved the example bits from application.lisp into basic-example.lisp.
+
+	Added dependency on CL-UTILITIES.
+
+
+
+04.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	Added new widget SPAN, and fixed silly bug in code for CONTAINER.
+
+
+
+04.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	Added specials.lisp. See INSTALL for info about how to get up and running,
+	as there has been some changes with regards to configuration.
+
+
+
+04.06.2008 Lars Rune Nøstdal <larsnostdal@gmail.com>
+	Support for doing:
+
+	(progn 
+          (setf (on-click-of *button* :callback-data '(("random-client-number" . "Math.random() * 100")))
+                (lambda (&key random-client-number)
+                  (dbg-princ random-client-number)))
+          (trigger (on-click-of *button*)))
+        ==> RANDOM-CLIENT-NUMBER => 19.36389961458309
+
+
+	:JS-BEFORE and :JS-AFTER works in the same way.
