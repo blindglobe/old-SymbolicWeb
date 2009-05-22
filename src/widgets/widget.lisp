@@ -28,33 +28,9 @@ or visible in.")
 
    (visible-p :initform nil
               :documentation "
-Use/see the VISIBLE-P-OF method.")
+Use/see the VISIBLE-P-OF method."))
 
-   #|(on-visibility-change-fns :accessor on-visibility-change-fns-of
-                             :type list
-                             :initform nil
-                             :documentation "
-A list of functions called when the widget's visibility changes. When a widget
-goes from visible to non-visible, these functions are called before the JS-code
-to remove the widget on the client-end has been added to the outgoing HTTP
-response and after the functions in the ON-CNT-REMOVE-FNS and ON-REMOVE-FNS
-slots. When a widget goes from non-visible to visible, these functions are
-called after the JS-code to add the widget on the client-end has been added to
-the outgoing HTTP response and before the functions in the ON-RENDER-FNS slot
-have been called. Create a function of the right form by using the
-MK-ON-VISIBILITY-CHANGE-FN macro and pass it to the :ON-VISIBILTY-CHANGE-FN
-initarg to append a callback to this slot.")|#
-
-   #|(on-render-fns :accessor on-render-fns-of
-                  :type list
-                  :initform nil
-                  :documentation "
-A list of functions called when the widget is being rendered. These are called
-after the (RENDER WIDGET) main method and before the functions in the
-ON-VISIBILITY-CHANGE-FNS slot. Create a function of the right form by using the
-MK-ON-RENDER-FN macro and pass it to the :ON-RENDER-FN initarg to append
-callbacks to this slot.")|#)
-
+  
   (:metaclass mvc-stm-class))
 
 
@@ -64,35 +40,6 @@ callbacks to this slot.")|#)
     (let ((*currently-constructing-widget* widget)
           (*creating-html-container-p* nil)) ;; To avoid SHTML-OF to screw up when nesting WITH-HTML-CONTAINER type stuff.
       (call-next-method))))
-
-
-(defmethod initialize-instance :after ((widget widget) &key
-                                       (on-visibility-change-fn nil on-visibility-change-fn-supplied-p)
-                                       (on-render-fn nil on-render-fn-supplied-p))
-  (declare (optimize speed))
-  #|(when on-render-fn-supplied-p
-    (push (ensure-function on-render-fn) (on-render-fns-of widget)))|#
-  #|(when on-visibility-change-fn-supplied-p
-    (push (ensure-function on-visibility-change-fn) (on-visibility-change-fns-of widget)))|#)
-
-
-
-#|
-(defmethod do-visibility-change ((widget widget) new-state)
-  (dolist (on-visibility-change-fn (on-visibility-change-fns-of widget))
-    (funcall on-visibility-change-fn widget new-state on-visibility-change-fn)))
-
-
-(defmacro mk-on-visibility-change-fn ((widget-sym new-state-sym &key (on-visibility-change-fn-sym
-                                                                      'on-visibility-change-fn
-                                                                      on-visibility-change-fn-sym-supplied-p))
-                                      &body body)
-  "See the doc-string for the ON-VISIBILITY-CHANGE-FN slot in WIDGET."
-  `(lambda (,widget-sym ,new-state-sym ,on-visibility-change-fn-sym)
-     ,(unless on-visibility-change-fn-sym-supplied-p
-       `(declare (ignorable ,on-visibility-change-fn-sym)))
-     ,@body))
-|#
 
 
 #.(maybe-inline 'currently-constructing-p)
@@ -174,19 +121,6 @@ in any session in any viewport."
   #|(warn "~A has no RENDER method; using an empty one." widget)|#
   (render-widget widget (formula-of (model-of widget))))
 (export 'render)
-
-
-#|(defmethod render :after ((widget widget))
-  (dolist (on-render-fn (on-render-fns-of widget))
-    (funcall on-render-fn widget on-render-fn)))|#
-
-
-#|(defmacro mk-on-render-fn ((widget-sym &key (on-render-fn-sym 'on-render-fn on-render-fn-supplied-p)) &body body)
-  "See the doc-string for the ON-RENDER-FNS slot in WIDGET."
-  `(lambda (,widget-sym ,on-render-fn-sym)
-     ,(unless on-render-fn-supplied-p
-       `(declare (ignorable ,on-render-fn-sym)))
-     ,@body))|#
 
 
 (defmethod focus ((widget widget))
