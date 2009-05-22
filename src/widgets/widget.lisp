@@ -5,8 +5,6 @@
 
 (declaim (optimize speed))
 
-(class-forward-reference dom-attribute-class)
-
 
 (defclass widget (self-ref
                   widget-base
