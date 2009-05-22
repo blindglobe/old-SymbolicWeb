@@ -67,17 +67,9 @@ override behaviour in a custom RENDER method."))
           (add new-widget container)))))
 
 
-;; TODO: specialize on EVENT..
-(defmethod handle-model-event ((container container) (model dlist) event)
-  (typecase event
-    (container-remove
-     (dolist (object (objects-of event))
-       (remove (view-in-context-of container object) container)))
-     
-    (otherwise
-     (error "(HANDLE-MODEL-EVENT ~A ~A ~A): No handler for event ~A for View ~A"
-            container model event event container))))
-
+(defmethod handle-model-event ((container container) (model dlist) (event container-remove))
+  (dolist (object (objects-of event))
+    (remove (view-in-context-of container object) container)))
 
 
 (defmethod render :around ((container container))
