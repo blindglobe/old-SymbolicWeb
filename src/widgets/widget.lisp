@@ -115,7 +115,7 @@ in any session in any viewport."
 
 
 (defmethod render ((widget widget))
-  (render-widget widget (formula-of (model-of widget))))
+  (render-widget widget (model-of widget)))
 (export 'render)
 
 
