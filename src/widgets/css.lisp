@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 #.(maybe-inline 'css)
 (defun css (property widget

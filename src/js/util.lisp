@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 (defun alert (msg &optional (viewport-or-widget *viewport*))
   (let ((js-code (catstr "alert(decodeURIComponent(\"" (url-encode msg) "\"));")))

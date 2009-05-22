@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 ;; TODO: This should use the ID-GENERATOR* stuff from Aromyxo.
 (let ((counter 0)

@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 (defclass code ()
   ((code-id :reader code-id-of :initarg :code-id

@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 (defclass server (id-mixin)
   ((debug-p :accessor debug-p-of :initarg :debug-p

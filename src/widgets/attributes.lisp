@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 #.(maybe-inline 'attribute)
 (defun attribute (attribute widget

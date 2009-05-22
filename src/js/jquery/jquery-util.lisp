@@ -2,7 +2,7 @@
 
 (in-package :sw-jquery)
 
-(declaim (optimize speed))
+(declaim #.(optimizations))
 
 
 (let ((counter 0))

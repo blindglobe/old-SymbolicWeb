@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 #| These are placed here so the compiler will know about them as early as
 possible and be able to optimize type-checking code based on this. |#

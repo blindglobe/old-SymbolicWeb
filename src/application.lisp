@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 (defclass application (id-mixin locked-object)
   ((server :reader server-of

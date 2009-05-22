@@ -81,7 +81,6 @@
      (:file "address-bar")
      (:file "application")
      (:file "server-sw-http")
-     (:file "manipulation")
      (:file "comet")
      (:file "ajax")
      ;;(:file "pagination")

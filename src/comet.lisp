@@ -2,8 +2,7 @@
 
 (in-package #:sw)
 
-
-(declaim (optimize speed))
+(declaim #.(optimizations))
 
 
 (defmethod handle-comet-request ((server sw-http-server) (app application) (viewport viewport))

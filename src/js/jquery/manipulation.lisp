@@ -2,7 +2,7 @@
 
 (in-package :sw-jquery)
 
-(declaim (optimize speed))
+(declaim #.(optimizations))
 
 
 (declaim (inline (setf js-html-of)))

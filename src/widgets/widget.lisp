@@ -2,8 +2,7 @@
 
 (in-package #:sw)
 
-
-(declaim (optimize speed))
+(declaim #.(optimizations))
 
 
 (defclass widget (self-ref
@@ -116,7 +115,6 @@ in any session in any viewport."
 
 
 (defmethod render ((widget widget))
-  #|(warn "~A has no RENDER method; using an empty one." widget)|#
   (render-widget widget (formula-of (model-of widget))))
 (export 'render)
 

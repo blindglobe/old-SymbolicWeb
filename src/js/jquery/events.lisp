@@ -2,8 +2,7 @@
 
 (in-package :sw-jquery)
 
-
-(declaim (optimize speed))
+(declaim #.(optimizations))
 
 
 (defvar *js-before* "return true;") (export '*js-before*)

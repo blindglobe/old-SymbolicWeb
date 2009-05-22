@@ -13,6 +13,7 @@
     :serial t
     :components
     ((:file "package")
+     (:file "config")
      ;;(:file "sw-jquery-mapping")
      (:file "jquery-util")
      (:file "selectors")

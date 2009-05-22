@@ -2,6 +2,7 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
 
 
 (defclass viewport (id-mixin)

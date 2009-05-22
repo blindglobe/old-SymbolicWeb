@@ -2,8 +2,7 @@
 
 (in-package #:sw)
 
-
-(declaim (optimize speed))
+(declaim #.(optimizations))
 
 
 ;; TODO: This thing doesn't actually work yet ..

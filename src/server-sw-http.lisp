@@ -2,8 +2,7 @@
 
 (in-package #:sw)
 
-
-(declaim (optimize speed))
+(declaim #.(optimizations))
 
 
 (defclass sw-http-server (server sw-http:server)
