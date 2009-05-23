@@ -5,7 +5,7 @@
 (declaim #.(optimizations))
 
 
-(defclass application (id-mixin locked-object)
+(defclass application (id-mixin locked-object self-ref)
   ((server :reader server-of
            :type server)
    
