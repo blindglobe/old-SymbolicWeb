@@ -82,8 +82,8 @@ link\" to these instances are stored (wrt. GC).")
   (if (debug-p-of server)
       (invoke-debugger condition)
       (progn
-        (warn "~A got condition: ~A~%Set DEBUG-P for to T to debug in Lisp/Slime to debug these."
-              server condition)
+        (warn "~A got condition: ~A~%Set DEBUG-P slot of ~A for to T to debug in Lisp/Slime."
+              server condition server)
         (invoke-restart 'sw-http:continue-listening))))
 
 
@@ -98,7 +98,7 @@ link\" to these instances are stored (wrt. GC).")
           (with-thread ((fmtn "~A (GC-THREAD)" server))
             (handler-bind ((error (lambda (c)
                                     (warn "SW:START-SERVER: Condition, ~A, in GC-loop for server ~A" c server)
-                                    (invoke-restart 'continue))))
+                                    (sw-http:maybe-debug server c))))
               (loop
                  (with-simple-restart (continue "SW:START-SERVER: Continue GC-loop for server ~A~%" server)
                    (with-time-limiter (gc-frequency-of server)
