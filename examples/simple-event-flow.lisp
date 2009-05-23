@@ -3,27 +3,42 @@
 (in-package #:sw)
 
 
-(defclass simple-event-flow (application)
-  ((click-me-widget :initform ¤(html-element :model #~"Click me!"))
-   (message :initform ""))
+;; Model?
+(defclass simple-event-flow-2 (application)
+  ((x :initform 0)
+   (square-of-x :initform ↑λ(* ¤x ¤x)))
 
   (:metaclass mvc-stm-class))
 
-(set-uri 'simple-event-flow "/simple-event-flow")
+(set-uri 'simple-event-flow-2 "/simple-event-flow-2")
 
 
-(defmethod main ((app simple-event-flow))
+;; Controller?
+(defmethod incf-x ((app simple-event-flow-2))
   (with-object app
-    λ(if (mouse-button-state-of ¤click-me-widget)
-         (setf ¤message "Mouse button down!")
-         (setf ¤message "Mouse button up!"))
-    
-    λ(when (mouse-click-state-of ¤click-me-widget)
-       (write-line "CLICKED!"))))
+    (incf ¤x)))
 
 
-(defmethod render-viewport ((viewport viewport) (app simple-event-flow))
+;; View?
+(defmethod render-viewport ((viewport viewport) (app simple-event-flow-2))
   (with-object app
-    (add-to (root)
-            ¤click-me-widget
-            ¤(html-element :model #λ¤message))))
+    (let ((click-me-widget ¤(html-element :model #~"Click me!")))
+      
+      λ(when (mouse-click-state-of click-me-widget)
+         (incf-x app)) ;; ..calls Controller.
+      
+      (add-to (root)
+              click-me-widget
+              ¤(html-element :model #λ(fmtn "X: ~A" ¤x))
+              ¤(html-element :model #λ(fmtn "SQUARE-OF-X: ~A" ¤square-of-x))))))
+
+
+#|
+Is this MVC "done right"? I can manipulate the Model via the Controller from the REPL:
+
+  > (incf-x *app*)
+
+
+|#
+
+
