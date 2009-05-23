@@ -4,7 +4,7 @@
 
 
 
-;; Model?
+;; Model.
 (defclass simple-event-flow (self-ref)
   ((x :initform 0)
    (square-of-x :initform ↑λ(* ¤x ¤x)))
@@ -13,10 +13,11 @@
 
 
 
-;; Controller?
-(defmethod incf-x ((app simple-event-flow))
-  (with-object app
+;; Controller.
+(defmethod incf-x ((model simple-event-flow))
+  (with-object model
     (incf ¤x)))
+
 
 
 ;; (The APPLICATION class represents a user "web-session" etc.)
@@ -29,7 +30,7 @@
 
 
 
-;; View?
+;; View.
 (defmethod render-viewport ((viewport viewport) (app simple-event-flow-app))
   (with-object app
     (let ((click-me-widget ¤(html-element :model #~"Click me!")))
@@ -39,8 +40,8 @@
       
       (add-to (root)
               click-me-widget
-              ¤(html-element :model #λ(fmtn "X: ~A" ¤x))
-              ¤(html-element :model #λ(fmtn "SQUARE-OF-X: ~A" ¤square-of-x))))))
+              ¤(html-element :model λ(fmtn "X: ~A" ¤x))
+              ¤(html-element :model λ(fmtn "SQUARE-OF-X: ~A" ¤square-of-x))))))
 
 
 
