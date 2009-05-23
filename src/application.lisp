@@ -145,9 +145,13 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
         (str (js-sw-headers app)))))))
 
 
-(defmethod remove ((app application) &optional (server *server*))
-  (declare (server server))
+(defmethod remove-application ((app application) &optional (server *server*))
+  (check-type server server)
   (with-each-viewport-in-app (:app app)
-    (remove viewport app))
+    (remove-viewport viewport app))
   (remhash (id-of app) (id->app-of server))
   (remhash (cookie-value-of app) (cookie-value->app-of server)))
+
+
+
+  

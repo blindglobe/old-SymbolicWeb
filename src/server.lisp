@@ -73,8 +73,8 @@ link\" to these instances are stored (wrt. GC).")
                (if (visible-p-of app)
                    (with-each-viewport-in-app (:app app)
                      (unless (visible-p-of viewport)
-                       (remove viewport app)))
-                   (remove app)))
+                       (remove-viewport viewport app)))
+                   (remove-application app server)))
              (id->app-of server))))
 
 
@@ -82,7 +82,8 @@ link\" to these instances are stored (wrt. GC).")
   (if (debug-p-of server)
       (invoke-debugger condition)
       (progn
-        (warn "~A got condition: ~A~%Set DEBUG-P for to T to debug in Lisp/Slime." server condition)
+        (warn "~A got condition: ~A~%Set DEBUG-P for to T to debug in Lisp/Slime to debug these."
+              server condition)
         (invoke-restart 'sw-http:continue-listening))))
 
 
@@ -160,8 +161,9 @@ link\" to these instances are stored (wrt. GC).")
           (warn "SW: (SET-URI ~A ~S) had no effect because *SERVER* was NIL." app-class-sym path))))
 
 
-(defmethod remove-all ((server server))
+(defmethod remove-application ((app (eql t)) &optional (server *server*))
   "Removes all APPLICATION instances in SERVER."
+  (check-type server server)
   (maphash (lambda (id app)
              (declare (ignore id))
              (remove app))

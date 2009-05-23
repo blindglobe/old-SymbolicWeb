@@ -194,7 +194,7 @@ refresh."
   (root-widget-of *viewport*))
 
 
-(defmethod remove ((viewport viewport) &optional app)
+(defmethod remove-viewport ((viewport viewport) (app application))
   (remhash (id-of viewport) (viewports-of app))
   (reload viewport)
   (with-each-widget-in-tree (:root (root-widget-of viewport))
