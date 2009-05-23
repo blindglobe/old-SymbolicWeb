@@ -95,17 +95,15 @@ If APP is supplied this will determine whether WIDGET is visible within any of
 the viewports within that session.
 If neither APP nor VIEWPORT is supplied this will determine wheter WIDGET is visible
 in any session in any viewport."
-  (declare (ignore app)
-           (optimize speed))
+  (declare (ignore app))
   (when app-supplied-p
     (error "TODO: Not implemented yet."))
   (if real-check-p
       (if (and (visible-p-of widget)
                (zerop (hash-table-count (viewports-of widget))))
-        ;; WIDGET isn't part of any viewport anymore.
-        (prog1 (nilf (slot-value widget 'visible-p))
-          #|(do-visibility-change widget nil)|#)
-        t)
+          ;; WIDGET isn't part of any viewport anymore.
+          (nilf (slot-value widget 'visible-p))
+          t)
       (and (slot-value widget 'visible-p)
            (if viewport-supplied-p
                (and (visible-p-of viewport)
@@ -148,8 +146,7 @@ Also see FOR-EACH-VIEWPORT-IN-APP."
   "Returns T if widget is visible in multiple contexts.
 This might not be 100% accurate; it might return T when the widget is only
 visible in one or even no context."
-  (declare (optimize speed)
-           (inline visible-p-of))
+  (declare (inline visible-p-of))
   (and (visible-p-of widget)
        (< 1 (hash-table-count (viewports-of widget)))))
 
