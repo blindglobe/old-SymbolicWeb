@@ -3,24 +3,34 @@
 (in-package #:sw)
 
 
+
 ;; Model?
-(defclass simple-event-flow-2 (application)
+(defclass simple-event-flow (self-ref)
   ((x :initform 0)
    (square-of-x :initform ↑λ(* ¤x ¤x)))
-
+   
   (:metaclass mvc-stm-class))
 
-(set-uri 'simple-event-flow-2 "/simple-event-flow-2")
 
 
 ;; Controller?
-(defmethod incf-x ((app simple-event-flow-2))
+(defmethod incf-x ((app simple-event-flow))
   (with-object app
     (incf ¤x)))
 
 
+;; (The APPLICATION class represents a user "web-session" etc.)
+(defclass simple-event-flow-app (simple-event-flow application)
+  ()
+  
+  (:metaclass mvc-stm-class))
+
+(set-uri 'simple-event-flow-app "/simple-event-flow")
+
+
+
 ;; View?
-(defmethod render-viewport ((viewport viewport) (app simple-event-flow-2))
+(defmethod render-viewport ((viewport viewport) (app simple-event-flow-app))
   (with-object app
     (let ((click-me-widget ¤(html-element :model #~"Click me!")))
       
@@ -33,12 +43,36 @@
               ¤(html-element :model #λ(fmtn "SQUARE-OF-X: ~A" ¤square-of-x))))))
 
 
+
+
 #|
 Is this MVC "done right"? I can manipulate the Model via the Controller from the REPL:
 
-  > (incf-x *app*)
+> (incf-x *app*)
 
-
+> (let ((model (make-instance 'simple-event-flow)))
+    (with-slots (x square-of-x) model
+      (dotimes (i 10)
+        (incf x)
+        (pprint (list x square-of-x)))))
+(1 1)
+(2 4)
+(3 9)
+(4 16)
+(5 25)
+(6 36)
+(7 49)
+(8 64)
+(9 81)
+(10 100)
+NIL
 |#
 
 
+
+
+
+
+
+  
+  
