@@ -112,7 +112,6 @@ in any session in any viewport."
 (export 'render)
 
 
-
 (defmethod focus ((widget widget))
   (if *js-code-only-p*
       (js-focus (id-of widget))

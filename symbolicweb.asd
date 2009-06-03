@@ -16,7 +16,7 @@
                :sw-stm
                :symbolicweb-jquery ;; Default JS generator backend.
                )
-  
+
   :serial t
   :components
   ((:module src
@@ -35,7 +35,7 @@
      (:file "object")
      (:file "base-classes")
      (:file "viewport")
-     
+
      (:module js
        :serial t
        :components
@@ -78,7 +78,7 @@
         (:file "alert-box")
         |#
         ))
-     
+
      (:file "address-bar")
      (:file "application")
      (:file "server-sw-http")
@@ -87,9 +87,3 @@
      ;;(:file "pagination")
      ))
    ))
-
-
-
-     
-
-
