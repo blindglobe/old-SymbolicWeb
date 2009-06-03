@@ -13,6 +13,7 @@
                :alexandria
                :cl-who
                :aromyxo
+               :sw-stm
                :symbolicweb-jquery ;; Default JS generator backend.
                )
   

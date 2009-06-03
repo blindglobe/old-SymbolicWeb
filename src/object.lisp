@@ -7,9 +7,7 @@
   ((urlized-p :reader urlized-p-of
               :initform nil
               :documentation "
-Initarg can be one of T :T-ADD :NO-HISTORY :NO-HISTORY-ADD NIL :NIL-ADD."))
-
-  (:metaclass mvc-stm-class))
+Initarg can be one of T :T-ADD :NO-HISTORY :NO-HISTORY-ADD NIL :NIL-ADD.")))
 
 
 (defmethod initialize-instance :after ((object object) &key urlized-p)

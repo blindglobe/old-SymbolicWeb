@@ -5,9 +5,7 @@
 (declaim #.(optimizations))
 
 
-(defclass widget (self-ref
-                  widget-base
-                  dom-mirror)
+(defclass widget (widget-base)
   ((shtml :initarg :shtml
           :documentation "
 \"Static\" outer HTML shell or wrapping of a widget. This HTML code usually
@@ -15,7 +13,7 @@ maintains or contains the ID attribute (stored in the ID-slot of the OBJECT
 parent class of this class) so the server and client \"versions\" of the
 widget can communicate or refer to each other.
 See the SHTML-OF method.")
-   
+
    (viewports :reader viewports-of
               :type hash-table
               :initform (make-hash-table :test #'equal :weakness :value :synchronized t)
@@ -25,10 +23,7 @@ or visible in.")
 
    (visible-p :initform nil
               :documentation "
-Use/see the VISIBLE-P-OF method."))
-
-  
-  (:metaclass mvc-stm-class))
+Use/see the VISIBLE-P-OF method.")))
 
 
 (defmethod initialize-instance :around ((widget widget) &key)
@@ -52,7 +47,7 @@ Use/see the VISIBLE-P-OF method."))
     (cond
       ((stringp shtml)
        shtml)
-      
+
       ((ensure-function shtml)
        (funcall shtml widget)))))
 
@@ -63,7 +58,7 @@ Use/see the VISIBLE-P-OF method."))
     (values
      (cond
        ((stringp obj) obj)
-       
+
        ((ignore-errors (ensure-function obj))
         (html<- (funcall obj widget) widget))
 
@@ -74,11 +69,11 @@ Use/see the VISIBLE-P-OF method."))
   `(progn
      (defclass ,name ,parents
        ,@body)
-     
+
      (declaim (inline ,(mksymf name '-p)))
      (defun ,(mksymf name '-p) (object)
          (typep object ',name))
-     
+
      (finalize-inheritance (find-class ',name))))
 
 
@@ -113,8 +108,9 @@ in any session in any viewport."
 
 
 (defmethod render ((widget widget))
-  (render-widget widget (model-of widget)))
+  )
 (export 'render)
+
 
 
 (defmethod focus ((widget widget))

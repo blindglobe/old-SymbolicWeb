@@ -6,12 +6,9 @@
 
 (class-forward-reference server)
 (class-forward-reference application)
-(class-forward-reference widget-base
-  (:metaclass mvc-stm-class))
-(class-forward-reference widget
-  (:metaclass mvc-stm-class))
-(class-forward-reference container
-  (:metaclass mvc-stm-class))
+(class-forward-reference widget-base)
+(class-forward-reference widget)
+(class-forward-reference container)
 (class-forward-reference viewport)
 (class-forward-reference callback-box)
 ;;(class-forward-reference hunchentoot-server)

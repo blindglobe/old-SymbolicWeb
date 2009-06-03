@@ -1,37 +1,6 @@
 AGPLv3 - http://www.fsf.org/licensing/licenses/agpl-3.0.html
-A copy of the license is found at the end of this file.
+A copy of the license follows:
 
-
-
-What if I want to develop a proprietary application using SymbolicWeb?
-======================================================================
-
-  It's fine. To make this very simple; you do not have to make your
-application free software.
-
-  However, if you create an application that runs on a modified version
-of SymbolicWeb you must make the source code of the modified
-SymbolicWeb software available to the users of the application.
-
-  Note that this includes cases where the only access users have to
-your application (and thus SW) is via a network. You cannot exploit
-the "ASP loophole" found in the traditional GPL. More on this is
-described in the AGPL license below.
-
-  If anything said here conflicts with the license below, you may
-consider what I've said to be a "linking exception" clause added to
-the license as described below.
-
-If you have any concerns or questions just ask me:
-
-  Lars Rune Nøstdal <larsnostdal@gmail.com>
-
-
-
-  
-
-Copy of the AGPLv3 follows:
-===========================
 
 
 

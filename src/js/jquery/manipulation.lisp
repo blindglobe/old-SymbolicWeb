@@ -33,7 +33,7 @@
   (declare (string html selector))
   ;; after
   "outside append"
-  (catstr "$(\"#" selector "\").after(decodeURIComponent(\"" (the string (url-encode html))  "\"));"))
+  (catstr "$(\"#" selector "\").after(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
 (export 'js-oappend)
 
 
@@ -82,12 +82,11 @@
   (catstr "(function(){"
           "var first = $(\"#" selector-a "\").clone(true);"
           "var second = $(\"#" selector-b "\").clone(true);"
-          
+
           "$(\"#" selector-a "\").attr(\"id\",  \"js-exchange-first\");"
           "$(\"#" selector-b "\").attr(\"id\", \"js-exchange-second\");"
-          
+
           "$(\"#js-exchange-first\").replaceWith(second);"
           "$(\"#js-exchange-second\").replaceWith(first);"
           "})();"))
 (export 'js-exchange)
-  

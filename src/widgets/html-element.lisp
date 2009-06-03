@@ -5,40 +5,49 @@
 (declaim #.(optimizations))
 
 
+
 (defclass html-element (widget)
   ((element-type :reader element-type-of :initarg :element-type
-                 :initform "div"))
+                 :type string
+                 :initform "div")
 
-  (:metaclass mvc-stm-class)
-  (:default-initargs
-      :model #~""))
+   (html-content :accessor html-content-of :initarg :html-content
+                 :initform "")))
 
 
-(defmethod initialize-instance :after ((html-element html-element) &key (display nil display-supplied-p))
+(defmethod initialize-instance :after ((html-element html-element) &key
+                                       (display nil display-supplied-p))
   (with-object html-element
-    (setf ¤shtml (catstr "<" ¤element-type " id='" ¤id "'"
-                         (if display-supplied-p
-                             (catstr " style='display: " display ";'")
-                             "")
-                         "></" ¤element-type ">"))))
+    (setf ¤shtml
+          (catstr "<" ¤element-type " id='" ¤id "'"
+                  (if display-supplied-p
+                      (catstr " style='display: " display ";'")
+                      "")
+                  "></" ¤element-type ">"))
+    (when display-supplied-p
+      (setf (display-of html-element :server-only-p t) display))))
 
 
-;; Handle generic models of the SINGLE-VALUE-MODEL kind. E.g., CELL etc.
-(flet ((update (html-element model)
-         (muffle-compiler-note
-           (run (setf (js-html-of (id-of html-element))
-                      (html<- (full-deref model) html-element))
-                html-element))))
-  (declare (inline update))
+(flet ((update-html (html-element new-html)
+         (with-object html-element
+           (muffle-compiler-note
+             (run (setf (js-html-of ¤id)
+                        (html<- new-html html-element))
+                  html-element)))))
+  (declare (inline update-html))
   
   
-  (defmethod handle-view-set-object-model ((html-element html-element) (model single-value-model))
-    (update html-element model))
+  (defmethod render ((html-element html-element))
+    (update-html html-element (html-content-of html-element)))
   
   
-  (defmethod handle-model-slot-set-event ((html-element html-element) (model single-value-model) slot-name event)
-    (update html-element model))
-  
-  
-  (defmethod render-widget ((html-element html-element) (model single-value-model))
-    (update html-element model)))
+  (defmethod (setf html-content-of) :after (new-html (html-element html-element))
+    (update-html html-element new-html)))
+
+
+(defmethod (setf model-of) (model (html-element html-element))
+  (with-object html-element
+    (setf ¤formula
+          #λ(when-commit ()
+              (setf (html-content-of html-element)
+                    ~¤model)))))

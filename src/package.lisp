@@ -6,15 +6,16 @@
         #:cl-utilities
         #:alexandria
         #:aromyxo
+        #:sw-stm
         #:sw-mvc
         ;;#:sw-db
         #:cl-ppcre
         #:cl-who
         #:closer-mop)
-  
+
   (:nicknames #:sw)
 
-  
+
   ;; Fix conflicts between Alexandria and cl-utilities.
   (:shadowing-import-from #:alexandria
     #:with-gensyms
@@ -23,13 +24,13 @@
     #:copy-array
     #:once-only)
 
-  
+
   (:shadow
     ;; From CL.
     #:remove #:replace
-    
+
     ;; From AROMYXO.
-    #:insert #:exchange #:get-obj ;#:id-of
+    #:insert #:exchange #:get-obj
 
     ;; From SW-MVC.
     #:value-of
@@ -38,9 +39,9 @@
     #:add #:add-to
     #:remove
     )
-  
-  
-  
+
+
+
   ;;; SERVER
   ;;;;;;;;;;
 
@@ -48,7 +49,7 @@
    ;; Server types.
    #:server
    #:hunchentoot-server
-   
+
    ;; Starting and stopping the server(s).
    #:start-server
    #:stop-server
@@ -62,9 +63,9 @@
    #:static-data-fs-path-of
    #:ht-server-instance-of
    )
-  
-  
-  
+
+
+
   ;;; ID-MIXIN
   ;;;;;;;;;;;;
   (:export
@@ -72,9 +73,9 @@
    #:id-of
    #:get-obj
    )
-  
-  
-  
+
+
+
   ;;; APPLICATION
   ;;;;;;;;;;;;;;;
   (:export
@@ -97,10 +98,10 @@
    )
 
 
-  
+
   ;;; VIEWPORT
   ;;;;;;;;;;;;
-  
+
   (:export
    #:viewport
    #:application-of
@@ -118,7 +119,7 @@
    #:reset
    )
 
-  
+
 
   ;;; OBJECT
   ;;;;;;;;;;
@@ -128,11 +129,11 @@
    #:urlized-p-of
    )
 
-  
+
 
   ;;; ADDRESS-BAR
   ;;;;;;;;;;;;;;;
-  
+
   (:export
    #:address-bar
    #:viewport-of
@@ -150,7 +151,7 @@
    #:state<-uri-value
    )
 
-  
+
 
   ;;; CODE
   ;;;;;;;;
@@ -163,7 +164,7 @@
    )
 
 
-  
+
   ;;; WIDGET
   ;;;;;;;;;;
 
@@ -189,10 +190,10 @@
    #:shared-p-of
    )
 
-  
+
    ;;; CONTAINER
    ;;;;;;;;;;;;;
-  
+
    (:export
     #:container
     #:num-children-of
@@ -214,11 +215,11 @@
     )
 
 
-   
+
    ;;; MODEL stuff
    ;;;;;;;;;;;;;;;
-   
-   (:export 
+
+   (:export
     #:model #:view
     #:model-of #:views-of
     #:view-in-context-of
@@ -235,8 +236,3 @@
    (:export
     #:filtered-container-model #:filter-fn #:filter-fn-of)
    )
-
-  
-
-
-  

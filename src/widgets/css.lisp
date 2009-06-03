@@ -62,17 +62,6 @@
 (gen-dom-css-class "font-size")
 (gen-dom-css-class "font")
 
-#|
-(defclass dom-all-css-font-style-properties (dom-css-font-family
-                                             dom-css-font-style
-                                             dom-css-font-variant
-                                             dom-css-font-weight
-                                             dom-css-font-size
-                                             dom-css-font)
-  ())
-(export 'dom-all-css-font-style-properties)
-|#
-
 
 ;; Color and background properties
 
@@ -83,18 +72,6 @@
 (gen-dom-css-class "background-attachment")
 (gen-dom-css-class "background-position")
 (gen-dom-css-class "background")
-
-#|
-(defclass dom-all-css-color-and-background-properties (dom-css-color
-                                                       dom-css-background-color
-                                                       dom-css-background-image
-                                                       dom-css-background-repeat
-                                                       dom-css-background-attachment
-                                                       dom-css-background-position
-                                                       dom-css-background)
-  ())
-(export 'dom-all-css-color-and-background-properties)
-|#
 
 
 ;; Text properties
@@ -107,19 +84,6 @@
 (gen-dom-css-class "text-align")
 (gen-dom-css-class "text-indent")
 (gen-dom-css-class "line-height")
-
-#|
-(defclass dom-all-css-text-style-properties (dom-css-word-spacing
-                                             dom-css-letter-spacing
-                                             dom-css-text-decoration
-                                             dom-css-vertical-align
-                                             dom-css-text-transform
-                                             dom-css-text-align
-                                             dom-css-text-indent
-                                             dom-css-line-height)
-  ())
-(export 'dom-all-css-text-style-properties)
-|#
 
 
 ;; Box properties
@@ -151,36 +115,6 @@
 (gen-dom-css-class "float")
 (gen-dom-css-class "clear")
 
-#|
-(defclass dom-all-css-box-style-properties (dom-css-margin-top
-                                            dom-css-margin-right
-                                            dom-css-margin-bottom
-                                            dom-css-margin-left
-                                            dom-css-margin
-                                            dom-css-padding-top
-                                            dom-css-padding-right
-                                            dom-css-padding-bottom
-                                            dom-css-padding-left
-                                            dom-css-padding
-                                            dom-css-border-top-width
-                                            dom-css-border-right-width
-                                            dom-css-border-bottom-width
-                                            dom-css-border-left-width
-                                            dom-css-border-width
-                                            dom-css-border-color
-                                            dom-css-border-style
-                                            dom-css-border-top
-                                            dom-css-border-right
-                                            dom-css-border-bottom
-                                            dom-css-border-left
-                                            dom-css-width
-                                            dom-css-height
-                                            dom-css-float
-                                            dom-css-clear)
-  ())
-(export 'dom-all-css-box-style-properties)
-|#
-
 
 ;; Classification properties
 
@@ -190,31 +124,6 @@
 (gen-dom-css-class "list-style-image")
 (gen-dom-css-class "list-style-position")
 (gen-dom-css-class "list-style")
-
-#|
-(defclass dom-all-css-classification-style-properties (dom-css-display
-                                                       dom-css-white-space
-                                                       dom-css-list-style-type
-                                                       dom-css-list-style-image
-                                                       dom-css-list-style-position
-                                                       dom-css-list-style)
-  ())
-(export 'dom-all-css-classification-style-properies)
-|#
-
-
-;; All CSS1 properties
-
-#|
-(defclass dom-all-css1-properties (dom-all-css-font-style-properties
-                                   dom-all-css-color-and-background-properties
-                                   dom-all-css-text-style-properties
-                                   dom-all-css-box-style-properties
-                                   dom-all-css-classification-style-properties)
-  ())
-(export 'dom-all-css1-properties)
-|#
-
 
 
 ;;; CSS21
@@ -240,34 +149,3 @@
 (gen-dom-css-class "unicode-bidi")
 (gen-dom-css-class "visibility")
 
-#|
-(defclass dom-all-css21-properties (dom-css-border-top-color
-                                    dom-css-border-right-color
-                                    dom-css-border-bottom-color
-                                    dom-css-border-left-color
-                                    dom-css-border-top
-                                    dom-css-border-right
-                                    dom-css-border-bottom
-                                    dom-css-border-left
-                                    dom-css-border
-                                    dom-css-position
-                                    dom-css-overflow
-                                    dom-css-cursor
-                                    dom-css-top
-                                    dom-css-right
-                                    dom-css-bottom
-                                    dom-css-left
-                                    dom-css-z-index
-                                    dom-css-direction
-                                    dom-css-unicode-bidi
-                                    dom-css-visibility)
-  ())
-(export 'dom-all-css21-properties)
-|#
-              
-#|              
-(defclass dom-all-css-properties (dom-all-css1-properties dom-all-css21-properties)
-  ())
-(export 'dom-all-css-properties)
-|#
-  
