@@ -23,7 +23,7 @@ possible and be able to optimize type-checking code based on this. |#
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defclass container-base ()
-  ((children :reader children-of
+  ((children :reader children-of :initarg :children
              :type list
              :initform nil)))
 (export '(container-base children children-of))

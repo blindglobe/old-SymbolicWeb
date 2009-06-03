@@ -54,6 +54,7 @@
         (:file "events")
         (:file "html-element")
         (:file "container")
+        (:file "button")
         #|
         (:file "container-with-1-active-item")
         (:file "html-elements")
@@ -64,7 +65,6 @@
         (:file "spin-button")
         (:file "text-input")
         (:file "text-area")
-        (:file "button")
         (:file "toggle-button")
         (:file "radio-button")
         (:file "checkbox")
