@@ -15,14 +15,7 @@
                      :initform nil))
 
   (:default-initargs
-   :model (dlist)
-   :view-constructor-fn (lambda (context-view model &key)
-                          (declare (ignore context-view))
-                          (typecase model
-                            (sw-mvc:container
-                             (make-instance 'container :model model))
-                            (t
-                             (make-instance 'html-element :model model))))))
+   :model (dlist)))
 
 
 (defmethod initialize-instance :after ((container container) &key
@@ -35,6 +28,14 @@
                       (catstr " style='display: " display ";'")
                       "")
                   "></" element-type ">"))))
+
+
+(defmethod view-constructor ((container container) model &key)
+  (error "~A doesn't know how to make a View of ~A." container model))
+
+
+(defmethod view-constructor ((container container) (model single-value-model) &key)
+  (make-instance 'html-element :model model))
 
 
 (defmethod (setf model-of) ((model dlist) (container container))
@@ -291,8 +292,8 @@ already be in."
 
 
 (defmethod exchange ((container container) (widget-a widget) (widget-b widget))
-  (setf (slot-valuec container 'children)
-        (amx:exchange widget-a widget-b (slot-value container 'children)))
+  (with-object container
+    (setf ¤children (amx:exchange widget-a widget-b ¤children)))
   (when (visible-p-of container)
     (run (js-exchange (id-of widget-a) (id-of widget-b)) container)))
 
