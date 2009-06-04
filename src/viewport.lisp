@@ -13,17 +13,17 @@
    (root-widget :reader root-widget-of :initarg :root-widget
                 :type (or symbol widget)
                 :initform 'container)
-   
+
    (widgets :reader widgets-of
             :type hash-table
             :initform (make-hash-table :test #'equal :synchronized t :weakness :value)
             :documentation "
 A weak hash of ID->WIDGETs of all currently active widgets in viewport.")
-   
+
    (callbacks :reader callbacks-of
               :type hash-table
               :initform (make-hash-table :test #'equal :weakness :value :synchronized t))
-   
+
    (address-bar :reader address-bar-of)
 
    (dirty-p :reader dirty-p-of
@@ -63,7 +63,7 @@ which normally might have delayed the end (it might be sleeping).")
    (code-id<->code :reader code-id<->code-of
                    :type hash-table
                    :initform (make-hash-table :test #'equal :synchronized t)))
-  
+
   (:documentation "
 Each instance of VIEWPORT represents a browser window or tab."))
 
@@ -143,6 +143,7 @@ refresh."
         (funcall to-do))
       (nilf (slot-value viewport 'do-at-end))
       (unless (eq *request-type* :comet)
+        ;; TODO: At least output a warning?
         (ignore-errors (funcall (comet-callback-of viewport)))))))
 
 
@@ -154,7 +155,7 @@ refresh."
 (defun do-comet-response (viewport)
   (declare (viewport viewport))
   (when-let ((comet-callback (comet-callback-of viewport)))
-    (funcall comet-callback)))
+    (funcall (the function comet-callback))))
 
 
 #.(maybe-inline 'append-to-response-data-of)
@@ -166,7 +167,7 @@ refresh."
     (setf (slot-value viewport 'response-data)
           ;; TODO: I'm guessing using an array with a fill-pointer etc. would be faster...
           (catstr (slot-value viewport 'response-data) js-str)))
-    
+
   (if (and (equal viewport *viewport*)
            (eq *request-type* :ajax))
       (with-recursive-lock-held ((do-at-end-mutex-of viewport))
@@ -182,12 +183,12 @@ refresh."
               (tf (slot-value viewport 'dirty-p))
               (push (iambda (with-recursive-lock-held ((do-at-end-mutex-of viewport)) (nilf (slot-value viewport 'dirty-p))))
                     (do-at-end-of viewport)))))
-      
+
       ;; When sending to other viewports we send a direct wake up call to the comet channel.
       ;; This is less than optimal, probably, but it's "safe". This will be called
       ;; when working from the REPL too.
       (do-comet-response viewport)))
-      
+
 
 #.(maybe-inline 'root)
 (defun root ()
