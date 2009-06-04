@@ -36,16 +36,13 @@
 
 
 (defmacro gen-dom-css-class (name &key (reader-value-on-no-entry nil reader-value-on-no-entry-supplied-p))
-  (let* (;;(class-name (symbolicate (string-upcase (catstr "dom-css-" name))))
-         (slot-name (symbolicate (string-upcase name)))
+  (let* ((slot-name (symbolicate (string-upcase name)))
          (accessor (symbolicate slot-name "-OF"))
-         ;;(initarg (format-symbol :keyword (string-upcase name)))
          (base-code
-          `(def-dom-class #|,class-name|# ,slot-name css ,name
+          `(def-dom-class ,slot-name css ,name
                           :writer-check-for-value-designating-removal-code (eq value nil)
                           :writer-value-marshaller-code (princ-to-string value)
-                          :accessor ,accessor
-                          #|:initarg ,initarg|#)))
+                          :accessor ,accessor)))
     (when reader-value-on-no-entry-supplied-p
       (appendf base-code (list :reader-value-on-no-entry reader-value-on-no-entry)))
     base-code))
@@ -148,4 +145,3 @@
 (gen-dom-css-class "direction")
 (gen-dom-css-class "unicode-bidi")
 (gen-dom-css-class "visibility")
-

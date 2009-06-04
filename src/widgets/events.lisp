@@ -7,24 +7,24 @@
 
 (defclass callback-box ()
   ((id :reader id-of)
-   
+
    (widget :reader widget-of :initarg :widget
            :type widget
            :initform (error ":WIDGET needed."))
-   
+
    (event-type :reader event-type-of :initarg :event-type
                :type string
                :initform (error ":EVENT-TYPE needed."))
-   
+
    (callback :reader callback-of :initarg :callback
              :initform (iambda))
-   
+
    (callback-data :accessor callback-data-of :initarg :callback-data
                   :initform nil)
-   
+
    (js-before :accessor js-before-of :initarg :js-before
               :initform *js-before*)
-   
+
    (js-after :accessor js-after-of :initarg :js-after
              :initform *js-after*)
 
@@ -72,7 +72,7 @@
            (viewport viewport)
            (optimize speed))
   (gethash id (callbacks-of viewport)))
-           
+
 
 (defmethod trigger ((callback-box callback-box) &rest args)
   (let ((js-code (js-trigger (id-of (widget-of callback-box))
@@ -165,9 +165,9 @@ that the event is to be unbound. |#
     (when dom-cache-writer-fn
       (funcall (the function dom-cache-writer-fn) callback))
     (when callback
-      (with-visible-contexts-of widget viewport 
+      (with-visible-contexts-of widget viewport
         (store-callback-box callback viewport)))
-        
+
     ;; setup @ client side
     (unless server-only-p (bind-widget widget event-type callback))))
 (export 'event)
@@ -182,43 +182,23 @@ that the event is to be unbound. |#
 
 (defmacro mk-cb ((widget-sym &rest args) &body body)
   "\"Make callback.\". Creates the Lisp side function or callback for
-DOM-events.
-
-In an INITFORM context, this binds the current instance to SELF which enables
-one to do things like:
-
-   (defwidget add-user-dialog (html-container)
-     ((save-btn :reader save-btn-of
-                :initform (mk-button \"Save and add user\"
-                                     :on-click (mk-cb (button)
-                                                 (declare (ignore button))
-                                                 (save self))))))
-
-  (defmethod save ((add-user-dialog add-user-dialog))
-    (write-line \"save!\"))
-"
-  `(let ((self (self)))
-     (declare (ignorable self))
-     (lambda (,widget-sym &key ,@args)
-       ,@body)))
+DOM-events."
+  `(lambda (,widget-sym &key ,@args)
+     ,@body))
 (export 'mk-cb)
 
 
 
 (defmacro gen-dom-event-class (name)
-  (let* (#|(class-name (symbolicate (string-upcase (catstr "dom-event-" name))))|#
-         (lisp-class-accessor-name (symbolicate (string-upcase (catstr "on-" name))))
-         (accessor (symbolicate (string-upcase (catstr "on-" name "-of"))))
-         #|(initarg (format-symbol :keyword (string-upcase (catstr "on-" name))))|#)
-    `(def-dom-class #|,class-name|# ,lisp-class-accessor-name event ,name
+  (let* ((lisp-class-accessor-name (symbolicate (string-upcase (catstr "on-" name))))
+         (accessor (symbolicate (string-upcase (catstr "on-" name "-of")))))
+    `(def-dom-class ,lisp-class-accessor-name event ,name
                     :writer-check-for-value-designating-removal-code (eq value nil)
                     :accessor ,accessor
-                    ;;:initarg ,initarg
                     :writer-extra-keyargs (js-before js-after callback-data (browser-default-action-p t))
                     :remover-code ((with-visible-contexts-of dom-mirror viewport
                                      (remove-callback-box dom-mirror ,name viewport))
                                    (remhash ',lisp-class-accessor-name (dom-mirror-data-of dom-mirror))))))
-            
 
 
 (gen-dom-event-class "blur")
@@ -240,49 +220,6 @@ one to do things like:
 (gen-dom-event-class "select")
 ;;(gen-dom-event-class "submit")
 (gen-dom-event-class "unload")
-
-
-(defclass dom-all-events (dom-event-blur
-                          dom-event-change
-                          dom-event-click
-                          dom-event-dblclick
-                          dom-event-focus
-                          dom-event-keydown
-                          dom-event-keypress
-                          dom-event-keyup
-                          dom-event-load
-                          dom-event-mousedown
-                          dom-event-mouseout
-                          dom-event-mouseover
-                          dom-event-mouseup
-                          dom-event-resize
-                          dom-event-scroll
-                          dom-event-select
-                          dom-event-unload)
-  ())
-(export 'dom-all-events)
-
-
-
-(defclass dom-event-change-with-support-for-t-value ()
-  ()
-  (:documentation "
-Widgets inheriting from this class will have a custom (SETF ON-CHANGE-OF) method
-that accepts T for its callback argument."))
-
-
-(defmethod (setf on-change-of) :around (new-value (widget dom-event-change-with-support-for-t-value) &rest args)
-  (if (eq t new-value)
-      (apply #'call-next-method
-             (lambda (widget &key value)
-               (with-locked-object widget
-                 (setf (value-of widget :server-only-p t) value)))
-             widget
-             :callback-data `((:value . ,(js-code-of (value-of widget))))
-             args)
-      (call-next-method)))
-
-
 
 
 
@@ -324,7 +261,3 @@ that accepts T for its callback argument."))
                                (if (numberp state)
                                    (incf state)
                                    (setf state 0)))))
-
-  
-
-                      
