@@ -43,7 +43,7 @@
     (update-html html-element new-html)))
 
 
-(defmethod (setf model-of) (model (html-element html-element))
+(defmethod (setf model-of) ((model single-value-model) (html-element html-element))
   (with-object html-element
     (setf ¤formula
           #λ(when-commit ()
