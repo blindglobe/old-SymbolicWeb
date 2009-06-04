@@ -35,9 +35,10 @@ Contains View instances.")))
                                        (children nil children-supplied-p)
                                        (child nil child-supplied-p))
   (with-object container-base
-    (cond
-      (children-supplied-p
-       (setf ¤children (mklst children)))
-
-      (child-supplied-p
-       (setf ¤children (mklst child))))))
+    (setf ¤children
+          (loop :for child :in (mklst (cond
+                                        (children-supplied-p children)
+                                        (child-supplied-p child)))
+             :collect (if (typep child 'view-base)
+                          child
+                          (view-in-context-of container-base child))))))
