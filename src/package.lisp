@@ -37,7 +37,7 @@
     #:right-of #:left-of
     #:container
     #:add #:add-to
-    #:remove
+    #:remove #:remove-all
     )
 
 
