@@ -5,7 +5,6 @@
 (declaim #.(optimizations))
 
 
-
 (defclass html-element (widget)
   ((element-type :reader element-type-of :initarg :element-type
                  :type string
@@ -30,17 +29,16 @@
 
 (flet ((update-html (html-element new-html)
          (with-object html-element
-           (muffle-compiler-note
-             (run (setf (js-html-of ¤id)
-                        (html<- new-html html-element))
-                  html-element)))))
+           (run (setf (js-html-of ¤id)
+                      (html<- new-html html-element))
+                html-element))))
   (declare (inline update-html))
-  
-  
+
+
   (defmethod render ((html-element html-element))
     (update-html html-element (html-content-of html-element)))
-  
-  
+
+
   (defmethod (setf html-content-of) :after (new-html (html-element html-element))
     (update-html html-element new-html)))
 
