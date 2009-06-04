@@ -23,7 +23,21 @@ possible and be able to optimize type-checking code based on this. |#
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defclass container-base ()
-  ((children :reader children-of :initarg :children
+  ((children :reader children-of
              :type list
-             :initform nil)))
+             :initform nil
+             :documentation "
+Contains View instances.")))
 (export '(container-base children children-of))
+
+
+(defmethod initialize-instance :after ((container-base container-base) &key
+                                       (children nil children-supplied-p)
+                                       (child nil child-supplied-p))
+  (with-object container-base
+    (cond
+      (children-supplied-p
+       (setf ¤children (mklst children)))
+
+      (child-supplied-p
+       (setf ¤children (mklst child))))))
