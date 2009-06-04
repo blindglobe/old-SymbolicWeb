@@ -26,6 +26,7 @@
            (setf (car arg) (mksymf ":" (car arg))))
          (execute-callback callback-box :dom-event (flatten arguments))))
 
+      #|
       ((string= "js-ack" event)
        (let* ((code-id (sw-http:get-parameter "code-id"))
               (code (code-of code-id)))
@@ -36,7 +37,7 @@
                (wake-up (sleeper-of code)))
              (format t "[SW] (js-ack) Warning: code-id \"~A\" not found in app \"~A\"~%"
                      code-id (id-of app)))))
-      
+
       ((string= "js-fail" event)
        (let ((code (code-of (sw-http:get-parameter "code-id"))))
          (if code
@@ -46,6 +47,7 @@
                (wake-up (sleeper-of code)))
              (format t "[SW] (js-fail) Warning: Client JS exception: ~A~%"
                      (sw-http:post-parameter "exception-str")))))
+      |#
 
       ((string= "url-hash-changed" event)
        (if-let (new-url-hash (sw-http:post-parameter "new-url-hash"))
