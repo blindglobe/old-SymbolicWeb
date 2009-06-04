@@ -51,7 +51,7 @@ Use/see the VISIBLE-P-OF method.")))
 #.(maybe-inline 'currently-constructing-p)
 (defun currently-constructing-p (widget)
   (declare (type widget widget))
-  (equal widget *currently-constructing-widget*))
+  (eq widget *currently-constructing-widget*))
 
 
 (defmethod shtml-of ((widget widget))
