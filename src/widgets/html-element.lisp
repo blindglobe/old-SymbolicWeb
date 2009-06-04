@@ -14,19 +14,6 @@
                  :initform "")))
 
 
-(defmethod initialize-instance :after ((html-element html-element) &key
-                                       (display nil display-supplied-p))
-  (with-object html-element
-    (setf ¤shtml
-          (catstr "<" ¤element-type " id='" ¤id "'"
-                  (if display-supplied-p
-                      (catstr " style='display: " display ";'")
-                      "")
-                  "></" ¤element-type ">"))
-    (when display-supplied-p
-      (setf (display-of html-element :server-only-p t) display))))
-
-
 (flet ((update-html (html-element new-html)
          (with-object html-element
            (run (setf (js-html-of ¤id)

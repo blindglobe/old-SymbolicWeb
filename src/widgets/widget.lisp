@@ -34,6 +34,20 @@ Use/see the VISIBLE-P-OF method.")))
       (call-next-method))))
 
 
+(defmethod initialize-instance :after ((widget widget) &key
+                                       (element-type "div")
+                                       (display nil display-supplied-p))
+  (unless (slot-boundp widget 'shtml)
+    (setf (slot-value widget 'shtml)
+          (catstr "<" element-type " id='" (id-of widget) "'"
+                  (if display-supplied-p
+                      (catstr " style='display: " display ";'")
+                      "")
+                  "></" element-type ">")))
+  (when display-supplied-p
+    (setf (display-of widget :server-only-p t) display)))
+
+
 #.(maybe-inline 'currently-constructing-p)
 (defun currently-constructing-p (widget)
   (declare (type widget widget))

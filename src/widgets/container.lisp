@@ -18,18 +18,6 @@
    :model (dlist)))
 
 
-(defmethod initialize-instance :after ((container container) &key
-                                       (element-type "div")
-                                       (display nil display-supplied-p))
-  (unless (slot-boundp container 'shtml)
-    (setf (slot-value container 'shtml)
-          (catstr "<" element-type " id='" (id-of container) "'"
-                  (if display-supplied-p
-                      (catstr " style='display: " display ";'")
-                      "")
-                  "></" element-type ">"))))
-
-
 (defmethod view-constructor ((container container) model &key)
   (error "~A doesn't know how to make a View of ~A." container model))
 
