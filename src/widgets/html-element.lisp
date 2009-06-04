@@ -48,4 +48,4 @@
     (setf ¤formula
           #λ(when-commit ()
               (setf (html-content-of html-element)
-                    ~¤model)))))
+                    ~model)))))
