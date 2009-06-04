@@ -65,15 +65,15 @@
                 exception-str)))
 
       ((string= "terminate-session" event)
-       (remove app))
+       (remove-application  app))
 
+      #|
       ((string= "display-session-info" event)
        (show-alert-box (who (:h3 "SymbolicWeb session info")
                             "(ID-OF APP) => " (str (id-of app)) :br
                             "(ID-OF VIEWPORT) => " (str (id-of viewport)) :br
                             "(COOKIE-VALUE-OF APP) => " (str (cookie-value-of app)))))
-      
+      |#
+
       (t
        (warn "Unknown event `~A' supplied to `handle-ajax-request'." event)))))
-
-
