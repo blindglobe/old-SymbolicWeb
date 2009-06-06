@@ -18,12 +18,16 @@
    :model (dlist)))
 
 
-(defmethod view-constructor ((container container) model &key)
+(defmethod view-constructor ((container container) model)
   (error "~A doesn't know how to make a View of ~A." container model))
 
 
-(defmethod view-constructor ((container container) (model single-value-model) &key)
+(defmethod view-constructor ((container container) (model single-value-model))
   (make-instance 'html-element :model model))
+
+
+(defmethod view-constructor ((container container) (model dlist))
+  (make-instance 'container :model model))
 
 
 (defmethod (setf model-of) ((model dlist) (container container))
@@ -31,22 +35,27 @@
     (unless ¤insert-event-λ
       (setf ¤insert-event-λ
             #λ(when-let (event (insert-event-of model))
-                (when-commit ()
-                  (mvc-container-insert container event)))))
+                (when (eq model (container-of event))
+                  (when-commit ()
+                    (mvc-container-insert container event))))))
     (unless ¤remove-event-λ
       (setf ¤remove-event-λ
             #λ(when-let (event (remove-event-of model))
-                (when-commit ()
-                  (mvc-container-remove container event)))))
+                (when (eq model (container-of event))
+                  (when-commit ()
+                    (mvc-container-remove container event))))))
     (unless ¤exchange-event-λ
       (setf ¤exchange-event-λ
             #λ(when-let (event (exchange-event-of model))
-                (when-commit ()
-                  (mvc-container-exchange container event))))))
+                (when (eq model (container-of event))
+                  (when-commit ()
+                    (mvc-container-exchange container event)))))))
 
-  (do ((node (head-of model) (sw-mvc:right-of node)))
-      ((null node))
-    (add (view-in-context-of container node) container)))
+  (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
+      ((null dlist-node))
+    (let ((model ~dlist-node))
+      (when-commit ()
+        (add (view-in-context-of container model) container)))))
 
 
 (defun mvc-container-insert (container event)
