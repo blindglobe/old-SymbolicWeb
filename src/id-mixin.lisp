@@ -27,11 +27,10 @@
   (gethash id *id->object*))
 
 
-(defmethod print-object :around ((id-mixin id-mixin) stream)
-  (print-unreadable-object (id-mixin stream :type t :identity nil)
-    (format stream ":ID ~S" (id-of id-mixin))
-    (call-next-method)))
-
-
 (defmethod print-object ((id-mixin id-mixin) stream)
-  )
+  (if (slot-boundp id-mixin 'id)
+      (print-unreadable-object (id-mixin stream :type nil :identity nil)
+        (format stream "~A" (slot-value id-mixin 'id))
+        (print-slots id-mixin stream))
+      (print-unreadable-object (id-mixin stream :type t :identity t)
+        (print-slots id-mixin stream))))
