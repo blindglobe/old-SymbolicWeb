@@ -6,11 +6,7 @@
 
 
 (defclass html-element (widget)
-  ((element-type :reader element-type-of :initarg :element-type
-                 :type string
-                 :initform "div")
-
-   (html-content :accessor html-content-of :initarg :html-content
+  ((html-content :accessor html-content-of :initarg :html-content
                  :initform "")))
 
 
