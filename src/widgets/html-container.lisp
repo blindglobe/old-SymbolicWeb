@@ -6,18 +6,11 @@
 (defclass html-container (container)
   ((html-content :initarg :html-content
                  :type function
-                 :initform (error ":HTML-CONTENT needed. Hint: Use the MK-HTML-CONTAINER macro.")))
+                 :initform (error ":HTML-CONTENT needed. Hint: Use the MK-HTMLC macro.")))
 
   (:default-initargs
    :model nil))
 (export 'html-container)
-
-
-(defmacro mk-html-container ((&rest initargs) &body who-html)
-  `(make-instance 'html-container
-                  :html-content (lambda () (who ,@who-html))
-                  ,@initargs))
-(export 'mk-html-container)
 
 
 (defmethod generate-html :around ((html-container html-container))
@@ -51,3 +44,14 @@
 (defmethod render ((html-container html-container))
   (update-client html-container))
 (export 'render)
+
+
+(defmacro mk-htmlc (args &body html)
+  (if (listp args)
+      `(make-instance 'html-container
+                      :html-content (lambda () (who ,@html))
+                      ,@args)
+      `(make-instance 'html-container
+                      :element-type (princ-to-string ,args)
+                      :html-content (lambda () (who ,@html)))))
+(export 'mk-htmlc)
