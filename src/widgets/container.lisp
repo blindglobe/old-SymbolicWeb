@@ -159,7 +159,6 @@ Returns WIDGETS."
     (nconcf (slot-value container 'children) widgets)
     (when (visible-p-of container)
       (dolist (widget widgets)
-        (push widget (slot-value container 'children))
         (run (js-iappend (shtml-of widget) (id-of container)) container)
         (propagate-for-add widget container)
         (with-code-block (:widget container)
