@@ -32,3 +32,14 @@
           #λ(when-commit ()
               (setf (html-content-of html-element)
                     ~model)))))
+
+
+(defmacro mk-html (args &body html)
+  (if (listp args)
+      `(make-instance 'html-element
+                      :html-content (who ,@html)
+                      ,@args)
+      `(make-instance 'html-element
+                      :element-type (princ-to-string ,args)
+                      :html-content (who ,@html))))
+(export 'mk-html)
