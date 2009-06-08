@@ -12,8 +12,7 @@
 
 (flet ((update-html (html-element new-html)
          (with-object html-element
-           (run (setf (js-html-of ¤id)
-                      (html<- new-html html-element))
+           (run (setf (js-html-of ¤id) (html<- new-html html-element))
                 html-element))))
   (declare (inline update-html))
 

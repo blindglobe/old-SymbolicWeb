@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations))
+
 
 (defclass html-container (container)
   ((html-content :initarg :html-content
