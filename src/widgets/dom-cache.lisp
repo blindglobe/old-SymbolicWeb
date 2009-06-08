@@ -18,11 +18,11 @@
 (defclass dom-mirror ()
   ((dom-mirror-data :reader dom-mirror-data-of
                     :type hash-table
-                    :initform (make-hash-table :test #'eq :synchronized t))
+                    :initform (make-hash-table :test #'eq))
 
    (event-router :reader event-router-of
                  :type hash-table
-                 :initform (make-hash-table :test #'eq :synchronized t))))
+                 :initform (make-hash-table :test #'eq))))
 
 
 (defmethod render :after ((dom-mirror dom-mirror))
