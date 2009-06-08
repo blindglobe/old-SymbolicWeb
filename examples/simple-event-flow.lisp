@@ -6,7 +6,7 @@
 (defclass simple-event-flow (self-ref)
   ((x :initform 0)
    (square-of-x :initform ↑λ(* ¤x ¤x)))
-   
+
   (:metaclass mvc-stm-class))
 
 
@@ -18,7 +18,7 @@
 
 (defclass simple-event-flow-app (simple-event-flow application)
   ()
-  
+
   (:metaclass mvc-stm-class))
 
 (set-uri 'simple-event-flow-app "/simple-event-flow")

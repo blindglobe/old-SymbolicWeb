@@ -19,7 +19,7 @@
 
 
 (defmethod view-constructor ((container container) model)
-  (error "~A doesn't know how to make a View of ~A." container model))
+  (error "~S doesn't know how to make a View of ~S." container model))
 
 
 (defmethod view-constructor ((container container) (model single-value-model))
@@ -53,9 +53,8 @@
 
   (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
       ((null dlist-node))
-    (let ((model ~dlist-node))
-      (when-commit ()
-        (add (view-in-context-of container model) container)))))
+    (when-commit ()
+      (add (view-in-context-of container ~dlist-node) container))))
 
 
 (defun mvc-container-insert (container event)
