@@ -14,6 +14,9 @@ parent class of this class) so the server and client \"versions\" of the
 widget can communicate or refer to each other.
 See the SHTML-OF method.")
 
+   (static-attributes :reader static-attributes-of
+                      :type list)
+
    (viewports :reader viewports-of
               :type hash-table
               :initform (make-hash-table :test #'equal :weakness :value :synchronized t)
@@ -27,6 +30,7 @@ Use/see the VISIBLE-P-OF method.")))
 
 
 (defmethod initialize-instance :around ((widget widget) &key)
+  (setf (slot-value widget 'static-attributes) (list))
   ;; Let the RENDER method send stuff to the client when things are ready instead.
   (with-code-block (:execute-p nil)
     (let ((*currently-constructing-widget* widget)
@@ -36,16 +40,22 @@ Use/see the VISIBLE-P-OF method.")))
 
 (defmethod initialize-instance :after ((widget widget) &key
                                        (element-type "div")
+                                       ;; NOTE: This gets special treatment to avoid "flashing" when rendering.
                                        (display nil display-supplied-p))
   (unless (slot-boundp widget 'shtml)
     (setf (slot-value widget 'shtml)
           (catstr "<" element-type " id='" (id-of widget) "'"
                   (if display-supplied-p
-                      (catstr " style='display: " display ";'")
+                      (progn
+                        (setf (display-of widget :server-only-p t) display)
+                        (catstr " style='display: " (princ-to-string display) ";'"))
                       "")
-                  "></" element-type ">")))
-  (when display-supplied-p
-    (setf (display-of widget :server-only-p t) display)))
+                  (if-let (attributes (static-attributes-of widget))
+                    (with-output-to-string (ss)
+                      (dolist (key.value attributes)
+                        (format ss " ~A='~A'" (car key.value) (cdr key.value))))
+                    "")
+                  "></" element-type ">"))))
 
 
 #.(maybe-inline 'currently-constructing-p)
