@@ -24,7 +24,7 @@
 
 (defun (setf window-location-href) (new-href &optional (viewport *viewport*))
   (declare (type viewport viewport))
-  (let ((js-code (catstr "window.location.href=\"" 
+  (let ((js-code (catstr "window.location.href=\""
                          new-href ;;(cl-ppcre:regex-replace-all " " new-href "_")
                          "\";")))
     (if *js-code-only-p*

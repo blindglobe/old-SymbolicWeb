@@ -9,20 +9,20 @@
   ((code-id :reader code-id-of :initarg :code-id
             :type string
             :initform (princ-to-string (generate-id)))
-   
+
    (code :initarg :code
          :type string
          :initform (error "Initarg :CODE not supplied."))
-   
+
    (status :accessor status-of :initarg :status
            :initform nil)
-   
+
    (return-value :accessor return-value-of
                  :initform nil)
-   
+
    (exception-str :accessor exception-str-of
                   :initform nil)
-   
+
    (sleeper :reader sleeper-of
             :initform (make-instance 'sleeper))))
 
@@ -161,4 +161,3 @@ bugs in a shared widget scenario, but is very useful in some contexts."
   (declare (ignore callback))
   (format t "[SW] Warning: Client JS exception: ~A~%"
           exception-str))
-

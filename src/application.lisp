@@ -8,7 +8,7 @@
 (defclass application (id-mixin locked-object self-ref)
   ((server :reader server-of
            :type server)
-   
+
    (cookie-value :reader cookie-value-of :initarg :cookie-value
                  :type string
                  :initform (error ":COOKIE-VALUE must be supplied."))
@@ -21,7 +21,7 @@
 
    (static-data-fs-path :accessor static-data-fs-path-of
                         :type string)
-   
+
    (initialized-p :reader initialized-p-of
                   :documentation "Has the MAIN method been executed?"
                   :initform nil)
@@ -33,7 +33,7 @@
 This contains all widgets currently or recently active or visible in a session.
 It is not 100% accurate; it is a weak hash, and some of these widgets might not
 have been GCed yet even though they are not active or visible anymore.")
-   
+
    (viewports :reader viewports-of
               :type hash-table
               :initform (make-hash-table :test #'equal :synchronized t)
@@ -44,11 +44,11 @@ browser windows or tabs.")
    (last-ping-time :accessor last-ping-time-of
                    :type integer
                    :initform (get-universal-time))
-   
+
    (last-activity-time :accessor last-activity-time-of
                        :documentation "
 Last time we had any real user _or_ server (server push) activity in the session."
-                       
+
                        :initform (get-universal-time))
    (last-user-activity-time :accessor last-user-activity-time-of
                             :initform (get-universal-time)
@@ -64,7 +64,7 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
                                         (static-data-subdomain (static-data-subdomain-of server))
                                         (static-data-fs-path (static-data-fs-path-of server))
                                         (cookie-expires (cookie-expires-of server)))
-  (let ((*app* app)) 
+  (let ((*app* app))
     (setf (slot-value app 'server) server
           (slot-value app 'static-data-subdomain) static-data-subdomain
           (slot-value app 'static-data-fs-path) static-data-fs-path
@@ -133,14 +133,14 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 
        (:body
         ;; NOTE/TODO: Browsers tend to add scrollbars for sub-pixel errors in their own rendering; this will probably be set to "hidden" later for that reason; it'll force the user to be more explicit in what he wants instead.
-        (:div :id "sw-root" :style "overflow: auto;") 
-        
+        (:div :id "sw-root" :style "overflow: auto;")
+
         (:img :id "sw-loading-spinner" :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"
               :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
 
         (:a :accesskey 1 :href "javascript:swTerminateSession();")
         (:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")
-              
+
         (:noscript "JavaScript needs to be enabled.")
         (str (js-sw-headers app)))))))
 
@@ -151,7 +151,3 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
     (remove-viewport viewport app))
   (remhash (id-of app) (id->app-of server))
   (remhash (cookie-value-of app) (cookie-value->app-of server)))
-
-
-
-  

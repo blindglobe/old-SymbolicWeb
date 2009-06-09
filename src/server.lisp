@@ -50,7 +50,7 @@ link\" to these instances are stored (wrt. GC).")
    (cookie-name :reader cookie-name-of :initarg :cookie-name
                 :type string
                 :initform "symbolicweb")
-   
+
    (cookie-value->app :reader cookie-value->app-of
                       :type hash-table
                       :initform (make-hash-table :test #'equal :weakness :value :synchronized t))
@@ -105,7 +105,7 @@ link\" to these instances are stored (wrt. GC).")
                      (gc-viewports server)))))))
     (unless *server*
       (setf *server* server))))
-  
+
 
 (defmethod stop-server :around ((server server) &key remove-sessions-p)
   (ignore-errors (destroy-thread (gc-thread-of server))) ;; TODO: This is probably not such a good idea.
@@ -136,7 +136,7 @@ link\" to these instances are stored (wrt. GC).")
     (start-server server-instance)
     server-instance)
 
-  
+
   (defun stop-sw (&key remove-sessions-p)
     (with-lock-held (lock)
       (unless server-instance
@@ -145,7 +145,7 @@ link\" to these instances are stored (wrt. GC).")
       (prog1 server-instance
         (setf server-instance nil))))
 
-  
+
   (defun get-sw ()
     (with-lock-held (lock)
       server-instance)))
