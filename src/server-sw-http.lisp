@@ -99,7 +99,7 @@
         (sw-http:mk-response-header-field "Expires: Mon, 26 Jul 1997 05:00:00 GMT")
         (sw-http:mk-response-header-field "Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
         (sw-http:mk-response-header-field "Pragma: no-cache")
-        (sw-http:mk-response-header-field "Server: SymbolicWeb (SW-HTTP) v0.5 alpha")))
+        (sw-http:mk-response-header-field "Server: SBCL (Common Lisp), SW-HTTP, SymbolicWeb -- License: AGPL -- http://nostdal.org/")))
     ;; NOTE: No `Set-Cookie' header; it is set by the RENDER method using JavaScript on the client
     (sw-http:response-add-chunk
      (sw-http:mk-response-header-field (catstr "Last-Modified: " (rfc-1123-date))))
