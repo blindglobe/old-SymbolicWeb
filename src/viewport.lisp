@@ -16,13 +16,13 @@
 
    (widgets :reader widgets-of
             :type hash-table
-            :initform (make-hash-table :test #'equal :synchronized t :weakness :value)
+            :initform (make-hash-table :test #'equal :weakness :value)
             :documentation "
 A weak hash of ID->WIDGETs of all currently active widgets in viewport.")
 
    (callbacks :reader callbacks-of
               :type hash-table
-              :initform (make-hash-table :test #'equal :weakness :value :synchronized t))
+              :initform (make-hash-table :test #'equal :weakness :value))
 
    (address-bar :reader address-bar-of)
 
@@ -62,7 +62,7 @@ which normally might have delayed the end (it might be sleeping).")
 
    (code-id<->code :reader code-id<->code-of
                    :type hash-table
-                   :initform (make-hash-table :test #'equal :synchronized t)))
+                   :initform (make-hash-table :test #'equal)))
 
   (:documentation "
 Each instance of VIEWPORT represents a browser window or tab."))
