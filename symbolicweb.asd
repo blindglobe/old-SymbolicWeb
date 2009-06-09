@@ -56,15 +56,14 @@
         (:file "container")
         (:file "button")
         (:file "html-container")
+        (:file "text-input")
         #|
         (:file "container-with-1-active-item")
         (:file "html-elements")
         (:file "table-container")
-
         (:file "location-callback")
         (:file "location-container")
         (:file "spin-button")
-        (:file "text-input")
         (:file "text-area")
         (:file "toggle-button")
         (:file "radio-button")
