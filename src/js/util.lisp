@@ -70,24 +70,6 @@
 (export 'redraw)
 
 
-(defmethod ping ((viewport viewport) &optional (timeout *timeout*))
-  "Pings the client."
-  (let ((irt-start (get-internal-real-time)))
-    (run "return \"pong\";" viewport :async-p nil :timeout timeout)
-    (values (- (get-internal-real-time) irt-start)
-            internal-time-units-per-second
-            viewport)))
-(export 'ping)
-
-
-(defun prompt (for-what &key (viewport *viewport*) (timeout *timeout*))
-  (declare (type viewport viewport))
-  (run (catstr "return prompt(decodeURIComponent(\"" (url-encode for-what) "\"));") viewport
-       :timeout timeout
-       :async-p nil))
-(export 'prompt)
-
-
 (defun fade-in (widget &key (speed 400) callback)
   "Returns WIDGET.
 If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to the server."
