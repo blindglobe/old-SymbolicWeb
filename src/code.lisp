@@ -49,10 +49,10 @@ RUN instead."
 #.(maybe-inline 'run)
 (defun run (code-str viewport-or-widget &key
             (async-p t)
-            (timeout *timeout*))
+            #|(timeout -timeout-)|#)
   (declare (string code-str)
            ((or viewport widget) viewport-or-widget)
-           (fixnum timeout)
+           #|(fixnum timeout)|#
            (optimize speed))
   "Send JavaScript code to client(s) for execution.
 
@@ -70,6 +70,7 @@ ASYNC-P: If NIL, RUN will block until the client is done executing and RUN will
 
 TIMEOUT: Used when ASYNC-P is NIL. This specifies the number of seconds to wait
          until the client is done executing the JS code."
+  (unless async-p (error "ASYNC-P was NIL.."))
   (when (string= code-str "")
     (warn "RUN: (STRING= CODE-STR \"\") => T. Returning from RUN with no effect.")
     (return-from run))
@@ -89,8 +90,8 @@ TIMEOUT: Used when ASYNC-P is NIL. This specifies the number of seconds to wait
     (if *creating-code-block-p*
         (if async-p
             (push (js-code "0") *code-block*)
-            (error "RUN: Currently creating code block (WITH-CODE-BLOCK) and RUN was called
-with :ASYNC-P set to NIL."))
+            #|(error "RUN: Currently creating code block (WITH-CODE-BLOCK) and RUN was called
+with :ASYNC-P set to NIL.")|#)
         (if async-p
             ;; Going to run in "async mode."
             (if (typep viewport-or-widget 'viewport)
@@ -99,7 +100,7 @@ with :ASYNC-P set to NIL."))
                   (run-js (js-code "0") viewport)))
             ;; Going to run in "sync mode" and/or we're (probably) expecting
             ;; to return something from the client (viewport).
-            (if (typep viewport-or-widget 'viewport)
+            #|(if (typep viewport-or-widget 'viewport)
                 (let ((code-obj (make-instance 'code :code code-str)))
                   (setf (gethash (code-id-of code-obj) (code-id<->code-of viewport-or-widget))
                         code-obj)
@@ -119,7 +120,7 @@ with :ASYNC-P set to NIL."))
                                (values (return-value-of code-obj)
                                        code-obj))))
                     (remhash (code-id-of code-obj) (code-id<->code-of viewport-or-widget))))
-                (error "RUN: :ASYNC-P is NIL and VIEWPORT-OR-WIDGET is not an instance of VIEWPORT."))))))
+                (error "RUN: :ASYNC-P is NIL and VIEWPORT-OR-WIDGET is not an instance of VIEWPORT."))|#))))
 
 
 (defmacro with-code-block ((&key (execute-p t execute-p-supplied-p)
