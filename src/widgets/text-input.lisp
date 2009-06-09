@@ -76,6 +76,6 @@
 (defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))
   (with-gensyms (text-input)
     `(letp1 ((,text-input (make-instance 'text-input ,@args)))
-       (when ,value-supplied-p
-         (setf (value-of ,text-input :server-only-p t) ,value)))))
+       ,(when value-supplied-p
+         `(setf (deref (model-of ,text-input)) ,value)))))
 (export 'mk-text-input)
