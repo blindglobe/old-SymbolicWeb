@@ -181,8 +181,8 @@ PAGE-LOAD-P: T, user is currently loading or refreshing the page.
             ;; * Let the user control sequence of serialization.
             ;; * Make sure these things do not matter (i like this option the best ..).
             ;; NOTE-TO-SELF (Lars): This was needed for the "Våre Falne" project (the GENERATE-HTML method in search-results.lisp).
-            (if (or (typep object 'location-callback)
-                    (typep object 'location-container))
+            (if nil #|(or (typep object 'location-callback)
+                          (typep object 'location-container))|#
                 (push (iambda (do-sync key-value object)) sync-last)
                 (do-sync key-value object))
             (progn
