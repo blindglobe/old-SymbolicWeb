@@ -53,7 +53,9 @@ Use/see the VISIBLE-P-OF method.")))
                   (if-let (attributes (static-attributes-of widget))
                     (with-output-to-string (ss)
                       (dolist (key.value attributes)
-                        (format ss " ~A='~A'" (car key.value) (cdr key.value))))
+                        (format ss " ~A='~A'"
+                                (car key.value)
+                                (princ-to-string (cdr key.value)))))
                     "")
                   "></" element-type ">"))))
 
