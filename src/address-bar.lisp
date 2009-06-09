@@ -14,16 +14,16 @@ to server side objects.")
 (defclass address-bar ()
   ((viewport :initarg :viewport :reader viewport-of
              :initform (error "Initarg :VIEWPORT needed."))
-   
+
    (mutex :reader mutex-of
           :initform (make-recursive-lock))
-   
+
    (objects :reader objects-of
             :initform nil)
-   
+
    (dirty-p :reader dirty-p-of
             :initform nil)
-   
+
    (replace-p :reader replace-p-of
               :initform t)))
 
@@ -49,14 +49,14 @@ to server side objects.")
     (pushnew object (slot-value address-bar 'objects))
     (when (urlized-p-of object)
       (maybe-update-address-bar address-bar :replace-p replace-p))))
-  
+
 
 (defun add-to-address-bar* (&rest objects)
   (let ((address-bar (address-bar)))
     (dolist (object objects)
       (add-to-address-bar object :address-bar address-bar))))
 
-  
+
 (defun remove-from-address-bar (object &key (address-bar (address-bar))
                                 (replace-p *address-bar-serializing-p*))
   "Remove mention of WIDGET from URI."
@@ -201,6 +201,3 @@ PAGE-LOAD-P: T, user is currently loading or refreshing the page.
   (unless (string= (query-str-of-address-bar (address-bar-of *viewport*))
                    hash-string)
     (maybe-update-address-bar (address-bar-of *viewport*) :replace-p t)))
-
-
-
