@@ -17,13 +17,13 @@
          (sw-http:mk-response-header-field "Content-Type: text/html; charset=utf-8")
          (sw-http:mk-response-header-field "Connection: keep-alive")))
      (sw-http:response-add-chunk
-      (sw-http:mk-response-message-body 
+      (sw-http:mk-response-message-body
        (who (:html
              (:body
               (:h1 "SymbolicWeb: HTTP 404")
               (:p (fmt "Resource at ~A not found." (sw-http:path))))))))
      (sw-http:done-generating-response))
-    
+
     :application-finder-fn
     (lambda (sw-http-server connection callback)
       (declare (ignore callback))
@@ -45,7 +45,7 @@
 
 (defmethod start-server ((server sw-http-server))
   (sw-http:start-listening server))
-        
+
 
 (defun sw-http-server-request-handler (server connection)
   (declare (sw-http-server server))
@@ -62,7 +62,7 @@
         (let ((*server* server)
               (*request-time* (get-universal-time)))
           (setf (last-ping-time-of server) *request-time*)
-          (muffle-compiler-note 
+          (muffle-compiler-note
             (incf (request-counter-of server)))
           (if-let (app (with-locked-object server
                          (or (gethash (sw-http:get-cookie (cookie-name-of server)) (cookie-value->app-of server))
@@ -91,7 +91,7 @@
                            (app application)
                            (viewport (eql nil)))
   (let ((*app* app))
-    (sw-http:response-add-chunk 
+    (sw-http:response-add-chunk
      #.(sw-http:combine-buffers
         (sw-http:mk-response-status-code 200)
         (sw-http:mk-response-header-field "Content-Type: text/html; charset=utf-8")
@@ -101,7 +101,7 @@
         (sw-http:mk-response-header-field "Pragma: no-cache")
         (sw-http:mk-response-header-field "Server: SymbolicWeb (SW-HTTP) v0.5 alpha")))
     ;; NOTE: No `Set-Cookie' header; it is set by the RENDER method using JavaScript on the client
-    (sw-http:response-add-chunk 
+    (sw-http:response-add-chunk
      (sw-http:mk-response-header-field (catstr "Last-Modified: " (rfc-1123-date))))
     (sw-http:response-add-chunk
      (sw-http:mk-response-message-body (with-sync () (render app))))
@@ -128,7 +128,7 @@
              (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
              (sw-http::mk-response-header-field "Connection: keep-alive")))
          (handle-comet-request server app viewport))
-        
+
         (:ajax
          (setf (last-user-activity-time-of viewport) *request-time*)
          (with-sync ()
