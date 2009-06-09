@@ -55,11 +55,12 @@
         (:file "html-element")
         (:file "container")
         (:file "button")
+        (:file "html-container")
         #|
         (:file "container-with-1-active-item")
         (:file "html-elements")
         (:file "table-container")
-        (:file "html-container")
+
         (:file "location-callback")
         (:file "location-container")
         (:file "spin-button")
