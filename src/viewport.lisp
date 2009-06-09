@@ -41,7 +41,7 @@ which normally might have delayed the end (it might be sleeping).")
 
    (long-poll-frequency :accessor long-poll-frequency-of
                         :type fixnum
-                        :initform *default-long-poll-frequency*)
+                        :initform -default-long-poll-frequency-)
 
    (comet-callback :accessor comet-callback-of
                    :initform nil)
@@ -98,7 +98,7 @@ Returns two values; the viewport and whether a new one was created or not."
 
 
 (defmethod visible-p-of ((viewport viewport) &key)
-  (> *viewport-visible-p-timeout*
+  (> -viewport-visible-p-timeout-
      (- (get-universal-time) (last-ping-time-of viewport))))
 
 

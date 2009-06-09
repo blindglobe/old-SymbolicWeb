@@ -84,7 +84,7 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 
 
 (defmethod visible-p-of ((app application) &key)
-  (> *app-visible-p-timeout*
+  (> -app-visible-p-timeout-
      (- (get-universal-time) (last-ping-time-of app))))
 
 

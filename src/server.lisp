@@ -8,26 +8,26 @@
 (defclass server (id-mixin)
   ((debug-p :accessor debug-p-of :initarg :debug-p
             :initform t)
-   
+
    (path->app-class :reader path->app-class-of
                     :type hash-table
                     :initform (make-hash-table :test #'equal))
 
    (static-data-path :accessor static-data-path-of :initarg :static-data-path
                      :type (or string null)
-                     :initform *server-default-static-path*
+                     :initform -server-default-static-path-
                      :documentation "
 A string like `sw-static' (no slash prefix) or NIL.")
 
    (static-data-subdomain :accessor static-data-subdomain-of :initarg :static-data-subdomain
                           :type (or string null)
-                          :initform *server-default-static-data-subdomain*
+                          :initform -server-default-static-data-subdomain-
                           :documentation "
 A string like `sw-static' (no dot) or NIL.")
 
    (static-data-fs-path :accessor static-data-fs-path-of :initarg :static-data-fs-path
                         :type string
-                        :initform *server-default-static-data-fs-path*)
+                        :initform -server-default-static-data-fs-path-)
 
    (last-ping-time :accessor last-ping-time-of
                    :type (or integer null)
@@ -35,10 +35,10 @@ A string like `sw-static' (no dot) or NIL.")
 
    (gc-thread :reader gc-thread-of
               :initform nil)
-   
+
    (gc-frequency :accessor gc-frequency-of :initarg :gc-frequency
                  :type fixnum
-                 :initform *server-default-gc-frequency*)
+                 :initform -server-default-gc-frequency-)
 
    (id->app :reader id->app-of
             :type hash-table
@@ -63,7 +63,7 @@ link\" to these instances are stored (wrt. GC).")
            :initform (lambda () "HTTP 404")))
 
   (:default-initargs
-      :port *server-default-port*))
+   :port -server-default-port-))
 
 
 (defmethod gc-viewports ((server server))
@@ -123,7 +123,7 @@ link\" to these instances are stored (wrt. GC).")
 
   (defun start-sw (&rest initargs &key
                    (server nil server-supplied-p)
-                   (server-type *server-default-type*)
+                   (server-type -server-default-type-)
                    &allow-other-keys)
     (with-lock-held (lock)
       (when server-instance

@@ -58,7 +58,7 @@
                                         :parse-post-parameters-p t
                                         :post-parameters-url-decode-p t
                                         :parse-cookies-p t)
-        (setf (sw-http:close-connection-p) *server-close-connection-p*)
+        (setf (sw-http:close-connection-p) -server-close-connection-p-)
         (let ((*server* server)
               (*request-time* (get-universal-time)))
           (setf (last-ping-time-of server) *request-time*)
@@ -70,11 +70,11 @@
             (let ((viewport (when-let* ((viewport-id (sw-http:get-parameter "_sw-viewport-id"))
                                         (viewport (find-or-create-viewport viewport-id app)))
                               (setf (last-ping-time-of viewport) *request-time*)
-                              (when (and +auto-set-viewport-support-p+ *auto-set-viewport-p*)
+                              (when (and +auto-set-viewport-support-p+ -auto-set-viewport-p-)
                                 (setf *viewport* viewport))
                               viewport)))
               (setf (last-ping-time-of app) *request-time*)
-              (when (and +auto-set-app-support-p+ *auto-set-app-p*)
+              (when (and +auto-set-app-support-p+ -auto-set-app-p-)
                 (setf *app* app))
               (or (handle-request server app viewport)
                   (handle-request app server viewport)

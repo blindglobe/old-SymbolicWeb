@@ -62,7 +62,7 @@
     (if (response-data-of viewport)
         (do-comet-response (response-data-of viewport))
         (setf (comet-callback-of viewport)
-              (mk-delay-callback *sw-comet-timeout*
+              (mk-delay-callback -sw-comet-timeout-
                                  (let ((connection sw-http::*connection*))
                                    (lambda ()
                                      ;; TODO: Timeout should be dealt with somehow here.
