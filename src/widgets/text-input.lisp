@@ -24,14 +24,16 @@
   (setf (on-blur-of text-input
                     :callback-data `((:value . ,(js-code-of (value-of text-input)))))
         (mk-cb (text-input value)
-          (setf ~~text-input value))
+          (unless (equal ~~text-input value)
+            (setf ~~text-input value)))
 
         (on-keyup-of text-input
                      :js-before "if(event.which == 13) return true;"
                      :callback-data `((:value . ,(js-code-of (value-of text-input)))))
         (mk-cb (text-input value)
-          (setf ~~text-input value
-                ~(slot-value text-input 'enterpress-state) t
+          (unless (equal ~~text-input value)
+            (setf ~~text-input value))
+          (setf ~(slot-value text-input 'enterpress-state) t
                 ~(slot-value text-input 'enterpress-state) nil))))
 
 
@@ -67,10 +69,9 @@
 (defmethod (setf model-of) ((model single-value-model) (text-input text-input))
   (with-object text-input
     (setf ¤formula
-          #λ(let ((data ~model))
-              (unless (string= (value-of text-input) data) ;; TODO: Magic function STRING=.
-                (when-commit ()
-                  (setf (value-of text-input) data)))))))
+          #λ(let ((value ~model))
+              (when-commit ()
+                (setf (value-of text-input) value))))))
 
 
 (defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))
