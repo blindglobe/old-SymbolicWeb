@@ -56,7 +56,7 @@ code root.")
                                                 1000))
 
 
-#.(use-package :sw-jquery)
+(eval-now (use-package :sw-jquery))
 
 
 (defconstant +transport-client-side-exceptions-to-server-p+ nil
