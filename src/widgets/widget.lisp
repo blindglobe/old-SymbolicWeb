@@ -69,13 +69,7 @@ Use/see the VISIBLE-P-OF method.")))
 (defmethod shtml-of ((widget widget))
   (when *creating-html-container-p*
     (push widget *html-container-children*))
-  (with-slots (shtml) widget
-    (cond
-      ((stringp shtml)
-       shtml)
-
-      ((ensure-function shtml)
-       (funcall shtml widget)))))
+  (slot-value widget 'shtml))
 
 
 (defun html<- (obj widget)
