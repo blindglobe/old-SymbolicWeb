@@ -91,23 +91,6 @@ Use/see the VISIBLE-P-OF method.")))
        (t (princ-to-string obj))))))
 
 
-(defmacro defwidget (name parents &body body)
-  `(progn
-     (defclass ,name ,parents
-       ,@body)
-
-     (declaim (inline ,(mksymf name '-p)))
-     (defun ,(mksymf name '-p) (object)
-         (typep object ',name))
-
-     (finalize-inheritance (find-class ',name))))
-
-
-(declaim (inline widget-p))
-(defun widget-p (object)
-  (typep object 'widget))
-
-
 (defmethod visible-p-of ((widget widget) &key
                          (app nil app-supplied-p) (viewport nil viewport-supplied-p)
                          real-check-p)

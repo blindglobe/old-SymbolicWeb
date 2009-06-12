@@ -26,9 +26,9 @@
           ;; NOTE: This is a patched version of jQuery!
           (read-file-into-string (catstr (static-data-fs-path-of application)
                                          "javascript/jquery-1.3.2-min.js"))
-          
+
           "sw_viewport_id = \"" (generate-id) "\";"
-          
+
           "sw_dynamic_subdomain = \""
           (if-let ((dynamic-data-subdomain (generate-dynamic-subdomain application)))
             (catstr (the string dynamic-data-subdomain) ".")
@@ -37,7 +37,7 @@
 
           (js-code-of (set-document-cookie))
           "</script>"
-          
+
           "<script type='text/javascript' defer='defer'>"
           (read-file-into-string (catstr (static-data-fs-path-of application)
                                          "javascript/sw/sw-ajax.js"))
@@ -105,8 +105,8 @@
 (defun sw-logo (title)
   (who
    (:b (:pre (str (mkstr
-" __.        .     .    .  .   .  
-\(__   .._ _ |_  _ |* _.|  | _ |_ 
+" __.        .     .    .  .   .
+\(__   .._ _ |_  _ |* _.|  | _ |_
 .__)\\_|[ | )[_)(_)||(_.|/\\|(/,[_) v0.3
 ====._|=========================> " title "
 <a href=\"http://nostdal.org/\">http://sw.nostdal.org/</a>"
@@ -175,7 +175,7 @@ and :NEW-VALUE while in the lex scope of BODY.
 
 (defun generate-backtrace ()
   (escape-for-html
-   (with-output-to-string (ss) 
+   (with-output-to-string (ss)
      (sb-debug:backtrace most-positive-fixnum ss))))
 (export 'generate-backtrace)
 
@@ -192,4 +192,3 @@ and :NEW-VALUE while in the lex scope of BODY.
            (declare (ignore app))
            (unless found-p
              (return-from generate-random-cookie-value cookie-value)))))))
-
