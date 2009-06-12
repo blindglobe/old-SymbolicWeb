@@ -35,13 +35,15 @@
 
 
 
-(defmacro gen-dom-css-class (name &key (reader-value-on-no-entry nil reader-value-on-no-entry-supplied-p))
+(defmacro gen-dom-css-class (name &key
+                             (reader-value-on-no-entry nil reader-value-on-no-entry-supplied-p)
+                             (writer-marshaller '(princ-to-string value)))
   (let* ((slot-name (symbolicate (string-upcase name)))
          (accessor (symbolicate slot-name "-OF"))
          (base-code
           `(def-dom-class ,slot-name css ,name
                           :writer-check-for-value-designating-removal-code (eq value nil)
-                          :writer-value-marshaller-code (princ-to-string value)
+                          :writer-value-marshaller-code ,writer-marshaller
                           :accessor ,accessor)))
     (when reader-value-on-no-entry-supplied-p
       (appendf base-code (list :reader-value-on-no-entry reader-value-on-no-entry)))
