@@ -26,17 +26,13 @@
 
 (defmethod render-viewport ((viewport viewport) (app simple-event-flow-app))
   (with-object app
-    ;; Create some widgets.
-    (let ((x-widget ¤(html-element :model #λ(fmtn "X: ~A" ¤x)))
-          (square-of-x-widget ¤(html-element :model #λ(fmtn "SQUARE-OF-X: ~A" ¤square-of-x)))
-          (click-me-widget ¤(html-element :html-content "Click me!")))
+    (add-to (root)
+            (mk-html
+              (:div
+               (:ul
+                (:li "X: " (:sw #λ¤x))
+                (:li "SQUARE-OF-X: " (:sw #λ¤square-of-x)))
 
-      ;; Whenever the CLICK-ME-WIDGET is clicked the INCF-X method should be called.
-      λ(when (mouse-click-state-of click-me-widget)
-         (incf-x app))
-
-      ;; Add the widgets to the page.
-      (add-to (root)
-              x-widget
-              square-of-x-widget
-              click-me-widget))))
+               (:p (:sw (letp1 ((button (mk-button "Click me!")))
+                          λ(when (mouse-click-state-of button)
+                             (incf-x app))))))))))
