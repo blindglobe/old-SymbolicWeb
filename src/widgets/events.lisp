@@ -233,7 +233,7 @@ DOM-events."
     `(defmethod ,accessor ((,dom-mirror-name dom-mirror) &key (store-in-view-p t))
        (symbol-macrolet ((,event-router (slot-value ,dom-mirror-name 'event-router)))
          (sb-ext:with-locked-hash-table (,event-router)
-           (if-let ((,formula creating-formula-p))
+           (if-let ((,formula sw-mvc:*creating-formula*))
              (multiple-value-bind (,state-monitor ,found-p)
                  (gethash ',name ,event-router)
                (if ,found-p
