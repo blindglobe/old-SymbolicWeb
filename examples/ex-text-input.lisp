@@ -19,6 +19,7 @@
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
   (with-object app
     (add-to (root)
-     (mk-htmlc :div
-       (:h1 "TEXT-INPUT-APP")
-       (:sw ¤text-input)))))
+     (mk-html
+       (:div
+        (:h1 "TEXT-INPUT-APP")
+        (:sw ¤text-input))))))
