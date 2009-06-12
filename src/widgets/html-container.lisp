@@ -8,7 +8,7 @@
 (defclass html-container (container)
   ((html-content :initarg :html-content
                  :type function
-                 :initform (error ":HTML-CONTENT needed. Hint: Use the MK-HTMLC macro.")))
+                 :initform (error ":HTML-CONTENT needed. Hint: Use the MK-HTML macro.")))
 
   (:default-initargs
    :model nil))
@@ -48,12 +48,17 @@
 (export 'render)
 
 
-(defmacro mk-htmlc (args &body html)
-  (if (listp args)
-      `(make-instance 'html-container
-                      :html-content (lambda () (who ,@html))
-                      ,@args)
-      `(make-instance 'html-container
-                      :element-type (princ-to-string ,args)
-                      :html-content (lambda () (who ,@html)))))
-(export 'mk-htmlc)
+(defmacro mk-html (&body html)
+  (assert (sequence-of-length-p html 1) nil
+          "MK-HTML: Need an \"outer\" HTML element wrapper like (:div ..),
+\(:span ..) or (:p ..) etc.")
+  (let ((res (cadr html)))
+    (assert (or (listp res) (member res who:*html-empty-tags*)) nil
+            "MK-HTML: The \"outer\" HTML element cannot have attributes.
+Use the functions in src/widgets/attributes.lisp and css.lisp instead.
+Saw: ~S" res))
+  (let ((html (first html)))
+    `(make-instance 'html-container
+                    :element-type ,(string-downcase (princ-to-string (first html)))
+                    :html-content (lambda () (who ,@(rest html))))))
+(export 'mk-html)

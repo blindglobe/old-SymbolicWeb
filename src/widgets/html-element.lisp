@@ -33,12 +33,12 @@
                     ~model)))))
 
 
-(defmacro mk-html (args &body html)
+(defmacro mk-div (args)
   (if (listp args)
       `(make-instance 'html-element
-                      :html-content (who ,@html)
+                      :element-type "div"
                       ,@args)
       `(make-instance 'html-element
-                      :element-type (princ-to-string ,args)
-                      :html-content (who ,@html))))
-(export 'mk-html)
+                      :element-type "div"
+                      :html-content ,args)))
+(export 'mk-div)

@@ -78,7 +78,14 @@
 ;; a WHEN check that will always yield T.
 (defmethod convert-tag-to-string-list ((tag (eql :sw)) attr-list body body-fn)
   (declare (ignore tag attr-list body-fn))
-  `((str (shtml-of ,@body))))
+  ;; TODO: Optimize this. Check if body is in fact an atom. Check if it is
+  ;; constant and whether it is a widget or not.
+  `((str (shtml-of (let ((maybe-widget (progn ,@body)))
+                     (if (typep maybe-widget 'widget)
+                         maybe-widget
+                         (make-instance 'html-element
+                                        :element-type "span"
+                                        :model maybe-widget)))))))
 
 
 #.(maybe-inline 'for-each-widget-in-tree)
