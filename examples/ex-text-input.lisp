@@ -37,5 +37,9 @@
            "X: " (:sw x-view) :br
            "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x)) :br
            "Y: " (:sw (mk-text-input (:model (cell-of ¤y)))) :br
-           "(+ SQUARE-OF-X Y): " (:sw (cell-of ¤sum)))))
+           "(+ SQUARE-OF-X Y): " (:sw (cell-of ¤sum))
+           :p
+           :hr
+           (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/master/examples/ex-text-input.lisp"
+               "source code"))))
       (focus x-view))))

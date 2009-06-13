@@ -24,3 +24,4 @@
 
 (set-uri 'sw::nostdal-app "/")
 (set-uri 'sw::simple-event-flow-app "/simple-event-flow")
+(set-uri 'sw::text-input-app "/text-input")
