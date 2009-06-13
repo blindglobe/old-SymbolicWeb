@@ -18,12 +18,12 @@
   (with-object app
     (setf (input-translator-of (cell-of ¤x))
           (lambda (input)
-            (handler-case (integer-input-translator input)
+            (handler-case (number-input-translator input)
               (error () ¤x)))
 
           (input-translator-of (cell-of ¤y))
           (lambda (input)
-            (handler-case (integer-input-translator input)
+            (handler-case (number-input-translator input)
               (error () ¤y))))))
 
 
