@@ -29,9 +29,8 @@
     (add-to (root)
             (mk-html
               (:div
-               (:ul
-                (:li "X: " (:sw #λ¤x))
-                (:li "SQUARE-OF-X: " (:sw #λ¤square-of-x)))
+               (:ul (:li "X: " (:sw #λ¤x))
+                    (:li "SQUARE-OF-X: " (:sw #λ¤square-of-x)))
 
                (:p (:sw (letp1 ((button (mk-button "Click me!")))
                           λ(when (mouse-click-state-of button)
