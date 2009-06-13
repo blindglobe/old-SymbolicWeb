@@ -4,34 +4,38 @@
 
 
 (defclass text-input-app (application)
-  ((x :initform #~42)
-   (square-of-x :initform ↑#λ(* ~¤x ~¤x))))
+  ((x :initform #~5)
+   (y :initform #~17)
+   (square-of-x :initform ↑#λ(* ¤x ¤x))
+   (sum :initform ↑#λ(+ ¤square-of-x ¤y)))
+
+  (:metaclass mvc-stm-class))
 
 (set-uri 'text-input-app "/text-input")
 
 
 (defmethod main ((app text-input-app))
   (with-object app
-    (setf (input-translator-of ¤x)
+    (setf (input-translator-of (cell-of ¤x))
           (lambda (input)
-            (handler-case
-                (typecase input
-                  (number input)
-                  (string (parse-integer input :junk-allowed nil))
-                  (t (error "Don't know what to do with ~S~%" input)))
-              (error (c)
-                (declare (ignore c))
-                (warn "TEXT-INPUT-APP: Got ~A as user input.~%" input)
-                ~¤x))))))
+            (handler-case (integer-input-translator input)
+              (error () ¤x)))
+
+          (input-translator-of (cell-of ¤y))
+          (lambda (input)
+            (handler-case (integer-input-translator input)
+              (error () ¤y))))))
 
 
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
   (with-object app
-    (let ((x-view (mk-text-input (:model ¤x))))
+    (let ((x-view (mk-text-input (:model (cell-of ¤x)))))
       (add-to (root)
         (mk-html
           (:div
            (:h1 "TEXT-INPUT-APP")
            "X: " (:sw x-view) :br
-           "SQUARE-OF-X: " (:sw #λ~¤square-of-x))))
+           "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x)) :br
+           "Y: " (:sw (mk-text-input (:model (cell-of ¤y)))) :br
+           "(+ SQUARE-OF-X Y): " (:sw (cell-of ¤sum)))))
       (focus x-view))))
