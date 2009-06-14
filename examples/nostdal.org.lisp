@@ -19,7 +19,9 @@
             (:p "Nothing much here for now. Check out some sauce at "
                 (:a :href "http://gitorious.org/~lnostdal" "gitorious") ".")
 
-            (:p "I'll add something here later.")
+            (:p "I'll add something interesting here later.")
+            (:ul
+             (:li (:a :href "text-input" "text-input-app")))
 
             (:hr :width "100%")
             (:a :href "mailto:larsnostdal@gmail.com" "Lars Rune Nøstdal")
