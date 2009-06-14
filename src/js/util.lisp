@@ -55,7 +55,6 @@
 
 (defun reload (&optional (viewport *viewport*))
   "Do a page reload equal to the user pressing F5 or Ctrl-R in the browser."
-  (declare (type viewport viewport))
   (let ((js-code "window.location.reload();"))
     (if *js-code-only-p*
         js-code
