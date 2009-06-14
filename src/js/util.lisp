@@ -116,19 +116,21 @@ If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to
 
 
 (defun set-document-cookie (&key
-                            (name (cookie-name-of (server-of *app*)))
-                            (value (cookie-value-of *app*))
+                            (app *app*)
+                            (name (cookie-name-of (server-of app)))
+                            (value (cookie-value-of app))
                             (viewport *viewport*))
-  ;; TODO: Supplying NIL for value should remove the cookie.
-  (declare (string name value)
+  (declare (string name)
            (optimize speed))
   (let ((js-code
          (catstr
-           "document.cookie = \"" name "=" value ";"
-           (if (generate-dynamic-subdomain *app*)
+           "document.cookie = \"" name "=" (if value value "") ";"
+           (if (and app (generate-dynamic-subdomain app))
                "domain=.\" + window.location.hostname + \";"
                "")
-           "expires=\" + (function(){ var date = new Date(); date.setFullYear(date.getFullYear()+1); return date.toUTCString(); })() + \";"
+           (if value
+               "expires=\" + (function(){ var date = new Date(); date.setFullYear(date.getFullYear()+1); return date.toUTCString(); })() + \";"
+               "expires=Fri, 27 Jul 2001 02:47:11 UTC;")
            "path=\" + window.location.pathname + \";"
            "\";")))
     (if *js-code-only-p*
