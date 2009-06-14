@@ -189,7 +189,7 @@ function swRun(code_id, async_p, func){
 
 /// Handling of history stuff ///
 /////////////////////////////////
-
+/*
 (function($){
   if($.browser.msie){
     // Internet Exploder
@@ -295,7 +295,7 @@ function swRun(code_id, async_p, func){
       250);
   }
 })(jQuery);
-
+*/
 
 
 /// Boot! ///
