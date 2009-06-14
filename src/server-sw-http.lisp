@@ -21,7 +21,10 @@ fixing this.
       #.(sw-http:combine-buffers
          (sw-http:mk-response-status-code 404)
          (sw-http:mk-response-header-field "Content-Type: text/html; charset=utf-8")
-         (sw-http:mk-response-header-field "Connection: keep-alive")))
+         (sw-http:mk-response-header-field "Connection: keep-alive")
+         (sw-http:mk-response-header-field "Expires: Mon, 26 Jul 1997 05:00:00 GMT")
+         (sw-http:mk-response-header-field "Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+         (sw-http:mk-response-header-field "Pragma: no-cache")))
      (sw-http:response-add-chunk
       (sw-http:mk-response-message-body
        (who (:html
