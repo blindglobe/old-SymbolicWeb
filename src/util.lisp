@@ -23,23 +23,24 @@
            (optimize speed))
   (catstr
     ;; NOTE: This is a patched version of jQuery!
-    "<script type='text/javascript' src='" (mk-static-data-url *server* "javascript/jquery-1.3.2-min.js") "'></script>"
+    "<script type='text/javascript' src='"
+    (mk-static-data-url *server* "javascript/jquery-1.3.2-min.js")
+    "'></script>"
+
+    ;; It is important that this is done before sw-ajax.js (below) is loaded+evaled.
     "<script type='text/javascript'>"
     "sw_viewport_id = \"" (generate-id) "\";"
-
     "sw_dynamic_subdomain = \""
     (if-let ((dynamic-data-subdomain (generate-dynamic-subdomain application)))
       (catstr (the string dynamic-data-subdomain) ".")
       "")
     "\";"
-
     (js-code-of (set-document-cookie))
     "</script>"
 
-    "<script type='text/javascript' defer='defer'>"
-    (read-file-into-string (catstr (static-data-fs-path-of application)
-                                   "javascript/sw/sw-ajax.js"))
-    "</script>"))
+    "<script type='text/javascript' defer='defer' src='"
+    (mk-static-data-url *server* "javascript/sw/sw-ajax.js")
+    "'></script>"))
 (export 'js-sw-headers)
 
 
