@@ -42,7 +42,7 @@ A string like `sw-static' (no dot) or NIL.")
 
    (id->app :reader id->app-of
             :type hash-table
-            :initform (make-hash-table :test #'equal :synchronized t)
+            :initform (make-hash-table :test #'equal)
             :documentation "
 Instances of APPLICATION (sessions). This is the only place where a \"hard
 link\" to these instances are stored (wrt. GC).")
@@ -53,12 +53,15 @@ link\" to these instances are stored (wrt. GC).")
 
    (cookie-value->app :reader cookie-value->app-of
                       :type hash-table
-                      :initform (make-hash-table :test #'equal :weakness :value :synchronized t))
+                      :initform (make-hash-table :test #'equal :weakness :value)
+                      :documentation "
+A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
 
    (request-counter :accessor request-counter-of
                     :type integer
                     :initform 0)
 
+   ;; TODO: This stuff sucks.
    (404-fn :accessor 404-fn-of :initarg :404-fn
            :initform (lambda () "HTTP 404")))
 
