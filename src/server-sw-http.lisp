@@ -5,6 +5,12 @@
 (declaim #.(optimizations))
 
 
+#| TODO:
+This thing is a messy copy/paste job. I'm getting sleepy just thinking about
+fixing this.
+|#
+
+
 (defclass sw-http-server (server sw-http:server)
   ()
 
@@ -23,6 +29,7 @@
               (:h1 "SymbolicWeb: HTTP 404")
               (:p (fmt "Resource at ~A not found." (sw-http:path))))))))
      (sw-http:done-generating-response))
+
 
     :application-finder-fn
     (lambda (sw-http-server connection callback)
@@ -65,8 +72,14 @@
           (muffle-compiler-note
             (incf (request-counter-of server)))
           (if-let (app (with-locked-object server
-                         (or (gethash (sw-http:get-cookie (cookie-name-of server)) (cookie-value->app-of server))
-                             (create-new-session server))))
+                         (if-let ((cookie-value (sw-http:get-cookie (cookie-name-of server))))
+                           (if-let ((app (gethash cookie-value (cookie-value->app-of server))))
+                             app
+                             (progn
+                               (warn "User is trying to fetch a session that no longer exists.")
+                               (session-expired-response)
+                               (invoke-restart 'skip-body)))
+                           (create-new-session server))))
             (let ((viewport (when-let* ((viewport-id (sw-http:get-parameter "_sw-viewport-id"))
                                         (viewport (find-or-create-viewport viewport-id app)))
                               (setf (last-ping-time-of viewport) *request-time*)
@@ -85,6 +98,50 @@
             (progn
               (warn "Server (global) HTTP-404 for (SW-HTTP:PATH): ~S" (sw-http:path))
               (funcall (the function (404-fn-of server))))))))))
+
+
+(defmethod session-expired-response ()
+  (let ((request-type (sw-http:get-parameter "_sw-request-type")))
+    (cond
+      ((or (string= "ajax" request-type)
+           (string= "comet" request-type))
+       (sw-http:response-add-chunk
+        #.(sw-http::combine-buffers
+           (sw-http::mk-response-status-code 200)
+           (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
+           (sw-http::mk-response-header-field "Connection: keep-alive")))
+       (sw-http:response-add-chunk
+        (sw-http::mk-response-message-body
+         (catstr
+           (js-code-of (set-document-cookie :name (cookie-name-of *server*)
+                                            :value nil))
+           (js-code-of (reload)))))
+       (sw-http:done-generating-response))
+
+      (t
+       (sw-http:response-add-chunk
+        #.(sw-http:combine-buffers
+           (sw-http:mk-response-status-code 200)
+           (sw-http:mk-response-header-field "Content-Type: text/html; charset=utf-8")
+           (sw-http:mk-response-header-field "Connection: keep-alive")
+           (sw-http:mk-response-header-field "Expires: Mon, 26 Jul 1997 05:00:00 GMT")
+           (sw-http:mk-response-header-field "Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+           (sw-http:mk-response-header-field "Pragma: no-cache")
+           (sw-http:mk-response-header-field "Server: SBCL (Common Lisp), SW-HTTP, SymbolicWeb -- License: AGPL -- http://nostdal.org/")))
+
+       (sw-http:response-add-chunk
+        (sw-http:mk-response-header-field (catstr "Last-Modified: " (rfc-1123-date))))
+
+       ;; NOTE: I think this is the only way to do this proper; HTTP headers will not include the URL hashes.
+       (sw-http:response-add-chunk
+        (sw-http:mk-response-message-body
+         (who (:html (:body (:script
+                             (str (catstr
+                                    (js-code-of (set-document-cookie :name (cookie-name-of *server*)
+                                                                     :value nil))
+                                    (js-code-of (reload))))))))))
+
+       (sw-http:done-generating-response)))))
 
 
 (defmethod handle-request ((server sw-http-server)
@@ -137,7 +194,7 @@
          (sw-http:response-add-chunk
           #.(sw-http::combine-buffers
              (sw-http::mk-response-status-code 200)
-             (sw-http::mk-response-header-field "Content-Type: text/html; charset=utf-8")
+             (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
              (sw-http::mk-response-header-field "Connection: keep-alive")
              (sw-http::mk-response-message-body "")))
          (sw-http:done-generating-response)))
