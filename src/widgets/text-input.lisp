@@ -24,14 +24,20 @@
   (setf (on-blur-of text-input
                     :callback-data `((:value . ,(js-code-of (value-of text-input)))))
         (mk-cb (text-input value)
-          (unless (equal ~~text-input value)
+          (unless (equal ~~text-input
+                         (if-let (input-translator (input-translator-of ~text-input))
+                           (funcall input-translator value)
+                           value))
             (setf ~~text-input value)))
 
         (on-keyup-of text-input
                      :js-before "if(event.which == 13) return true;"
                      :callback-data `((:value . ,(js-code-of (value-of text-input)))))
         (mk-cb (text-input value)
-          (unless (equal ~~text-input value)
+          (unless (equal ~~text-input
+                         (if-let (input-translator (input-translator-of ~text-input))
+                           (funcall input-translator value)
+                           value))
             (setf ~~text-input value))
           (setf ~(slot-value text-input 'enterpress-state) t
                 ~(slot-value text-input 'enterpress-state) nil))))
