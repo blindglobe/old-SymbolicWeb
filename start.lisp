@@ -22,6 +22,6 @@
 ;(set-uri 'sw-examples::urlizing-app "/urlizing-app")
 ;(set-uri 'sw-examples::spin-button-app "/spin-button-app")
 
-(set-uri 'sw::nostdal-app "/")
+(set-uri 'sw::nostdal-app "/nostdal.org")
 (set-uri 'sw::simple-event-flow-app "/simple-event-flow")
 (set-uri 'sw::text-input-app "/text-input")

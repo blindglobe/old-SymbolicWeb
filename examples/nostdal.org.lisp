@@ -8,7 +8,7 @@
 
   (:metaclass mvc-stm-class))
 
-(set-uri 'nostdal-app "/")
+(set-uri 'nostdal-app "/nostdal.org")
 
 
 (defmethod render-viewport ((viewport viewport) (app nostdal-app))
