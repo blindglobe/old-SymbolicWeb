@@ -187,115 +187,15 @@ function swRun(code_id, async_p, func){
 
 
 
-/// Handling of history stuff ///
-/////////////////////////////////
-/*
-(function($){
-  if($.browser.msie){
-    // Internet Exploder
-    ////////////////////
-    var last_hash = swGetCurrentHash();
-    if(last_hash == '#') location.replace('#');
+/// address-bar.lisp ///
+////////////////////////
 
-    $("body").prepend('<iframe id="ie-history" style="display: none;"></iframe>');
-    var ie_history = $("#ie-history")[0].contentWindow.document;
-    ie_history.open(); ie_history.close();
-    ie_history.location.hash = last_hash;
+$.address.change(function(event){
+    //alert(event.value);
+    swAjax("&event=url-hash-changed",
+           "&new-url-hash=" + encodeURIComponent(event.value));
+  });
 
-    updateHash = function(new_hash, replace_p){
-      var ie_history = $("#ie-history")[0];
-      ie_history = ie_history.contentDocument || ie_history.contentWindow.document; // TODO: I have no idea why I need to do this, but it seems to work.
-      new_hash = "#" + new_hash;
-
-      // So the "interval-code" below won't trigger.
-      if(replace_p){
-        location.replace(last_hash = new_hash);
-        ie_history.location.replace(last_hash);
-      }
-      else{
-        location.hash = last_hash = new_hash;
-        ie_history.open(); ie_history.close();
-        ie_history.location.hash = new_hash;
-      }
-    }
-
-    // TODO: Wait for browsers to have support for onhashchanged event. Gotta love how we can't do this on our own without MS doing it "for us" first. Yes, I'm bitter.
-    setInterval(function(){
-        var ie_history = $("#ie-history")[0];
-        ie_history = ie_history.contentDocument || ie_history.contentWindow.document; // TODO: I have no idea why I need to do this, but it seems to work.
-
-        var curr_hash = swGetCurrentHash();
-        if((ie_history.location.hash != last_hash) || (curr_hash != last_hash)){
-          if(curr_hash != last_hash){
-            ie_history.open(); ie_history.close();
-            ie_history.location.hash = last_hash = curr_hash;
-          }
-          else
-            location.hash = last_hash = ie_history.location.hash;
-          // TODO: Only transmit diff!
-          swAjax("&event=url-hash-changed",
-                 "&new-url-hash=" + encodeURIComponent(encodeURIComponent(last_hash.substr(1)))); // TODO: Try to figure out why I need to do this so I can add a comment explaining why later ..
-        }
-      },
-      250);
-  }
-  else if($.browser.safari){
-    var last_hash = swGetCurrentHash();
-
-    updateHash = function(new_hash, replace_p){
-      new_hash = "#" + new_hash;
-      // So the "interval-code" below won't trigger.
-      if(replace_p){
-        // FIXME: Safari seems to have the same problem Opera does when it comes to the replace function ..
-        // I've reported a bug about this here: https://bugs.webkit.org/show_bug.cgi?id=20425
-        window.location.replace(last_hash = new_hash);
-      }
-      else
-        window.location.hash = last_hash = new_hash;
-    }
-
-    // TODO: Wait for browsers to have support for onhashchanged event. Gotta love how we can't do this on our own without MS doing it "for us". Yes, I'm bitter.
-    setInterval(function(){
-        var curr_hash = swGetCurrentHash();
-        if(curr_hash != last_hash){
-          // TODO: Only transmit diff!
-          last_hash = curr_hash;
-          swAjax("&event=url-hash-changed",
-                 "&new-url-hash=" + encodeURIComponent(encodeURIComponent(last_hash.substr(1)))); // TODO: Try to figure out why I need to do this so I can add a comment explaining why later ..
-          // FIXME: blah .. this seems to be neccessary for some reason .. extra load on server, waste of bandwidth .. great
-          //swComet('');
-        }
-      },
-      250);
-  }
-  else{
-    // Firefox, Opera or other (unknown) browsers
-    /////////////////////////////////////////////
-    var last_hash = swGetCurrentHash();
-
-    updateHash = function(new_hash, replace_p){
-      new_hash = "#" + new_hash;
-      // So the "interval-code" below won't trigger.
-      if(replace_p)
-        window.location.replace(last_hash = new_hash);
-      else
-        window.location.hash = last_hash = new_hash;
-    }
-
-    // TODO: Wait for browsers to have support for onhashchanged event. Gotta love how we can't do this on our own without MS doing it "for us". Yes, I'm bitter.
-    setInterval(function(){
-        var curr_hash = swGetCurrentHash();
-        if(curr_hash != last_hash){
-          // TODO: Only transmit diff!
-          last_hash = curr_hash;
-          swAjax("&event=url-hash-changed",
-                 "&new-url-hash=" + encodeURIComponent(encodeURIComponent(last_hash.substr(1)))); // TODO: Try to figure out why I need to do this so I can add a comment explaining why later ..
-        }
-      },
-      250);
-  }
-})(jQuery);
-*/
 
 
 /// Boot! ///
