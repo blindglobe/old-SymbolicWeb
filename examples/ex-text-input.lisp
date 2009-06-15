@@ -18,24 +18,9 @@
 
 (defmethod main ((app text-input-app))
   (with-object app
-    (setf (input-translator-of (cell-of ¤x))
-          (lambda (input)
-            (handler-case
-                (unwind-protect-case ()
-                    (number-input-translator input)
-                  (:abort
-                   (unless (eq t (feedback-event-of (cell-of ¤x)))
-                     (tf (feedback-event-of (cell-of ¤x)))))
-                  (:normal
-                   (unless (eq nil (feedback-event-of (cell-of ¤x)))
-                     (nilf (feedback-event-of (cell-of ¤x))))))
-              (error ()
-                ¤x)))
-
-          (input-translator-of (cell-of ¤y))
-          (lambda (input)
-            (handler-case (number-input-translator input)
-              (error () ¤y))))))
+    (allf #'number-input-translator
+          (input-translator-of (cell-of ¤x))
+          (input-translator-of (cell-of ¤y)))))
 
 
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
