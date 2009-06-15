@@ -24,12 +24,6 @@ See the SHTML-OF method.")
 The viewports, all browser tabs/windows regardless of user/session, the widget is part of
 or visible in.")
 
-   (css-display :reader css-display-of :initarg :css-display
-                :initform "block"
-                :documentation "
-When the widget is hidden using e.g. FADE-OUT this will determine or \"remember\"
-how the widget is to be displayed again later.")
-
    (visible-p :initform nil
               :documentation "
 Use/see the VISIBLE-P-OF method.")))

@@ -5,6 +5,26 @@
 (declaim #.(optimizations))
 
 
+(defun add-class (widget class-name)
+  (declare (widget widget)
+           (string class-name))
+  (let ((js-code (catstr "$('#" (id-of widget) "').addClass('" class-name "');")))
+    (if *js-code-only-p*
+        js-code
+        (run js-code widget))))
+(export 'add-class)
+
+
+(defun remove-class (widget class-name)
+  (declare (widget widget)
+           (string class-name))
+  (let ((js-code (catstr "$('#" (id-of widget) "').removeClass('" class-name "');")))
+    (if *js-code-only-p*
+        js-code
+        (run js-code widget))))
+(export 'remove-class)
+
+
 (defun alert (msg &optional (viewport-or-widget *viewport*))
   (let ((js-code (catstr "alert(decodeURIComponent(\"" (url-encode msg) "\"));")))
     (if *js-code-only-p*
@@ -69,7 +89,7 @@
 (export 'redraw)
 
 
-(defun fade-in (widget &key (speed 400) (display (css-display-of widget)))
+(defun fade-in (widget &key (speed 400))
   "Returns WIDGET.
 If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to the server."
   (declare (type widget widget))
@@ -79,12 +99,7 @@ If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to
     (if *js-code-only-p*
         (js-code)
         (progn
-          ;; We trust that jQuery will restore the DISPLAY CSS property as it was.
           (run (js-code) widget)
-          ;; But we still need to keep track of this on the server end in case the
-          ;; user refreshes the page.
-          (setf (display-of widget :server-only-p t)
-                (string-downcase (princ-to-string display)))
           widget))))
 (export 'fade-in)
 

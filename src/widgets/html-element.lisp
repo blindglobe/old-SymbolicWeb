@@ -34,15 +34,16 @@
 
 
 (defmacro mk-elt (element-type &rest args)
-  (if (listp args)
-      `(make-instance 'html-element
-                      :element-type ,(string-downcase (princ-to-string element-type))
-                      ,@(if (member :model args)
-                            args
-                            `(:html-content ,(first args) ,@(rest args))))
-      `(make-instance 'html-element
-                      :element-type ,(string-downcase (princ-to-string element-type))
-                      :html-content ,args)))
+  (let ((element-type (string-downcase (princ-to-string element-type))))
+    (if (listp args)
+        `(make-instance 'html-element
+                        :element-type ,element-type
+                        ,@(if (member :model args)
+                              args
+                              `(:html-content ,(first args) ,@(rest args))))
+        `(make-instance 'html-element
+                        :element-type ,element-type
+                        :html-content ,args))))
 (export 'mk-elt)
 
 
