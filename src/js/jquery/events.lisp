@@ -10,17 +10,17 @@
 
 
 (declaim (inline js-callback-id-of))
-(defun js-callback-id-of (selector event-type)
-  (declare (string selector event-type))
-  (catstr selector "-" event-type))
+(defun js-callback-id-of (widget-id event-type)
+  (declare (string widget-id event-type))
+  (catstr widget-id "-" event-type))
 (export 'js-callback-id-of)
 
 
 (declaim (inline js-unbind))
-(defun js-unbind (selector &optional event-type)
-  (declare (string selector))
+(defun js-unbind (widget-id &optional event-type)
+  (declare (string widget-id))
   (catstr
-   "$(\"#" selector "\").unbind("
+   "$(\"#" widget-id "\").unbind("
    (if event-type
        (catstr "\"" event-type "\"")
        "")
@@ -29,10 +29,10 @@
 
 
 (declaim (inline js-bind))
-(defun js-bind (selector event-type callback-id &key client-side-only-p
+(defun js-bind (widget-id event-type callback-id &key client-side-only-p
                 callback-data js-before js-after
                 browser-default-action-p)
-  (declare (string selector event-type callback-id))
+  (declare (string widget-id event-type callback-id))
   (unless js-before (setf js-before *js-before*)) ;; Because NIL is always supplied from the stuff in dom-cache.lisp
   (unless js-after (setf js-after *js-after*))
   ;; TODO: Code here isn't very "nice".
@@ -53,8 +53,8 @@
                      1)
              "")))
     (catstr "
-$(\"#" selector "\").unbind(\"" event-type "\");
-$(\"#" selector "\").bind(\"" event-type "\", function(event)
+$(\"#" widget-id "\").unbind(\"" event-type "\");
+$(\"#" widget-id "\").bind(\"" event-type "\", function(event)
 {
 " (if client-side-only-p
       ;; TODO: Need to add a try/catch wrapper for this, and it needs to be moved to sw-ajax.js.
@@ -68,20 +68,20 @@ $(\"#" selector "\").bind(\"" event-type "\", function(event)
 
 
 (declaim (inline js-trigger))
-(defun js-trigger (selector event-type)
-  (declare (string selector event-type))
-  (catstr "$(\"#" selector "\").trigger(\"" event-type "\");"))
+(defun js-trigger (widget-id event-type)
+  (declare (string widget-id event-type))
+  (catstr "$(\"#" widget-id "\").trigger(\"" event-type "\");"))
 (export 'js-trigger)
 
 
 (declaim (inline js-trigger-handler))
-(defun js-trigger-handler (selector event-type)
-  (declare (string selector event-type))
-  (catstr "$(\"#" selector "\").triggerHandler(\"" event-type "\");"))
+(defun js-trigger-handler (widget-id event-type)
+  (declare (string widget-id event-type))
+  (catstr "$(\"#" widget-id "\").triggerHandler(\"" event-type "\");"))
 (export 'js-trigger-handler)
 
 
-(defun js-blur (selector)
-  (declare (string selector))
-  (catstr "$(\"#" selector "\").blur();"))
+(defun js-blur (widget-id)
+  (declare (string widget-id))
+  (catstr "$(\"#" widget-id "\").blur();"))
 (export 'js-blur)

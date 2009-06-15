@@ -6,85 +6,85 @@
 
 
 (declaim (inline (setf js-html-of)))
-(defun (setf js-html-of) (new-html selector)
-  (declare (string new-html selector))
-  (catstr "$(\"#" selector "\").html(decodeURIComponent(\"" (the string (url-encode new-html)) "\"));"))
+(defun (setf js-html-of) (new-html widget-id)
+  (declare (string new-html widget-id))
+  (catstr "$(\"#" widget-id "\").html(decodeURIComponent(\"" (the string (url-encode new-html)) "\"));"))
 (export 'js-html-of)
 
 
 (declaim (inline js-html-of))
-(defun js-html-of (selector)
-  (declare (string selector))
-  (catstr "return $(\"#" selector "\").html();"))
+(defun js-html-of (widget-id)
+  (declare (string widget-id))
+  (catstr "return $(\"#" widget-id "\").html();"))
 (export 'js-html-of)
 
 
 (declaim (inline js-iappend))
-(defun js-iappend (html selector)
-  (declare (string html selector))
+(defun js-iappend (html widget-id)
+  (declare (string html widget-id))
   ;; append
   "inside append"
-  (catstr "$(\"#" selector "\").append(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").append(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
 (export 'js-iappend)
 
 
 (declaim (inline js-oappend))
-(defun js-oappend (html selector)
-  (declare (string html selector))
+(defun js-oappend (html widget-id)
+  (declare (string html widget-id))
   ;; after
   "outside append"
-  (catstr "$(\"#" selector "\").after(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").after(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
 (export 'js-oappend)
 
 
 (declaim (inline js-iprepend))
-(defun js-iprepend (html selector)
-  (declare (string html selector))
+(defun js-iprepend (html widget-id)
+  (declare (string html widget-id))
   ;; prepend
   "inside prepend"
-  (catstr "$(\"#" selector "\").prepend(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").prepend(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
 (export 'js-iprepend)
 
 
 (declaim (inline js-oprepend))
-(defun js-oprepend (html selector)
-  (declare (string html selector))
+(defun js-oprepend (html widget-id)
+  (declare (string html widget-id))
   ;; before
   "outside prepend"
-  (catstr "$(\"#" selector "\").before(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").before(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
 (export 'js-oprepend)
 
 
 (declaim (inline js-remove))
-(defun js-remove (selector)
-  (declare (string selector))
-  (catstr "$(\"#" selector "\").remove();"))
+(defun js-remove (widget-id)
+  (declare (string widget-id))
+  (catstr "$(\"#" widget-id "\").remove();"))
 (export 'js-remove)
 
 
 (declaim (inline js-replace-with))
-(defun js-replace-with (selector new-content)
-  (declare (string selector new-content))
-  (catstr "$(\"#" selector "\").replaceWith(decodeURIComponent(\"" (the string (url-encode new-content)) "\"));"))
+(defun js-replace-with (widget-id new-content)
+  (declare (string widget-id new-content))
+  (catstr "$(\"#" widget-id "\").replaceWith(decodeURIComponent(\"" (the string (url-encode new-content)) "\"));"))
 (export 'js-replace-with)
 
 
 (declaim (inline js-empty))
-(defun js-empty (selector)
-  (declare (string selector))
-  (catstr "$(\"#" selector "\").empty();"))
+(defun js-empty (widget-id)
+  (declare (string widget-id))
+  (catstr "$(\"#" widget-id "\").empty();"))
 (export 'js-empty)
 
 
 (declaim (inline js-exchange))
-(defun js-exchange (selector-a selector-b)
-  (declare (string selector-a selector-b))
+(defun js-exchange (widget-id-a widget-id-b)
+  (declare (string widget-id-a widget-id-b))
   (catstr "(function(){"
-          "var first = $(\"#" selector-a "\").clone(true);"
-          "var second = $(\"#" selector-b "\").clone(true);"
+          "var first = $(\"#" widget-id-a "\").clone(true);"
+          "var second = $(\"#" widget-id-b "\").clone(true);"
 
-          "$(\"#" selector-a "\").attr(\"id\",  \"js-exchange-first\");"
-          "$(\"#" selector-b "\").attr(\"id\", \"js-exchange-second\");"
+          "$(\"#" widget-id-a "\").attr(\"id\",  \"js-exchange-first\");"
+          "$(\"#" widget-id-b "\").attr(\"id\", \"js-exchange-second\");"
 
           "$(\"#js-exchange-first\").replaceWith(second);"
           "$(\"#js-exchange-second\").replaceWith(first);"
