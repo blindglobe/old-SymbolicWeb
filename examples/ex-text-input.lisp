@@ -44,11 +44,11 @@
       (mk-html
         (:div
          (:h1 "TEXT-INPUT-APP")
-         "X: " (:sw ¤x-view) (:sw (letp1 ((div (mk-div "need more cowbell" :display "none")))
-                                    (setf (formula-of div)
+         "X: " (:sw ¤x-view) (:sw (letp1 ((span (mk-elt :span "need more cowbell" :display "none")))
+                                    (setf (formula-of span)
                                           #λ(if (feedback-event-of (cell-of ¤x))
-                                                (setf (display-of div) "inline")
-                                                (setf (display-of div) "none")))))
+                                                (setf (display-of span) "inline")
+                                                (setf (display-of span) "none")))))
          :br
          "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x)) :br
          "Y: " (:sw (mk-text-input (:model (cell-of ¤y)))) :br
