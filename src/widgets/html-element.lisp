@@ -33,14 +33,19 @@
                     ~model)))))
 
 
-(defmacro mk-div (&rest args)
+(defmacro mk-elt (element-type &rest args)
   (if (listp args)
       `(make-instance 'html-element
-                      :element-type "div"
+                      :element-type ,(string-downcase (princ-to-string element-type))
                       ,@(if (member :model args)
                             args
                             `(:html-content ,(first args) ,@(rest args))))
       `(make-instance 'html-element
-                      :element-type "div"
+                      :element-type ,(string-downcase (princ-to-string element-type))
                       :html-content ,args)))
+(export 'mk-elt)
+
+
+(defmacro mk-div (&rest args)
+  `(mk-elt :div ,@args))
 (export 'mk-div)
