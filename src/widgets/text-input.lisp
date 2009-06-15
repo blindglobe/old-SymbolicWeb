@@ -77,11 +77,10 @@
 
 
 (defmethod (setf model-of) ((model single-value-model) (text-input text-input))
-  (with-object text-input
-    (setf ¤formula
-          #λ(let ((value ~model))
-              (when-commit ()
-                (setf (value-of text-input) value))))))
+  (setf (formula-of text-input)
+        #λ(let ((value ~model))
+            (when-commit ()
+              (setf (value-of text-input) value)))))
 
 
 (defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))
