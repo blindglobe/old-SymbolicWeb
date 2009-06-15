@@ -24,6 +24,7 @@
   (setf (on-blur-of text-input
                     :callback-data `((:value . ,(js-code-of (value-of text-input)))))
         (mk-cb (text-input value)
+          (setf (value-of text-input :server-only-p t) value)
           (let ((model ~text-input))
             (unless (equal ~model
                            (if-let (input-translator (input-translator-of model))
@@ -35,6 +36,7 @@
                      :js-before "if(event.which == 13) return true;"
                      :callback-data `((:value . ,(js-code-of (value-of text-input)))))
         (mk-cb (text-input value)
+          (setf (value-of text-input :server-only-p t) value)
           (let ((model ~text-input))
             (unless (equal ~model
                            (if-let (input-translator (input-translator-of model))
