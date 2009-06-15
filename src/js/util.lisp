@@ -69,27 +69,30 @@
 (export 'redraw)
 
 
-(defun fade-in (widget &key (speed 400) callback)
+(defun fade-in (widget &key (speed 400) (display (css-display-of widget)))
   "Returns WIDGET.
 If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to the server."
   (declare (type widget widget))
-  (when callback (error "TODO"))
   (flet ((js-code ()
            (catstr "$(\"#" (id-of widget) "\").fadeIn(" (princ-to-string speed) ");")))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
         (progn
+          ;; We trust that jQuery will restore the DISPLAY CSS property as it was.
           (run (js-code) widget)
+          ;; But we still need to keep track of this on the server end in case the
+          ;; user refreshes the page.
+          (setf (display-of widget :server-only-p t)
+                (string-downcase (princ-to-string display)))
           widget))))
 (export 'fade-in)
 
 
-(defun fade-out (widget &key (speed 400) callback)
+(defun fade-out (widget &key (speed 400))
   "Returns WIDGET.
 If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to the server."
   (declare (type widget widget))
-  (when callback (error "TODO"))
   (flet ((js-code ()
            (catstr "$(\"#" (id-of widget) "\").fadeOut(" (princ-to-string speed) ");")))
     (declare (inline js-code))
@@ -97,6 +100,7 @@ If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to
         (js-code)
         (progn
           (run (js-code) widget)
+          (setf (display-of widget :server-only-p t) "none")
           widget))))
 (export 'fade-out)
 
