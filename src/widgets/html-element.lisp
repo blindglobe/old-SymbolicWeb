@@ -33,11 +33,13 @@
                     ~model)))))
 
 
-(defmacro mk-div (args)
+(defmacro mk-div (&rest args)
   (if (listp args)
       `(make-instance 'html-element
                       :element-type "div"
-                      ,@args)
+                      ,@(if (member :model args)
+                            args
+                            `(:html-content ,(first args) ,@(rest args))))
       `(make-instance 'html-element
                       :element-type "div"
                       :html-content ,args)))
