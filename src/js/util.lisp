@@ -5,26 +5,6 @@
 (declaim #.(optimizations))
 
 
-(defun add-class (widget class-name)
-  (declare (widget widget)
-           (string class-name))
-  (let ((js-code (catstr "$('#" (id-of widget) "').addClass('" class-name "');")))
-    (if *js-code-only-p*
-        js-code
-        (run js-code widget))))
-(export 'add-class)
-
-
-(defun remove-class (widget class-name)
-  (declare (widget widget)
-           (string class-name))
-  (let ((js-code (catstr "$('#" (id-of widget) "').removeClass('" class-name "');")))
-    (if *js-code-only-p*
-        js-code
-        (run js-code widget))))
-(export 'remove-class)
-
-
 (defun alert (msg &optional (viewport-or-widget *viewport*))
   (let ((js-code (catstr "alert(decodeURIComponent(\"" (url-encode msg) "\"));")))
     (if *js-code-only-p*

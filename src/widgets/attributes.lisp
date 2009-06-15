@@ -48,8 +48,29 @@
 
 
 (def-dom-class css-class attribute "class"
+               :writer-value-marshaller-code (format nil "~{~A~^ ~}" value)
                :writer-check-for-value-designating-removal-code (eq value nil))
-(export '(css-class-of))
+;;(export '(css-class-of))
+
+
+(defun add-class (widget class-name &key server-only-p)
+  (declare (widget widget)
+           (string class-name))
+  (let ((classes (let ((*js-code-only-p* nil))
+                   (css-class-of widget))))
+    (pushnew class-name classes :test #'string=)
+    (setf (css-class-of widget :server-only-p server-only-p) classes)))
+(export 'add-class)
+
+
+(defun remove-class (widget class-name &key server-only-p)
+  (declare (widget widget)
+           (string class-name))
+  (let ((classes (let ((*js-code-only-p* nil))
+                   (css-class-of widget))))
+    (deletef classes class-name :test #'string=)
+    (setf (css-class-of widget :server-only-p server-only-p) classes)))
+(export 'remove-class)
 
 
 (def-dom-class title attribute "title"
@@ -112,4 +133,3 @@
                :writer-check-for-value-designating-removal-code (eq value nil)
                :writer-value-marshaller-code (princ-to-string value))
 (export '(tabindex-of))
-
