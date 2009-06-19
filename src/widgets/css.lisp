@@ -6,11 +6,9 @@
 
 
 #.(maybe-inline 'css)
-(defun css (property widget
-            &optional dom-cache-reader-fn)
+(defun css (property widget &optional dom-cache-reader-fn)
   (declare (string property)
-           (widget widget)
-           (optimize speed))
+           (widget widget))
   (if *js-code-only-p*
       (js-get-css (id-of widget) property)
       (when dom-cache-reader-fn (funcall (the function dom-cache-reader-fn)))))
@@ -18,11 +16,9 @@
 
 
 #.(maybe-inline '(setf css))
-(defun (setf css) (new-value property widget &key
-                   dom-cache-writer-fn server-only-p)
+(defun (setf css) (new-value property widget &key dom-cache-writer-fn server-only-p)
   (declare (string new-value property)
-           (widget widget)
-           (optimize speed))
+           (widget widget))
   (flet ((js-code ()
            (js-set-css (id-of widget) property new-value)))
     (declare (inline js-code))

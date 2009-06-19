@@ -103,7 +103,6 @@
 
      ,@(when reader
         `((defmethod ,reader ((dom-mirror dom-mirror))
-            (declare (optimize speed))
             ,@reader-code)
           ,(when export-p
             `(export ',reader))))
@@ -111,13 +110,11 @@
 
      ,(when render-code
        `(defmethod render-dom ((dom-mirror dom-mirror) (name (eql ',lisp-class-accessor-name)) value)
-          (declare (optimize speed))
           ,@render-code))
 
 
      ,@(when writer
         `((defmethod (setf ,writer) :around (value (dom-mirror dom-mirror) &rest args)
-            (declare (optimize speed))
             (let ((*old-value* ,(if writer-old-value-binding-if-slot-is-unbound-supplied-p
                                     `(multiple-value-bind (value found-p) ,dom-get-code
                                        (if found-p
@@ -131,7 +128,6 @@
 
           (defmethod (setf ,writer) (value (dom-mirror dom-mirror)
                                      &key server-only-p render-only-p ,@writer-extra-keyargs)
-            (declare (optimize speed))
             ,@writer-code)
           ,(when export-p
             `(export ',writer))))))

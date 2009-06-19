@@ -50,8 +50,7 @@
 #.(maybe-inline 'store-callback-box)
 (defun store-callback-box (callback-box viewport)
   (declare (callback-box callback-box)
-           (viewport viewport)
-           (optimize speed))
+           (viewport viewport))
   (setf (gethash (id-of callback-box) (callbacks-of viewport))
         callback-box))
 
@@ -60,8 +59,7 @@
 (defun remove-callback-box (widget event-type viewport)
   (declare (widget widget)
            (string event-type)
-           (viewport viewport)
-           (optimize speed))
+           (viewport viewport))
   (remhash (js-callback-id-of (id-of widget) event-type)
            (callbacks-of viewport)))
 
@@ -69,8 +67,7 @@
 #.(maybe-inline 'find-callback-box)
 (defun find-callback-box (id viewport)
   (declare (string id)
-           (viewport viewport)
-           (optimize speed))
+           (viewport viewport))
   (gethash id (callbacks-of viewport)))
 
 
@@ -90,8 +87,7 @@
 (defun execute-callback (callback-box status args)
   (declare (callback-box callback-box)
            (symbol status)
-           (list args)
-           (optimize speed))
+           (list args))
   (let ((*current-event-widget* (widget-of callback-box)))
     (apply (the function (callback-of callback-box)) (widget-of callback-box)
            :status status :callback callback-box :allow-other-keys t
@@ -141,8 +137,7 @@
                      js-before js-after callback-data
                      (browser-default-action-p t))
   (declare (string event-type)
-           (widget widget)
-           (optimize speed))
+           (widget widget))
   #| CALLBACK can be a function, a string representing JS code or NIL which means
 that the event is to be unbound. |#
   (let ((callback (when callback

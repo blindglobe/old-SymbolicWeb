@@ -9,8 +9,7 @@
 (defun attribute (attribute widget
                   &optional dom-cache-reader-fn)
   (declare (string attribute)
-           (widget widget)
-           (optimize speed))
+           (widget widget))
   (if *js-code-only-p*
       (js-get-attribute (id-of widget) attribute)
       (when dom-cache-reader-fn (funcall (the function dom-cache-reader-fn)))))
@@ -21,8 +20,7 @@
 (defun (setf attribute) (new-value attribute widget &key
                          dom-cache-writer-fn server-only-p)
   (declare (string new-value attribute)
-           (widget widget)
-           (optimize speed))
+           (widget widget))
   (flet ((js-code ()
            (js-set-attribute (id-of widget) attribute new-value)))
     (declare (inline js-code))
