@@ -137,7 +137,7 @@
 
 #.(maybe-inline '(setf event))
 (defun (setf event) (callback event-type widget &key
-                     dom-cache-writer-fn server-only-p
+                     server-only-p
                      js-before js-after callback-data
                      (browser-default-action-p t))
   (declare (string event-type)
@@ -151,19 +151,18 @@ that the event is to be unbound. |#
                                        :widget widget
                                        :event-type event-type
                                        :callback callback)))))
-    (setf (widget-of callback) widget)
-    (when js-before
-      (setf (slot-value callback 'js-before) js-before))
-    (when js-after
-      (setf (slot-value callback 'js-after) js-after))
-    (when callback-data
-      (setf (slot-value callback 'callback-data) callback-data))
-    (when (typep callback 'callback-box)
-      (setf (slot-value callback 'browser-default-action-p) browser-default-action-p))
+    (when callback
+      (setf (widget-of callback) widget)
+      (when js-before
+        (setf (slot-value callback 'js-before) js-before))
+      (when js-after
+        (setf (slot-value callback 'js-after) js-after))
+      (when callback-data
+        (setf (slot-value callback 'callback-data) callback-data))
+      (when (typep callback 'callback-box)
+        (setf (slot-value callback 'browser-default-action-p) browser-default-action-p)))
 
     ;; setup @ server side
-    (when dom-cache-writer-fn
-      (funcall (the function dom-cache-writer-fn) callback))
     (when callback
       (with-visible-contexts-of widget viewport
         (store-callback-box callback viewport)))
@@ -199,6 +198,7 @@ that the event is to be unbound. |#
 (defun event-remove (event-type widget &key server-only-p)
   (declare (string event-type)
            (widget widget))
+  (setf (event event-type widget) nil)
   (with-visible-contexts-of widget viewport
     (remove-callback-box widget event-type viewport)))
 (export 'event-remove)
