@@ -7,16 +7,14 @@
 
 (defun attribute (attribute widget)
   (declare (string attribute)
-           (widget widget)
-           (inline js-get-attribute))
+           (widget widget))
   (js-get-attribute (id-of widget) attribute))
 (export 'attribute)
 
 
 (defun (setf attribute) (new-value attribute widget &key server-only-p)
   (declare (string new-value attribute)
-           (widget widget)
-           (inline js-set-attribute))
+           (widget widget))
   (flet ((js-code ()
            (js-set-attribute (id-of widget) attribute new-value)))
     (declare (inline js-code))

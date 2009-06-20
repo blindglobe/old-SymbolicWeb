@@ -5,14 +5,11 @@
 (declaim #.(optimizations))
 
 
-
-
 #| TODO:
 There is a chance "value marshalling" isn't needed here anymore since it is
 something the Model -> View connection (SW-MVC) can take care of. Or, well,
 I need to think about stuff like CSS-CLASS-OF.
 |#
-
 
 
 (defclass dom-mirror ()
@@ -131,6 +128,7 @@ I need to think about stuff like CSS-CLASS-OF.
                                                            (funcall value-marshaller property-value)
                                                            dom-name dom-mirror))
                                       dom-mirror))))))
+(export 'define-dom-property)
 
 
 (defmethod remove-dom-property ((lisp-accessor-name symbol) (dom-name string) (dom-client-remover function)
@@ -165,3 +163,4 @@ I need to think about stuff like CSS-CLASS-OF.
                               (list (find-class 'dom-mirror)
                                     (make-instance 'eql-specializer :object lisp-accessor-name)
                                     (find-class 't)))))
+(export 'remove-dom-property)

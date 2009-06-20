@@ -7,16 +7,14 @@
 
 (defun css (property widget)
   (declare (string property)
-           (widget widget)
-           (inline js-get-css))
+           (widget widget))
   (js-get-css (id-of widget) property))
 (export 'css)
 
 
 (defun (setf css) (new-value property widget &key server-only-p)
   (declare (string new-value property)
-           (widget widget)
-           (inline js-set-css))
+           (widget widget))
   (flet ((js-code ()
            (js-set-css (id-of widget) property new-value)))
     (declare (inline js-code))
