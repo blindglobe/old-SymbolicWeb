@@ -6,140 +6,148 @@
 
 
 #.(maybe-inline 'css)
-(defun css (property widget &optional dom-cache-reader-fn)
+(defun css (property widget)
   (declare (string property)
-           (widget widget))
-  (if *js-code-only-p*
-      (js-get-css (id-of widget) property)
-      (when dom-cache-reader-fn (funcall (the function dom-cache-reader-fn)))))
+           (widget widget)
+           (inline js-get-css))
+  (js-get-css (id-of widget) property))
 (export 'css)
 
 
 #.(maybe-inline '(setf css))
-(defun (setf css) (new-value property widget &key dom-cache-writer-fn server-only-p)
+(defun (setf css) (new-value property widget &key server-only-p)
   (declare (string new-value property)
-           (widget widget))
+           (widget widget)
+           (inline js-set-css))
   (flet ((js-code ()
            (js-set-css (id-of widget) property new-value)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
-        (progn
-          (when dom-cache-writer-fn (funcall (the function dom-cache-writer-fn)))
-          (unless server-only-p (run (js-code) widget))))))
+        (unless server-only-p (run (js-code) widget)))))
 (export 'css)
 
 
+(defun css-remove (property widget &key server-only-p)
+  (declare (string property)
+           (widget widget))
+  (write-line "TODO: CSS-REMOVE"))
 
-(defmacro gen-dom-css-class (name &key
-                             (reader-value-on-no-entry nil reader-value-on-no-entry-supplied-p)
-                             (writer-marshaller '(princ-to-string value)))
-  (let* ((slot-name (symbolicate (string-upcase name)))
-         (accessor (symbolicate slot-name "-OF"))
-         (base-code
-          `(def-dom-class ,slot-name css ,name
-                          :writer-check-for-value-designating-removal-code (eq value nil)
-                          :writer-value-marshaller-code ,writer-marshaller
-                          :accessor ,accessor)))
-    (when reader-value-on-no-entry-supplied-p
-      (appendf base-code (list :reader-value-on-no-entry reader-value-on-no-entry)))
-    base-code))
+
+
+(defmacro define-css-property (lisp-name dom-name &body args)
+  `(progn
+     (define-dom-property ',lisp-name ,dom-name #'(setf css) #'css #'css-remove
+                          ,@args)
+     (export ',lisp-name)))
+
 
 
 ;;; CSS1
 
 ;; Font properties
 
-(gen-dom-css-class "font-family")
-(gen-dom-css-class "font-style")
-(gen-dom-css-class "font-variant")
-(gen-dom-css-class "font-weight")
-(gen-dom-css-class "font-size")
-(gen-dom-css-class "font")
+(define-css-property font-family-of "font-family")
+(define-css-property font-style-of "font-style")
+(define-css-property font-variant-of "font-variant")
+(define-css-property font-weight-of "font-weight")
+(define-css-property font-size-of "font-size")
+(define-css-property font-of "font")
 
 
 ;; Color and background properties
 
-(gen-dom-css-class "color")
-(gen-dom-css-class "background-color")
-(gen-dom-css-class "background-image")
-(gen-dom-css-class "background-repeat")
-(gen-dom-css-class "background-attachment")
-(gen-dom-css-class "background-position")
-(gen-dom-css-class "background")
+(define-css-property color-of "color")
+(define-css-property background-color-of "background-color")
+(define-css-property background-image-of "background-image")
+(define-css-property background-repeat-of "background-repeat")
+(define-css-property background-attachment-of "background-attachment")
+(define-css-property background-position-of "background-position")
+(define-css-property background-of "background")
 
 
 ;; Text properties
 
-(gen-dom-css-class "word-spacing")
-(gen-dom-css-class "letter-spacing")
-(gen-dom-css-class "text-decoration")
-(gen-dom-css-class "vertical-align")
-(gen-dom-css-class "text-transform")
-(gen-dom-css-class "text-align")
-(gen-dom-css-class "text-indent")
-(gen-dom-css-class "line-height")
+(define-css-property word-spacing-of "word-spacing")
+(define-css-property letter-spacing-of "letter-spacing")
+(define-css-property text-decoration-of "text-decoration")
+(define-css-property vertical-align-of "vertical-align")
+(define-css-property text-transform-of "text-transform")
+(define-css-property text-align-of "text-align")
+(define-css-property text-indent-of "text-indent")
+(define-css-property line-height-of "line-height")
 
 
 ;; Box properties
 
-(gen-dom-css-class "margin-top")
-(gen-dom-css-class "margin-right")
-(gen-dom-css-class "margin-bottom")
-(gen-dom-css-class "margin-left")
-(gen-dom-css-class "margin")
-(gen-dom-css-class "padding-top")
-(gen-dom-css-class "padding-right")
-(gen-dom-css-class "padding-bottom")
-(gen-dom-css-class "padding-left")
-(gen-dom-css-class "padding")
-(gen-dom-css-class "border-top-width")
-(gen-dom-css-class "border-right-width")
-(gen-dom-css-class "border-bottom-width")
-(gen-dom-css-class "border-left-width")
-(gen-dom-css-class "border-width")
-(gen-dom-css-class "border-color")
-(gen-dom-css-class "border-style")
-(gen-dom-css-class "border-top")
-(gen-dom-css-class "border-top")
-(gen-dom-css-class "border-right")
-(gen-dom-css-class "border-bottom")
-(gen-dom-css-class "border-left")
-(gen-dom-css-class "width" :reader-value-on-no-entry :auto)
-(gen-dom-css-class "height")
-(gen-dom-css-class "float")
-(gen-dom-css-class "clear")
+(define-css-property margin-top-of "margin-top")
+(define-css-property margin-right-of "margin-right")
+(define-css-property margin-bottom-of "margin-bottom")
+(define-css-property margin-left-of "margin-left")
+(define-css-property margin-of "margin")
+(define-css-property padding-top-of "padding-top")
+(define-css-property padding-right-of "padding-right")
+(define-css-property padding-bottom-of "padding-bottom")
+(define-css-property padding-left-of "padding-left")
+(define-css-property padding-of "padding")
+(define-css-property border-top-width-of "border-top-width")
+(define-css-property border-right-width-of "border-right-width")
+(define-css-property border-bottom-width-of "border-bottom-width")
+(define-css-property border-left-width-of "border-left-width")
+(define-css-property border-width-of "border-width")
+(define-css-property border-color-of "border-color")
+(define-css-property border-style-of "border-style")
+(define-css-property border-top-of "border-top")
+(define-css-property border-right-of "border-right")
+(define-css-property border-bottom-of "border-bottom")
+(define-css-property border-left-of "border-left")
+(define-css-property width-of "width"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property height-of "height"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property float-of "float")
+(define-css-property clear-of "clear"
+  :dom-server-reader-fallback-value :none)
 
 
 ;; Classification properties
 
-(gen-dom-css-class "display")
-(gen-dom-css-class "white-space")
-(gen-dom-css-class "list-style-type")
-(gen-dom-css-class "list-style-image")
-(gen-dom-css-class "list-style-position")
-(gen-dom-css-class "list-style")
+(define-css-property display-of "display")
+(define-css-property white-space-of "white-space"
+  :dom-server-reader-fallback-value :normal)
+(define-css-property list-style-type-of "list-style-type")
+(define-css-property list-style-image-of "list-style-image")
+(define-css-property list-style-position-of "list-style-position")
+(define-css-property list-style-of "list-style")
 
 
 ;;; CSS21
 
-(gen-dom-css-class "border-top-color")
-(gen-dom-css-class "border-right-color")
-(gen-dom-css-class "border-bottom-color")
-(gen-dom-css-class "border-left-color")
-(gen-dom-css-class "border-top")
-(gen-dom-css-class "border-right")
-(gen-dom-css-class "border-bottom")
-(gen-dom-css-class "border-left")
-(gen-dom-css-class "border")
-(gen-dom-css-class "position")
-(gen-dom-css-class "overflow")
-(gen-dom-css-class "cursor")
-(gen-dom-css-class "top")
-(gen-dom-css-class "right")
-(gen-dom-css-class "bottom")
-(gen-dom-css-class "left")
-(gen-dom-css-class "z-index")
-(gen-dom-css-class "direction")
-(gen-dom-css-class "unicode-bidi")
-(gen-dom-css-class "visibility")
+(define-css-property border-top-color-of "border-top-color")
+(define-css-property border-right-color-of "border-right-color")
+(define-css-property border-bottom-color-of "border-bottom-color")
+(define-css-property border-left-color-of "border-left-color")
+(define-css-property border-top-of "border-top")
+(define-css-property border-right-of "border-right")
+(define-css-property border-bottom-of "border-bottom")
+(define-css-property border-left-of "border-left")
+(define-css-property border-of "border")
+(define-css-property position-of "position"
+  :dom-server-reader-fallback-value :static)
+(define-css-property overflow-of "overflow"
+  :dom-server-reader-fallback-value :visible)
+(define-css-property cursor-of "cursor"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property top-of "top"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property right-of "right"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property bottom-of "bottom"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property left-of "left"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property z-index-of "z-index"
+  :dom-server-reader-fallback-value :auto)
+(define-css-property direction-of "direction")
+(define-css-property unicode-bidi-of "unicode-bidi")
+(define-css-property visibility-of "visibility")

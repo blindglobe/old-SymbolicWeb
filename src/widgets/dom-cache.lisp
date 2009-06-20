@@ -5,13 +5,13 @@
 (declaim #.(optimizations))
 
 
-(defun mk-dom-accessor-sym (name &key (prefix "") (suffix "-of"))
-  (intern (string-upcase (format nil "~A~A~A" prefix name suffix))
-          (symbol-package name)))
 
-(defun mk-dom-initarg-sym (name &key (prefix "") (suffix ""))
-  (intern (string-upcase (format nil "~A~A~A" prefix name suffix))
-          :keyword))
+
+#| TODO:
+There is a chance "value marshalling" isn't needed here anymore since it is
+something the Model -> View connection (SW-MVC) can take care of. Or, well,
+I need to think about stuff like CSS-CLASS-OF.
+|#
 
 
 
@@ -20,9 +20,13 @@
                     :type hash-table
                     :initform (make-hash-table :test #'eq))
 
+   ;; TODO: I think I can remove this now.
    (event-router :reader event-router-of
                  :type hash-table
                  :initform (make-hash-table :test #'eq))))
+
+
+(defgeneric render-dom (dom-mirror property-name property-vaule))
 
 
 (defmethod render :after ((dom-mirror dom-mirror))
@@ -31,103 +35,133 @@
            (dom-mirror-data-of dom-mirror)))
 
 
-(defmethod dom-mirror-before-writing ((dom-mirror dom-mirror) value args)
-  (values dom-mirror value args))
+(defun dom-server-reader (dom-mirror lisp-accessor-name)
+  (declare (dom-mirror dom-mirror)
+           (symbol lisp-accessor-name))
+  (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror)))
 
 
-;; Best way to understand this macro is to look at the expansions of it.
-(defmacro def-dom-class (lisp-class-accessor-name lisp-dom-accessor-fn-name dom-name &key
-                         (export-p t)
-                         (accessor (mk-dom-accessor-sym lisp-class-accessor-name))
-                         (reader (or accessor (error "No :ACCESSOR or :READER given.")))
-                         (writer (or accessor (error "No :ACCESSOR or :WRITER given.")))
-                         (reader-value-on-no-entry nil reader-value-on-no-entry-supplied-p)
-                         (writer-old-value-binding-if-slot-is-unbound nil writer-old-value-binding-if-slot-is-unbound-supplied-p)
-                         (writer-extra-keyargs nil writer-extra-keyargs-supplied-p)
-
-                         (dom-get-code `(gethash ',lisp-class-accessor-name (dom-mirror-data-of dom-mirror)))
-
-                         (writer-check-for-value-designating-removal-code nil writer-check-for-value-designating-removal-code-supplied-p)
-
-                         (writer-value-marshaller-code nil writer-value-marshaller-code-supplied-p)
-
-                         (remover-code `((remhash ',lisp-class-accessor-name (dom-mirror-data-of dom-mirror))))
-
-                         (reader-code `((,lisp-dom-accessor-fn-name ,dom-name dom-mirror
-                                          (lambda ()
-                                            ,(if reader-value-on-no-entry-supplied-p
-                                              `(multiple-value-bind (value found-p) ,dom-get-code
-                                                 (if found-p
-                                                     (values value found-p)
-                                                     (values ,reader-value-on-no-entry :fallback)))
-                                              dom-get-code)))))
-
-                         (writer-code `((setf (,lisp-dom-accessor-fn-name ,dom-name dom-mirror
-                                                :dom-cache-writer-fn
-                                                (if render-only-p
-                                                  (lambda (&optional inner-value) (declare (ignore inner-value)))
-                                                  ,(let ((dom-set-code `(setf ,dom-get-code
-                                                                              (if inner-value-supplied-p
-                                                                                  inner-value
-                                                                                  value))))
-                                                     (if writer-check-for-value-designating-removal-code-supplied-p
-                                                      `(if ,writer-check-for-value-designating-removal-code
-                                                         (lambda (&optional (inner-value nil inner-value-supplied-p))
-                                                           (declare (ignorable inner-value inner-value-supplied-p))
-                                                           ,@remover-code)
-                                                         (lambda (&optional (inner-value nil inner-value-supplied-p))
-                                                           (declare (ignorable inner-value inner-value-supplied-p))
-                                                           ,dom-set-code))
-                                                      `(lambda (&optional (inner-value nil inner-value-supplied-p))
-                                                         (declare (ignorable inner-value inner-value-supplied-p))
-                                                         ,dom-set-code))))
-                                                :server-only-p server-only-p
-                                                ,@(when writer-extra-keyargs-supplied-p
-                                                    (flatten
-                                                     (loop :for keyarg :in writer-extra-keyargs
-                                                        :collect (let ((keyarg (if (listp keyarg) (first keyarg) keyarg)))
-                                                                   (list (format-symbol :keyword "~A" keyarg) keyarg))))))
-                                              ,(if writer-value-marshaller-code-supplied-p
-                                                   writer-value-marshaller-code
-                                                   'value))))
-
-                         (render-code `((run (js-code-of (setf (,lisp-dom-accessor-fn-name ,dom-name dom-mirror)
-                                                               ,(if writer-value-marshaller-code-supplied-p
-                                                                    writer-value-marshaller-code
-                                                                    'value)))
-                                             dom-mirror))))
+(defun dom-server-writer (dom-mirror lisp-accessor-name new-value)
+  (declare (dom-mirror dom-mirror)
+           (symbol lisp-accessor-name))
+  (setf (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))
+        new-value))
 
 
-
-  `(progn
-
-     ,@(when reader
-        `((defmethod ,reader ((dom-mirror dom-mirror))
-            ,@reader-code)
-          ,(when export-p
-            `(export ',reader))))
+(defun dom-server-remover (dom-mirror lisp-accessor-name)
+  (declare (dom-mirror dom-mirror)
+           (symbol lisp-accessor-name))
+  (remhash lisp-accessor-name (dom-mirror-data-of dom-mirror)))
 
 
-     ,(when render-code
-       `(defmethod render-dom ((dom-mirror dom-mirror) (name (eql ',lisp-class-accessor-name)) value)
-          ,@render-code))
+(defmethod define-dom-property ((lisp-accessor-name symbol) (dom-name string)
+                                (dom-client-writer function)
+                                (dom-client-reader function)
+                                (dom-client-remover function)
+                                &key
+                                (lisp-reader-name lisp-accessor-name)
+                                (lisp-writer-name (list 'setf lisp-accessor-name))
+                                (dom-server-reader-fallback-value nil dom-server-reader-fallback-value-supplied-p)
+                                (dom-server-reader #'dom-server-reader)
+                                (dom-server-writer #'dom-server-writer)
+                                (dom-server-remover #'dom-server-remover)
+                                (value-marshaller #'princ-to-string)
+                                (value-removal-checker #'not)) ;; Essentially (lambda (value) (eq value nil)).
+  (declare (function dom-server-reader dom-server-writer dom-server-remover
+                     value-marshaller value-removal-checker)
+           (inline dom-server-reader dom-server-writer dom-server-remover
+                   value-marshaller value-removal-checker))
 
-
-     ,@(when writer
-        `((defmethod (setf ,writer) :around (value (dom-mirror dom-mirror) &rest args)
-            (let ((*old-value* ,(if writer-old-value-binding-if-slot-is-unbound-supplied-p
-                                    `(multiple-value-bind (value found-p) ,dom-get-code
+  ;; Add DOM reader.
+  (ensure-generic-function lisp-reader-name :lambda-list '(dom-mirror))
+  (add-method (ensure-function lisp-reader-name)
+              (make-instance 'standard-method
+                             :lambda-list '(dom-mirror)
+                             :specializers (list (find-class 'dom-mirror))
+                             :function
+                             (lambda (args method)
+                               (declare (ignore method))
+                               (let ((dom-mirror (first args)))
+                                 (if *js-code-only-p*
+                                     (funcall dom-client-reader dom-name dom-mirror)
+                                     (multiple-value-bind (value found-p)
+                                         (funcall dom-server-reader dom-mirror lisp-accessor-name)
                                        (if found-p
-                                           value
-                                           ,writer-old-value-binding-if-slot-is-unbound))
-                                    dom-get-code)))
-              (catch 'cancel-writer
-                (multiple-value-bind (widget value args)
-                    (dom-mirror-before-writing dom-mirror value args)
-                  (apply #'call-next-method value widget args)))))
+                                           (values value found-p)
+                                           (when dom-server-reader-fallback-value-supplied-p
+                                             (values dom-server-reader-fallback-value :fallback)))))))))
 
-          (defmethod (setf ,writer) (value (dom-mirror dom-mirror)
-                                     &key server-only-p render-only-p ,@writer-extra-keyargs)
-            ,@writer-code)
-          ,(when export-p
-            `(export ',writer))))))
+  ;; Add DOM writer.
+  (ensure-generic-function lisp-writer-name :lambda-list '(property-value dom-mirror &rest args))
+  (add-method (ensure-function lisp-writer-name)
+              (make-instance 'standard-method
+                             :lambda-list '(property-value dom-mirror &rest args)
+                             :specializers (list (find-class 't) (find-class 'dom-mirror))
+                             :function
+                             (lambda (args method)
+                               (declare (ignore method))
+                               (let ((property-value (first args))
+                                     (dom-mirror (second args)))
+                                 (prog1 property-value
+                                   (unless *js-code-only-p*
+                                     (if (funcall value-removal-checker property-value)
+                                         (progn
+                                           (funcall dom-server-remover dom-mirror lisp-accessor-name)
+                                           (apply dom-client-remover dom-name dom-mirror (cddr args)))
+                                         (progn
+                                           (funcall dom-server-writer dom-mirror lisp-accessor-name property-value)
+                                           (apply dom-client-writer
+                                                  (funcall value-marshaller property-value)
+                                                  dom-name dom-mirror (cddr args))))))))))
+
+  ;; Add DOM renderer.
+  (add-method (ensure-function 'render-dom)
+              (make-instance 'standard-method
+                             :lambda-list '(dom-mirror property-name property-value)
+                             :specializers (list (find-class 'dom-mirror)
+                                                 (make-instance 'eql-specializer :object lisp-accessor-name)
+                                                 (find-class 't))
+                             :function
+                             (lambda (args method)
+                               (declare (ignore method))
+                               (let ((dom-mirror (first args))
+                                     ;;(property-name (second args))
+                                     (property-value (third args)))
+                                 (run (js-code-of (funcall dom-client-writer
+                                                           (funcall value-marshaller property-value)
+                                                           dom-name dom-mirror))
+                                      dom-mirror))))))
+
+
+(defmethod remove-dom-property ((lisp-accessor-name symbol) (dom-name string) (dom-client-remover function)
+                                &key
+                                (lisp-reader-name lisp-accessor-name)
+                                (lisp-writer-name (list 'setf lisp-accessor-name))
+                                (dom-server-remover #'dom-server-remover))
+
+  ;; Remove entry from DOM-MIRROR-DATA hash-table and call DOM-CLIENT-REMOVER.
+  ;; We do this by iterating through every active widget of *SERVER*.
+  (with-each-viewport-in-server ()
+    (with-each-widget-in-tree (:root (root-widget-of *viewport*))
+      (funcall dom-server-remover widget lisp-accessor-name)
+      (funcall dom-client-remover dom-name widget)))
+
+  ;; Remove DOM reader.
+  (remove-method (ensure-function lisp-reader-name)
+                 (find-method (ensure-function lisp-reader-name)
+                              nil
+                              (list (find-class 'dom-mirror))))
+
+  ;; Remove DOM writer.
+  (remove-method (ensure-function lisp-writer-name)
+                 (find-method (ensure-function lisp-writer-name)
+                              nil
+                              (list (find-class 't) (find-class 'dom-mirror))))
+
+  ;; Remove DOM renderer.
+  (remove-method (ensure-function 'render-dom)
+                 (find-method (ensure-function 'render-dom)
+                              nil
+                              (list (find-class 'dom-mirror)
+                                    (make-instance 'eql-specializer :object lisp-accessor-name)
+                                    (find-class 't)))))

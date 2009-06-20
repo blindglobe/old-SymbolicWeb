@@ -8,9 +8,8 @@
 (defclass callback-box ()
   ((id :reader id-of)
 
-   (widget :reader widget-of :initarg :widget
-           :type widget
-           :initform (error ":WIDGET needed."))
+   (widget :accessor widget-of :initarg :widget
+           :type widget)
 
    (event-type :reader event-type-of :initarg :event-type
                :type string
@@ -33,6 +32,11 @@
 
 
 (defmethod initialize-instance :after ((callback-box callback-box) &key)
+  #|(setf (slot-value callback-box 'id)
+        (js-callback-id-of (id-of (widget-of callback-box))
+                           (event-type-of callback-box)))|#)
+
+(defmethod (setf widget-of) :after ((widget widget) (callback-box callback-box))
   (setf (slot-value callback-box 'id)
         (js-callback-id-of (id-of (widget-of callback-box))
                            (event-type-of callback-box))))
@@ -147,6 +151,7 @@ that the event is to be unbound. |#
                                        :widget widget
                                        :event-type event-type
                                        :callback callback)))))
+    (setf (widget-of callback) widget)
     (when js-before
       (setf (slot-value callback 'js-before) js-before))
     (when js-after
@@ -168,11 +173,36 @@ that the event is to be unbound. |#
 (export 'event)
 
 
-(defmethod event ((event-type string) (widget widget)
-                  &optional dom-cache-reader-fn)
-  ;; If the user want JS code he should use: (js-code-of (trigger (on-click-of some-widget))).
-  (when dom-cache-reader-fn (funcall dom-cache-reader-fn)))
+;; TODO: Finish this.
+(defmethod event ((event-type string) (widget widget) &key
+                  dom-cache-writer-fn server-only-p
+                  js-before js-after callback-data
+                  (browser-default-action-p t))
+  (assert *formula*)
+  (let ((event-router (event-router-of widget)))
+    (sb-ext:with-locked-hash-table (event-router)
+      (multiple-value-bind (state-cell found-p)
+          (gethash event-type event-router)
+        (if found-p
+            (prog1 ~(car state-cell)
+                   (unless (find *formula* (cdr state-cell) :key (lambda (elt)
+                                                                   (formula-of elt)))
+                     (write-line "blah")
+                     (push #~*formula* (cdr state-cell))))
+            (let ((state-cell (cons #~nil (list #~*formula*))))
+              (prog1 ~(car state-cell)
+                     (setf (gethash event-type event-router) state-cell
+                           (event event-type widget) (iambda (pulse ~(car state-cell) t))))))))))
 (export 'event)
+
+
+(defun event-remove (event-type widget &key server-only-p)
+  (declare (string event-type)
+           (widget widget))
+  (with-visible-contexts-of widget viewport
+    (remove-callback-box widget event-type viewport)))
+(export 'event-remove)
+
 
 
 (defmacro mk-cb ((widget-sym &rest args) &body body)
@@ -184,40 +214,61 @@ DOM-events."
 
 
 
-(defmacro gen-dom-event-class (name)
-  (let* ((lisp-class-accessor-name (symbolicate (string-upcase (catstr "on-" name))))
-         (accessor (symbolicate (string-upcase (catstr "on-" name "-of")))))
-    `(def-dom-class ,lisp-class-accessor-name event ,name
-                    :writer-check-for-value-designating-removal-code (eq value nil)
-                    :accessor ,accessor
-                    :writer-extra-keyargs (js-before js-after callback-data (browser-default-action-p t))
-                    :remover-code ((with-visible-contexts-of dom-mirror viewport
-                                     (remove-callback-box dom-mirror ,name viewport))
-                                   (remhash ',lisp-class-accessor-name (dom-mirror-data-of dom-mirror))))))
+(defmacro define-event-property (lisp-name dom-name &body args)
+  `(progn
+     (define-dom-property ',lisp-name ,dom-name #'(setf event) #'event #'event-remove
+                          :value-marshaller
+                          (lambda (callback)
+                            (when callback
+                              (typecase callback
+                                ((or function string)
+                                 (make-instance 'callback-box
+                                                :event-type ,dom-name
+                                                :callback callback))
+
+                                (callback-box
+                                 callback)
+
+                                (t
+                                 (error "Don't know what to do with ~A" callback)))))
+                          ,@args)
+     (export ',lisp-name)))
 
 
-(gen-dom-event-class "blur")
-(gen-dom-event-class "change")
-(gen-dom-event-class "click")
-(gen-dom-event-class "dblclick")
-(gen-dom-event-class "focus")
-(gen-dom-event-class "keydown")
-(gen-dom-event-class "keypress")
-(gen-dom-event-class "keyup")
-(gen-dom-event-class "load")
-(gen-dom-event-class "mousedown")
-(gen-dom-event-class "mousemove")
-(gen-dom-event-class "mouseout")
-(gen-dom-event-class "mouseover")
-(gen-dom-event-class "mouseup")
-(gen-dom-event-class "resize")
-(gen-dom-event-class "scroll")
-(gen-dom-event-class "select")
-;;(gen-dom-event-class "submit")
-(gen-dom-event-class "unload")
+(define-event-property on-blur-of "blur")
+(define-event-property on-change-of "change")
+(define-event-property on-click-of "click")
+(define-event-property on-dblclick-of "dblclick")
+(define-event-property on-focus-of "focus")
+(define-event-property on-keydown-of "keydown")
+(define-event-property on-keypress-of "keypress")
+(define-event-property on-keyup-of "keyup")
+(define-event-property on-load-of "load")
+(define-event-property on-mousedown-of "mousedown")
+(define-event-property on-mousemove-of "mousemove")
+(define-event-property on-mouseout-of "mouseout")
+(define-event-property on-mouseover-of "mouseover")
+(define-event-property on-mouseup-of "mouseup")
+(define-event-property on-resize-of "resize")
+(define-event-property on-scroll-of "scroll")
+(define-event-property on-select-of "select")
+(define-event-property on-unload "unload")
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+#|
 (defmacro define-event-router ((name &key
                                      (dom-mirror-name 'widget)
                                      (accessor (symbolicate name '-of))
@@ -256,3 +307,4 @@ DOM-events."
                                (if (numberp state)
                                    (incf state)
                                    (setf state 0)))))
+|#

@@ -6,49 +6,48 @@
 
 
 #.(maybe-inline 'attribute)
-(defun attribute (attribute widget
-                  &optional dom-cache-reader-fn)
+(defun attribute (attribute widget)
   (declare (string attribute)
-           (widget widget))
-  (if *js-code-only-p*
-      (js-get-attribute (id-of widget) attribute)
-      (when dom-cache-reader-fn (funcall (the function dom-cache-reader-fn)))))
+           (widget widget)
+           (inline js-get-attribute))
+  (js-get-attribute (id-of widget) attribute))
 (export 'attribute)
 
 
 #.(maybe-inline '(setf attribute))
-(defun (setf attribute) (new-value attribute widget &key
-                         dom-cache-writer-fn server-only-p)
+(defun (setf attribute) (new-value attribute widget &key server-only-p)
   (declare (string new-value attribute)
-           (widget widget))
+           (widget widget)
+           (inline js-set-attribute))
   (flet ((js-code ()
            (js-set-attribute (id-of widget) attribute new-value)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
-        (progn
-          (when dom-cache-writer-fn (funcall (the function dom-cache-writer-fn)))
-          (unless server-only-p (run (js-code) widget))))))
+        (unless server-only-p (run (js-code) widget)))))
 (export 'attribute)
 
 
-
-(def-dom-class value attribute "value"
-               :reader-value-on-no-entry ""
-               :writer-check-for-value-designating-removal-code (eq value nil)
-               :writer-value-marshaller-code (princ-to-string value))
-(export '(dom-value-of))
-
-
-;;(def-dom-class dom-attribute-selected-p selected-p attribute "selected"
-;;               :writer-value-marshaller-code (if value "selected" ""))
-;;(export '(dom-attribute-selected-p selected-p-of))
+(defun attribute-remove (attribute widget &key server-only-p)
+  (declare (string attribute)
+           (widget widget))
+  (write-line "TODO: ATTRIBUTE-REMOVE"))
+(export 'attribute-remove)
 
 
-(def-dom-class css-class attribute "class"
-               :writer-value-marshaller-code (format nil "~{~A~^ ~}" value)
-               :writer-check-for-value-designating-removal-code (eq value nil))
-;;(export '(css-class-of))
+(defmacro define-attribute-property (lisp-name dom-name &body args)
+  `(progn
+     (define-dom-property ',lisp-name ,dom-name #'(setf attribute) #'attribute #'attribute-remove
+                          ,@args)
+     (export ',lisp-name)))
+
+
+(define-attribute-property value-of "value"
+  :dom-server-reader-fallback-value "")
+
+
+(define-attribute-property css-class-of "class"
+  :value-marshaller (lambda (value) (format nil "~{~A~^ ~}" value)))
 
 
 (defun add-class (widget class-name &key server-only-p)
@@ -71,63 +70,44 @@
 (export 'remove-class)
 
 
-(def-dom-class title attribute "title"
-               :writer-check-for-value-designating-removal-code (eq value nil))
-(export '(title-of))
+(define-attribute-property title-of "title")
 
 
-(def-dom-class readonly-p attribute "readonly"
-               :writer-value-marshaller-code (if value "readonly" ""))
-(export '(readonly-p-of))
+(define-attribute-property readonly-p-of "readonly"
+  :value-marshaller (lambda (value) (if value "readonly" "")))
 
 
-(def-dom-class disabled-p attribute "disabled"
-               :writer-value-marshaller-code (if value "disabled" ""))
-(export '(dom-attribute-disabled-p disabled-p-of))
+(define-attribute-property disabled-p-of "disabled"
+  :value-marshaller (lambda (value) (if value "disabled" "")))
 
 
-(def-dom-class name attribute "name"
-               :writer-check-for-value-designating-removal-code (eq value nil))
-(export '(name-of))
+(define-attribute-property name-of "name")
 
 
-(def-dom-class checked-p attribute "checked"
-               :writer-value-marshaller-code (if value "checked" ""))
-(export '(checked-p-of))
+(define-attribute-property checked-p-of "checked"
+  :value-marshaller (lambda (value) (if value "checked" "")))
 
 
-(def-dom-class href attribute "href"
-               :writer-check-for-value-designating-removal-code (eq value nil))
-(export '(href-of))
+(define-attribute-property href-of "href")
 
 
-(def-dom-class src attribute "src"
-               :writer-check-for-value-designating-removal-code (eq value nil))
-(export '(src-of))
+(define-attribute-property src-of "src")
 
 
 ;; Used by the TEXT-AREA widget (text-area.lisp).
-(def-dom-class cols attribute "cols"
-               :writer-value-marshaller-code (princ-to-string value))
-(export '(cols-of))
+(define-attribute-property cols-of "cols")
+
 
 ;; Used by the TEXT-AREA widget (text-area.lisp).
-(def-dom-class rows attribute "rows"
-               :writer-value-marshaller-code (princ-to-string value))
-(export '(rows-of))
+(define-attribute-property rows-of "rows")
 
 
 ;; Used by the TABLE widget (table-container.lisp).
-(def-dom-class colspan attribute "colspan")
-(export '(colspan-of))
+(define-attribute-property colspan-of "colspan")
 
 ;; Used by the TABLE widget (table-container.lisp).
-(def-dom-class rowspan attribute "rowspan")
-(export '(rowspan-of))
+(define-attribute-property rowspan-of "rowspan")
 
 
-(def-dom-class tabindex attribute "tabindex"
-               :reader-value-on-no-entry 0
-               :writer-check-for-value-designating-removal-code (eq value nil)
-               :writer-value-marshaller-code (princ-to-string value))
-(export '(tabindex-of))
+(define-attribute-property tabindex-of "tabindex"
+  :dom-server-reader-fallback-value 0)
