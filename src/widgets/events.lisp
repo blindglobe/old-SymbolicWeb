@@ -31,11 +31,6 @@
                              :initform t)))
 
 
-(defmethod initialize-instance :after ((callback-box callback-box) &key)
-  #|(setf (slot-value callback-box 'id)
-        (js-callback-id-of (id-of (widget-of callback-box))
-                           (event-type-of callback-box)))|#)
-
 (defmethod (setf widget-of) :after ((widget widget) (callback-box callback-box))
   (setf (slot-value callback-box 'id)
         (js-callback-id-of (id-of (widget-of callback-box))
@@ -51,7 +46,6 @@
 (export 'has-client-side-side-effects-p-of)
 
 
-#.(maybe-inline 'store-callback-box)
 (defun store-callback-box (callback-box viewport)
   (declare (callback-box callback-box)
            (viewport viewport))
@@ -59,7 +53,6 @@
         callback-box))
 
 
-#.(maybe-inline 'remove-callback-box)
 (defun remove-callback-box (widget event-type viewport)
   (declare (widget widget)
            (string event-type)
@@ -68,7 +61,6 @@
            (callbacks-of viewport)))
 
 
-#.(maybe-inline 'find-callback-box)
 (defun find-callback-box (id viewport)
   (declare (string id)
            (viewport viewport))
@@ -87,7 +79,6 @@
 (export 'trigger)
 
 
-#.(maybe-inline 'execute-callback)
 (defun execute-callback (callback-box status args)
   (declare (callback-box callback-box)
            (symbol status)
@@ -115,7 +106,6 @@
   (bind-widget (widget-of callback-box) (event-type-of callback-box) callback-box))
 
 
-#.(maybe-inline 'bind-widget)
 (defun bind-widget (widget event-type callback)
   (declare (widget widget)
            (string event-type))
@@ -135,40 +125,30 @@
         (run js-code widget))))
 
 
-#.(maybe-inline '(setf event))
 (defun (setf event) (callback event-type widget &key
                      server-only-p
                      js-before js-after callback-data
                      (browser-default-action-p t))
   (declare (string event-type)
            (widget widget))
-  #| CALLBACK can be a function, a string representing JS code or NIL which means
-that the event is to be unbound. |#
-  (let ((callback (when callback
-                    (if (typep callback 'callback-box)
-                        callback
-                        (make-instance 'callback-box
-                                       :widget widget
-                                       :event-type event-type
-                                       :callback callback)))))
-    (when callback
-      (setf (widget-of callback) widget)
-      (when js-before
-        (setf (slot-value callback 'js-before) js-before))
-      (when js-after
-        (setf (slot-value callback 'js-after) js-after))
-      (when callback-data
-        (setf (slot-value callback 'callback-data) callback-data))
-      (when (typep callback 'callback-box)
-        (setf (slot-value callback 'browser-default-action-p) browser-default-action-p)))
+  (when callback
+    (setf (widget-of callback) widget)
+    (when js-before
+      (setf (slot-value callback 'js-before) js-before))
+    (when js-after
+      (setf (slot-value callback 'js-after) js-after))
+    (when callback-data
+      (setf (slot-value callback 'callback-data) callback-data))
+    (when (typep callback 'callback-box)
+      (setf (slot-value callback 'browser-default-action-p) browser-default-action-p)))
 
-    ;; setup @ server side
-    (when callback
-      (with-visible-contexts-of widget viewport
-        (store-callback-box callback viewport)))
+  ;; setup @ server side
+  (when callback
+    (with-visible-contexts-of widget viewport
+      (store-callback-box callback viewport)))
 
-    ;; setup @ client side
-    (unless server-only-p (bind-widget widget event-type callback))))
+  ;; setup @ client side
+  (unless server-only-p (bind-widget widget event-type callback)))
 (export 'event)
 
 
@@ -197,7 +177,8 @@ that the event is to be unbound. |#
 
 (defun event-remove (event-type widget &key server-only-p)
   (declare (string event-type)
-           (widget widget))
+           (widget widget)
+           (ignore server-only-p))
   (setf (event event-type widget) nil)
   (with-visible-contexts-of widget viewport
     (remove-callback-box widget event-type viewport)))

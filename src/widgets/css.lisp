@@ -5,7 +5,6 @@
 (declaim #.(optimizations))
 
 
-#.(maybe-inline 'css)
 (defun css (property widget)
   (declare (string property)
            (widget widget)
@@ -14,7 +13,6 @@
 (export 'css)
 
 
-#.(maybe-inline '(setf css))
 (defun (setf css) (new-value property widget &key server-only-p)
   (declare (string new-value property)
            (widget widget)
@@ -32,6 +30,7 @@
   (declare (string property)
            (widget widget))
   (write-line "TODO: CSS-REMOVE"))
+(export 'css-remove)
 
 
 

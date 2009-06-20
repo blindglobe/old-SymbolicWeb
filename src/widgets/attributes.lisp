@@ -5,7 +5,6 @@
 (declaim #.(optimizations))
 
 
-#.(maybe-inline 'attribute)
 (defun attribute (attribute widget)
   (declare (string attribute)
            (widget widget)
@@ -14,7 +13,6 @@
 (export 'attribute)
 
 
-#.(maybe-inline '(setf attribute))
 (defun (setf attribute) (new-value attribute widget &key server-only-p)
   (declare (string new-value attribute)
            (widget widget)
