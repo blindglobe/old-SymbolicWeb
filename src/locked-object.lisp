@@ -8,13 +8,13 @@
 (defclass locked-object-group ()
   ((lock :reader lock-of
          :initform (make-lock))
-   
+
    (objects-lock :reader objects-lock-of
                  :initform (make-lock))
-   
+
    (objects :type list
             :initform nil))
-  
+
   (:documentation "
 When you need to lock multiple objects at the _same time_
 \(locking them in sequential order of execution == fail)."))

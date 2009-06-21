@@ -8,40 +8,40 @@
 (defclass pagination (object)
   ((add-entries-fn :accessor add-entries-fn-of
                    :initform (iambda))
-   
+
    (remove-entries-fn :accessor remove-entries-fn-of
                       :initform (iambda))
-   
+
    (entry-ids :reader entry-ids-of
               :type list
               :initform nil)
-   
+
    (current-page :reader current-page-of
                  :type integer
                  :initform 0)
-   
+
    (current-entry-widgets :reader current-entry-widgets-of
                           :type list
                           :initform nil)
-   
+
    (num-entries-pr-page :reader num-entries-pr-page-of :initarg :num-entries-pr-page
                         :type integer
                         :initform 10)
-   
+
    (total-num-entries :reader total-num-entries-of
                       :type integer
                       :initform 0)
-   
+
    (total-num-pages :reader total-num-pages-of :initarg :total-num-pages
                     :type integer
                     :initform 0)
-   
+
    (on-page-change-fn :accessor on-page-change-fn-of :initarg :on-page-change-fn
                       :initform (iambda))
-   
+
    (on-state-change-of-pages-before-current-p :accessor on-state-change-of-pages-before-current-p-of
                                               :initform (iambda))
-   
+
    (on-state-change-of-pages-after-current-p :accessor on-state-change-of-pages-after-current-p-of
                                              :initform (iambda))))
 (export '(pagination add-entries-fn-of remove-entries-fn-of entry-ids-of current-page-of num-entries-pr-page-of total-num-entries-of

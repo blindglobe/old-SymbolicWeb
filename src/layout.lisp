@@ -14,13 +14,13 @@
 (defclass temp-layout-container ()
   ((element-name :reader element-name :initarg :element-name
                  :initform (error ":ELEMENT-NAME needed."))
-   
+
    (left  :initarg :left
           :initform (error ":LEFT needed."))
    (width :initarg :width
           :initform (error ":WIDTH needed."))
    (width-determined-p :initform nil)
-   
+
    (top    :initarg :top
            :initform (error ":TOP needed."))
    (height :initarg :height
@@ -72,7 +72,7 @@
                                         :left (format nil "~F%" left) :width  (format nil "~F%" width)
                                         :top  (format nil "~F%" top)  :height (format nil "~F%" height))))
            (reverse layout-containers))))
-  
+
 
 
 (defmacro with-layout ((&key (resolution-x 10) (resolution-y 10) bindings)
@@ -120,5 +120,3 @@
 
 (defmethod render-viewport ((viewport viewport) (app empty-page-app))
   (test))
-
-
