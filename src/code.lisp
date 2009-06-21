@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :code.lisp))
 
 
 (defclass code ()

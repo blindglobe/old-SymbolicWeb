@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations :pagination.lisp))
+
 
 (defclass pagination (object)
   ((add-entries-fn :accessor add-entries-fn-of

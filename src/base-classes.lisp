@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :base-classes.lisp))
 
 
 #| These are placed here so the compiler will know about them as early as

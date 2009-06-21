@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :widgets/widget.lisp))
 
 
 (defclass widget (widget-base)

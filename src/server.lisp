@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :server.lisp))
 
 
 (defclass server (id-mixin)

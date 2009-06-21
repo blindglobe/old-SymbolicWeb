@@ -2,6 +2,8 @@
 
 (in-package :sw)
 
+(declaim #.(optimizations :address-bar.lisp))
+
 
 (defparameter *address-bar-serializing-p* nil
   "This is T when we're in the process of serializing values from the URL (client)

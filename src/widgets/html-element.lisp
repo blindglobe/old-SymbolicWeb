@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :widgets/html-element.lisp))
 
 
 (defclass html-element (widget)

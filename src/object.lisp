@@ -2,6 +2,8 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations :object.lisp))
+
 
 (defclass object ()
   ((urlized-p :reader urlized-p-of
@@ -45,4 +47,3 @@ the browser back/forward buttons."
   (declare (ignore from-browser-history-p))
   (error "Tried to de-serialize ~A (from URL) to ~A, but a STATE<-URI-VALUE method has not been defined for ~A."
          uri-value (type-of object) (type-of object)))
-    

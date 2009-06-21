@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :util.lisp))
 
 
 ;; TODO: This should use the ID-GENERATOR* stuff from Aromyxo.

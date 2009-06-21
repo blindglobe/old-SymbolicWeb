@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :widgets/text-input.lisp))
 
 
 (defclass text-input (widget)

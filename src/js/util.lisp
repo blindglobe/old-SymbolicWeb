@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :js/util.lisp))
 
 
 (defun alert (msg &optional (viewport-or-widget *viewport*))

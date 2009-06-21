@@ -2,6 +2,7 @@
 
 (in-package #:sw)
 
+(declaim #.(optimizations :layout.lisp))
 
 
 (defwidget layout-container (container)

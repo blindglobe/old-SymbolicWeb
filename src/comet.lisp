@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :comet.lisp))
 
 
 (defmethod handle-comet-request ((server sw-http-server) (app application) (viewport viewport))

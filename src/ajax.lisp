@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :ajax.lisp))
 
 
 ;; TODO: This thing doesn't actually work yet ..

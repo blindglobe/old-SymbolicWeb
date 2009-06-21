@@ -1,6 +1,8 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package :sw)
+(in-package #:sw)
+
+(declaim #.(optimizations :locked-object.lisp))
 
 
 (defclass locked-object-group ()

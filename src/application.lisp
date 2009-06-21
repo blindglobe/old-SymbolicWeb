@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :application.lisp))
 
 
 (defclass application (id-mixin locked-object self-ref)

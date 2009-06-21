@@ -2,7 +2,7 @@
 
 (in-package #:sw)
 
-(declaim #.(optimizations))
+(declaim #.(optimizations :widgets/attributes.lisp))
 
 
 (defun attribute (attribute widget)
