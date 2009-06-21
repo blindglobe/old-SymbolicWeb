@@ -65,69 +65,49 @@ I need to think about stuff like CSS-CLASS-OF.
                                 (value-marshaller #'princ-to-string)
                                 (value-removal-checker #'not)) ;; Essentially (lambda (value) (eq value nil)).
   (declare (function dom-server-reader dom-server-writer dom-server-remover
-                     value-marshaller value-removal-checker)
-           (inline dom-server-reader dom-server-writer dom-server-remover
-                   value-marshaller value-removal-checker))
+                     value-removal-checker))
 
   ;; Add DOM reader.
-  (ensure-generic-function lisp-reader-name :lambda-list '(dom-mirror))
-  (add-method (ensure-function lisp-reader-name)
-              (make-instance 'standard-method
-                             :lambda-list '(dom-mirror)
-                             :specializers (list (find-class 'dom-mirror))
-                             :function
-                             (lambda (args method)
-                               (declare (ignore method))
-                               (let ((dom-mirror (first args)))
-                                 (if *js-code-only-p*
-                                     (funcall dom-client-reader dom-name dom-mirror)
-                                     (multiple-value-bind (value found-p)
-                                         (funcall dom-server-reader dom-mirror lisp-accessor-name)
-                                       (if found-p
-                                           (values value found-p)
-                                           (when dom-server-reader-fallback-value-supplied-p
-                                             (values dom-server-reader-fallback-value :fallback)))))))))
+  (compile-and-execute
+    `(defun ,lisp-reader-name (dom-mirror)
+       (declare (dom-mirror dom-mirror))
+       (if *js-code-only-p*
+           (funcall ,dom-client-reader ,dom-name dom-mirror)
+           (multiple-value-bind (value found-p)
+               (funcall ,dom-server-reader dom-mirror ',lisp-accessor-name)
+             (if found-p
+                 (values value found-p)
+                 ,(when dom-server-reader-fallback-value-supplied-p
+                   `(values ,dom-server-reader-fallback-value :fallback)))))))
 
   ;; Add DOM writer.
-  (ensure-generic-function lisp-writer-name :lambda-list '(property-value dom-mirror &rest args))
-  (add-method (ensure-function lisp-writer-name)
-              (make-instance 'standard-method
-                             :lambda-list '(property-value dom-mirror &rest args)
-                             :specializers (list (find-class 't) (find-class 'dom-mirror))
-                             :function
-                             (lambda (args method)
-                               (declare (ignore method))
-                               (let ((property-value (first args))
-                                     (dom-mirror (second args)))
-                                 (prog1 property-value
-                                   (unless *js-code-only-p*
-                                     (if (funcall value-removal-checker property-value)
-                                         (progn
-                                           (funcall dom-server-remover dom-mirror lisp-accessor-name)
-                                           (apply dom-client-remover dom-name dom-mirror (cddr args)))
-                                         (progn
-                                           (funcall dom-server-writer dom-mirror lisp-accessor-name property-value)
-                                           (apply dom-client-writer
-                                                  (funcall value-marshaller property-value)
-                                                  dom-name dom-mirror (cddr args))))))))))
+  (compile-and-execute
+    `(defun ,lisp-writer-name (property-value dom-mirror &rest args)
+       (declare (dom-mirror dom-mirror))
+       (prog1 property-value
+         (unless *js-code-only-p*
+           (if (funcall ,value-removal-checker property-value)
+               (progn
+                 (funcall ,dom-server-remover dom-mirror ',lisp-accessor-name)
+                 (apply ,dom-client-remover ,dom-name dom-mirror args))
+               (progn
+                 (funcall ,dom-server-writer dom-mirror ',lisp-accessor-name property-value)
+                 (apply ,dom-client-writer
+                        ,(if value-marshaller
+                             `(funcall ,value-marshaller property-value)
+                             `property-value)
+                        ,dom-name dom-mirror args)))))))
 
   ;; Add DOM renderer.
-  (add-method (ensure-function 'render-dom)
-              (make-instance 'standard-method
-                             :lambda-list '(dom-mirror property-name property-value)
-                             :specializers (list (find-class 'dom-mirror)
-                                                 (make-instance 'eql-specializer :object lisp-accessor-name)
-                                                 (find-class 't))
-                             :function
-                             (lambda (args method)
-                               (declare (ignore method))
-                               (let ((dom-mirror (first args))
-                                     ;;(property-name (second args))
-                                     (property-value (third args)))
-                                 (run (js-code-of (funcall dom-client-writer
-                                                           (funcall value-marshaller property-value)
-                                                           dom-name dom-mirror))
-                                      dom-mirror))))))
+  (compile-and-execute
+    `(defmethod render-dom ((dom-mirror dom-mirror) (property-name (eql ',lisp-accessor-name)) property-value)
+       (run (js-code-of (funcall ,dom-client-writer
+                                 ,(if value-marshaller
+                                      `(funcall ,value-marshaller property-value)
+                                      `property-value)
+                                 ,dom-name
+                                 dom-mirror))
+            dom-mirror))))
 (export 'define-dom-property)
 
 
@@ -145,16 +125,10 @@ I need to think about stuff like CSS-CLASS-OF.
       (funcall dom-client-remover dom-name widget)))
 
   ;; Remove DOM reader.
-  (remove-method (ensure-function lisp-reader-name)
-                 (find-method (ensure-function lisp-reader-name)
-                              nil
-                              (list (find-class 'dom-mirror))))
+  (fmakunbound lisp-reader-name)
 
   ;; Remove DOM writer.
-  (remove-method (ensure-function lisp-writer-name)
-                 (find-method (ensure-function lisp-writer-name)
-                              nil
-                              (list (find-class 't) (find-class 'dom-mirror))))
+  (fmakunbound lisp-writer-name)
 
   ;; Remove DOM renderer.
   (remove-method (ensure-function 'render-dom)
