@@ -23,6 +23,7 @@
               (arguments sw-http::*post-parameters*))
          (setf (last-user-activity-time-of app) (get-universal-time))
          (dolist (arg arguments)
+           ;; TODO: MKSYMF can cause a leak here.
            (setf (car arg) (mksymf ":" (car arg))))
          (execute-callback callback-box :dom-event (flatten arguments))))
 
@@ -70,7 +71,7 @@
       ((string= "terminate-session" event)
        (remove-application  app))
 
-      #|
+      #| TODO: Add this back later.
       ((string= "display-session-info" event)
        (show-alert-box (who (:h3 "SymbolicWeb session info")
                             "(ID-OF APP) => " (str (id-of app)) :br

@@ -1,6 +1,6 @@
 ;;;; http.//nostdal.org/ ;;;;
 
-(in-package :sw)
+(in-package #:sw)
 
 (declaim #.(optimizations :address-bar.lisp))
 
