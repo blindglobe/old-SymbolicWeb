@@ -35,14 +35,18 @@ I need to think about stuff like CSS-CLASS-OF.
 (defun dom-server-reader (dom-mirror lisp-accessor-name)
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name))
-  (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror)))
+  (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
+    (sb-ext:with-locked-hash-table (dom-mirror-data)
+      (gethash lisp-accessor-name dom-mirror-data))))
 
 
 (defun dom-server-writer (dom-mirror lisp-accessor-name new-value)
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name))
-  (setf (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))
-        new-value))
+  (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
+    (sb-ext:with-locked-hash-table (dom-mirror-data)
+      (setf (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))
+            new-value))))
 
 
 (defun dom-server-remover (dom-mirror lisp-accessor-name)
