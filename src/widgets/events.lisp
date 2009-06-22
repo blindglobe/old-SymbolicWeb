@@ -8,8 +8,12 @@
 (defclass callback-box ()
   ((id :reader id-of)
 
-   (widget :accessor widget-of :initarg :widget
+   (widget :accessor widget-of
            :type widget)
+
+   (event-cell :reader event-cell-of :initarg :event-cell
+               :type cell
+               :initform #~nil)
 
    (event-type :reader event-type-of :initarg :event-type
                :type string
@@ -29,6 +33,11 @@
 
    (browser-default-action-p :accessor browser-default-action-p-of :initarg :browser-default-action-p
                              :initform t)))
+
+
+(defmethod initialize-instance :after ((callback-box callback-box) &key widget)
+  (when widget
+    (setf (widget-of callback-box) widget)))
 
 
 (defmethod (setf widget-of) :after ((widget widget) (callback-box callback-box))
@@ -82,18 +91,17 @@
         (if (and (null args)
                  (has-client-side-side-effects-p-of callback-box))
             (run js-code (widget-of callback-box))
-            (execute-callback callback-box :server-side-trigger args)))))
+            (execute-callback callback-box args)))))
 (export 'trigger)
 
 
-(defun execute-callback (callback-box status args)
+(defun execute-callback (callback-box args)
   (declare (callback-box callback-box)
-           (symbol status)
            (list args))
   (let ((*current-event-widget* (widget-of callback-box)))
-    (apply (the function (callback-of callback-box)) (widget-of callback-box)
-           :status status :callback callback-box :allow-other-keys t
-           args)))
+    (pulse ~(event-cell-of callback-box) (if args args t))
+    #|(funcall callback-box *current-event-widget* args)|#))
+
 
 
 (defmethod (setf js-before-of) :after (new-js (callback-box callback-box))
@@ -115,9 +123,9 @@
 
 (defun bind-widget (widget event-type callback)
   (declare (widget widget)
-           (string event-type))
+           (string event-type)
+           ((or callback-box string null) callback))
   (let ((js-code (if callback
-                     ;; It's an instance of CALLBACK-BOX.
                      (js-bind (id-of widget) (event-type-of callback) (id-of callback)
                               :client-side-only-p (when (stringp (callback-of callback))
                                                     (callback-of callback))
@@ -125,7 +133,6 @@
                               :js-before (js-before-of callback)
                               :js-after (js-after-of callback)
                               :browser-default-action-p (browser-default-action-p-of callback))
-                     ;; CALLBACK argument for (SETF EVENT) was NIL.
                      (js-unbind (id-of widget) event-type))))
     (if *js-code-only-p*
         js-code
@@ -189,6 +196,28 @@ DOM-events."
 (export 'mk-cb)
 
 
+(defun event-dom-server-reader (dom-mirror lisp-accessor-name)
+  (unless *formula*
+    (return-from event-dom-server-reader
+      (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))
+  (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
+    (sb-ext:with-locked-hash-table (dom-mirror-data)
+      (multiple-value-bind (callback-box found-p)
+          (dom-server-reader dom-mirror lisp-accessor-name)
+        (if found-p
+            (values ~(event-cell-of callback-box) t)
+            (let ((callback-box (make-instance 'callback-box
+                                               :widget dom-mirror
+                                               :event-type "click")))
+              (dom-event-cb-constructor dom-mirror callback-box)
+              (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror)
+              (values ~(event-cell-of callback-box) t)))))))
+
+
+(defmethod dom-event-cb-constructor ((dom-mirror dom-mirror) (callback-box callback-box))
+  (setf (callback-data-of callback-box) '(("answer" . "return 42;"))))
+(export 'dom-event-cb-constructor)
+
 
 (defmacro define-event-property (lisp-name dom-name &body args)
   `(progn
@@ -197,32 +226,7 @@ DOM-events."
                           nil
 
                           :dom-server-reader
-                          (lambda (dom-mirror lisp-accessor-name)
-                            (assert *formula*)
-
-                            (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
-                              (sb-ext:with-locked-hash-table (dom-mirror-data)
-                                (multiple-value-bind (callback found-p)
-                                    (dom-server-reader dom-mirror lisp-accessor-name)
-                                  (if found-p
-                                      (let ((event-cell (funcall callback dom-mirror :sw-mvc-p t)))
-                                        (multiple-value-prog1 (values ~(car event-cell) t)
-                                          (let ((formula *formula*))
-                                            (sw-mvc:with-ignored-sources ()
-                                              (unless (find formula (cdr event-cell) :key (lambda (elt)
-                                                                                            (formula-of ~elt)))
-                                                (push #~formula (cdr event-cell)))))))
-                                      (let ((event-cell (cons #~nil nil)))
-                                        (multiple-value-prog1 (values ~(car event-cell) t)
-                                          (setf (cdr event-cell) (list #~*formula*))
-                                          (setf (gethash lisp-accessor-name dom-mirror-data)
-                                                event-cell
-                                                (,lisp-name dom-mirror)
-                                                (mk-cb (dom-mirror sw-mvc-p)
-                                                  (declare (ignore dom-mirror))
-                                                  (if sw-mvc-p
-                                                      event-cell
-                                                      (pulse ~(car event-cell))))))))))))
+                          #'event-dom-server-reader
 
                           :value-marshaller
                           (lambda (callback)
@@ -239,6 +243,7 @@ DOM-events."
                                  (error "Don't know what to do with ~S." callback))))
                           ,@args)
      (export ',lisp-name)))
+
 
 
 (define-event-property on-blur-of "blur")
