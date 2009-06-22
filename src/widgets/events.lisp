@@ -46,19 +46,26 @@
 (export 'has-client-side-side-effects-p-of)
 
 
-(defun store-callback-box (callback-box viewport)
+(defun store-callback-box (callback-box widget)
   (declare (callback-box callback-box)
-           (viewport viewport))
-  (setf (gethash (id-of callback-box) (callbacks-of viewport))
-        callback-box))
+           (widget widget))
+  (let ((id (id-of callback-box)))
+    ;; Weak links.
+    (with-visible-contexts-of widget viewport
+      (setf (gethash id (callbacks-of viewport))
+            callback-box))
+    ;; Hard links.
+    (setf (gethash id (callbacks-of widget))
+          callback-box)))
 
 
-(defun remove-callback-box (widget event-type viewport)
-  (declare (widget widget)
-           (string event-type)
-           (viewport viewport))
-  (remhash (js-callback-id-of (id-of widget) event-type)
-           (callbacks-of viewport)))
+(defun remove-callback-box (event-type widget)
+  (declare (string event-type)
+           (widget widget))
+  (let ((id (js-callback-id-of (id-of widget) event-type)))
+    (with-visible-contexts-of widget viewport
+      (remhash id (callbacks-of viewport)))
+    (remhash id (callbacks-of widget))))
 
 
 (defun find-callback-box (id viewport)
@@ -129,23 +136,23 @@
                      server-only-p
                      js-before js-after callback-data
                      (browser-default-action-p t))
-  (declare (string event-type)
-           (widget widget))
-  (when callback
-    (setf (widget-of callback) widget)
-    (when js-before
-      (setf (slot-value callback 'js-before) js-before))
-    (when js-after
-      (setf (slot-value callback 'js-after) js-after))
-    (when callback-data
-      (setf (slot-value callback 'callback-data) callback-data))
-    (when (typep callback 'callback-box)
-      (setf (slot-value callback 'browser-default-action-p) browser-default-action-p)))
+  (declare (callback-box callback)
+           (string event-type)
+           (widget widget)
+           ((or string null) js-before js-after)
+           ((or list null) callback-data))
+  (setf (widget-of callback) widget)
+  (when js-before
+    (setf (slot-value callback 'js-before) js-before))
+  (when js-after
+    (setf (slot-value callback 'js-after) js-after))
+  (when callback-data
+    (setf (slot-value callback 'callback-data) callback-data))
+  (when (typep callback 'callback-box)
+    (setf (slot-value callback 'browser-default-action-p) browser-default-action-p))
 
   ;; setup @ server side
-  (when callback
-    (with-visible-contexts-of widget viewport
-      (store-callback-box callback viewport)))
+  (store-callback-box callback widget)
 
   ;; setup @ client side
   (unless server-only-p (bind-widget widget event-type callback)))
@@ -154,24 +161,12 @@
 
 ;; TODO: Finish this.
 (defmethod event ((event-type string) (widget widget) &key
-                  dom-cache-writer-fn server-only-p
+                  server-only-p
                   js-before js-after callback-data
                   (browser-default-action-p t))
+  (declare (ignorable server-only-p js-before js-after callback-data browser-default-action-p))
   (assert *formula*)
-  (let ((event-router (event-router-of widget)))
-    (sb-ext:with-locked-hash-table (event-router)
-      (multiple-value-bind (state-cell found-p)
-          (gethash event-type event-router)
-        (if found-p
-            (prog1 ~(car state-cell)
-                   (unless (find *formula* (cdr state-cell) :key (lambda (elt)
-                                                                   (formula-of elt)))
-                     (write-line "blah")
-                     (push #~*formula* (cdr state-cell))))
-            (let ((state-cell (cons #~nil (list #~*formula*))))
-              (prog1 ~(car state-cell)
-                     (setf (gethash event-type event-router) state-cell
-                           (event event-type widget) (iambda (pulse ~(car state-cell) t))))))))))
+  (write-line "TODO: event"))
 (export 'event)
 
 
@@ -179,9 +174,9 @@
   (declare (string event-type)
            (widget widget)
            (ignore server-only-p))
-  (setf (event event-type widget) nil)
-  (with-visible-contexts-of widget viewport
-    (remove-callback-box widget event-type viewport)))
+  (declare (ignore event-type widget))
+  #|(setf (event event-type widget) nil)|#
+  #|(remove-callback-box event-type widget)|#)
 (export 'event-remove)
 
 
@@ -198,9 +193,39 @@ DOM-events."
 (defmacro define-event-property (lisp-name dom-name &body args)
   `(progn
      (define-dom-property ',lisp-name ,dom-name #'(setf event) #'event #'event-remove
+                          :value-removal-checker
+                          nil
+
+                          :dom-server-reader
+                          (lambda (dom-mirror lisp-accessor-name)
+                            (assert *formula*)
+
+                            (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
+                              (sb-ext:with-locked-hash-table (dom-mirror-data)
+                                (multiple-value-bind (callback found-p)
+                                    (dom-server-reader dom-mirror lisp-accessor-name)
+                                  (if found-p
+                                      (let ((event-cell (funcall callback dom-mirror :sw-mvc-p t)))
+                                        (multiple-value-prog1 (values ~(car event-cell) t)
+                                          (let ((formula *formula*))
+                                            (sw-mvc:with-ignored-sources ()
+                                              (unless (find formula (cdr event-cell) :key (lambda (elt)
+                                                                                            (formula-of ~elt)))
+                                                (push #~formula (cdr event-cell)))))))
+                                      (let ((event-cell (cons #~nil nil)))
+                                        (multiple-value-prog1 (values ~(car event-cell) t)
+                                          (setf (cdr event-cell) (list #~*formula*))
+                                          (setf (gethash lisp-accessor-name dom-mirror-data)
+                                                event-cell
+                                                (,lisp-name dom-mirror)
+                                                (mk-cb (dom-mirror sw-mvc-p)
+                                                  (declare (ignore dom-mirror))
+                                                  (if sw-mvc-p
+                                                      event-cell
+                                                      (pulse ~(car event-cell))))))))))))
+
                           :value-marshaller
                           (lambda (callback)
-                            (when callback
                               (typecase callback
                                 ((or function string)
                                  (make-instance 'callback-box
@@ -211,7 +236,7 @@ DOM-events."
                                  callback)
 
                                 (t
-                                 (error "Don't know what to do with ~A" callback)))))
+                                 (error "Don't know what to do with ~S." callback))))
                           ,@args)
      (export ',lisp-name)))
 

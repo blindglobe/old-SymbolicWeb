@@ -17,10 +17,9 @@ I need to think about stuff like CSS-CLASS-OF.
                     :type hash-table
                     :initform (make-hash-table :test #'eq))
 
-   ;; TODO: I think I can remove this now.
-   (event-router :reader event-router-of
+   (callbacks-of :reader callbacks-of
                  :type hash-table
-                 :initform (make-hash-table :test #'eq))))
+                 :initform (make-hash-table :test #'equal))))
 
 
 (defgeneric render-dom (dom-mirror property-name property-vaule))
