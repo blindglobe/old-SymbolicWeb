@@ -22,10 +22,7 @@
                                  (return-from handle-ajax-request))))
               (arguments sw-http::*post-parameters*))
          (setf (last-user-activity-time-of app) (get-universal-time))
-         (dolist (arg arguments)
-           ;; TODO: MKSYMF can cause a leak here.
-           (setf (car arg) (mksymf ":" (car arg))))
-         (execute-callback callback-box :dom-event (flatten arguments))))
+         (execute-callback callback-box arguments)))
 
       #|
       ((string= "js-ack" event)
