@@ -19,6 +19,11 @@
                :type string
                :initform (error ":EVENT-TYPE needed."))
 
+   (argument-parser :reader argument-parser-of :initarg :argument-parser
+                    :type function
+                    :initform (lambda (args)
+                                args))
+
    (callback :reader callback-of :initarg :callback
              :initform (iambda))
 
@@ -99,9 +104,10 @@
   (declare (callback-box callback-box)
            (list args))
   (let ((*current-event-widget* (widget-of callback-box)))
-    (pulse ~(event-cell-of callback-box) (if args args t))
-    #|(funcall callback-box *current-event-widget* args)|#))
-
+    (pulse ~(event-cell-of callback-box)
+           (if args
+               (funcall (argument-parser-of callback-box) args)
+               t))))
 
 
 (defmethod (setf js-before-of) :after (new-js (callback-box callback-box))
@@ -196,7 +202,10 @@ DOM-events."
 (export 'mk-cb)
 
 
-(defun event-dom-server-reader (dom-mirror lisp-accessor-name)
+(defun event-dom-server-reader (dom-mirror lisp-accessor-name dom-name)
+  (declare (dom-mirror dom-mirror)
+           (symbol lisp-accessor-name)
+           (string dom-name))
   (unless *formula*
     (return-from event-dom-server-reader
       (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))
@@ -208,7 +217,7 @@ DOM-events."
             (values ~(event-cell-of callback-box) t)
             (let ((callback-box (make-instance 'callback-box
                                                :widget dom-mirror
-                                               :event-type "click")))
+                                               :event-type dom-name)))
               (dom-event-cb-constructor dom-mirror callback-box)
               (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror)
               (values ~(event-cell-of callback-box) t)))))))
@@ -226,7 +235,8 @@ DOM-events."
                           nil
 
                           :dom-server-reader
-                          #'event-dom-server-reader
+                          (lambda (dom-mirror lisp-accessor-name)
+                            (event-dom-server-reader dom-mirror lisp-accessor-name ,dom-name))
 
                           :value-marshaller
                           (lambda (callback)
