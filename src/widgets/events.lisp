@@ -206,9 +206,9 @@ DOM-events."
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name)
            (string dom-name))
-  (unless *formula*
+  #|(unless (dbg-princ *formula*)
     (return-from event-dom-server-reader
-      (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))
+      (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))|#
   (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
     (sb-ext:with-locked-hash-table (dom-mirror-data)
       (multiple-value-bind (callback-box found-p)
@@ -218,14 +218,14 @@ DOM-events."
             (let ((callback-box (make-instance 'callback-box
                                                :widget dom-mirror
                                                :event-type dom-name)))
-              (dom-event-cb-constructor dom-mirror callback-box)
+              (initialize-callback-box callback-box dom-mirror)
               (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror)
               (values ~(event-cell-of callback-box) t)))))))
 
 
-(defmethod dom-event-cb-constructor ((dom-mirror dom-mirror) (callback-box callback-box))
-  (setf (callback-data-of callback-box) '(("answer" . "return 42;"))))
-(export 'dom-event-cb-constructor)
+(defmethod initialize-callback-box ((callback-box callback-box) (dom-mirror dom-mirror))
+  )
+(export 'initialize-callback-box)
 
 
 (defmacro define-event-property (lisp-name dom-name &body args)
@@ -240,17 +240,18 @@ DOM-events."
 
                           :value-marshaller
                           (lambda (callback)
-                              (typecase callback
-                                ((or function string)
-                                 (make-instance 'callback-box
-                                                :event-type ,dom-name
-                                                :callback callback))
+                            (typecase callback
+                              ;; TODO: It might not make sense to accept a FUNCTION anymore.
+                              ((or function string)
+                               (make-instance 'callback-box
+                                              :event-type ,dom-name
+                                              :callback callback))
 
-                                (callback-box
-                                 callback)
+                              (callback-box
+                               callback)
 
-                                (t
-                                 (error "Don't know what to do with ~S." callback))))
+                              (t
+                               (error "Don't know what to do with ~S." callback))))
                           ,@args)
      (export ',lisp-name)))
 
