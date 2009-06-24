@@ -206,10 +206,10 @@ DOM-events."
 (export 'mk-cb)
 
 
-(defun event-dom-server-reader (dom-mirror lisp-accessor-name dom-name)
+(defun event-dom-server-reader (dom-mirror lisp-accessor-name event-type)
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name)
-           (string dom-name))
+           (string event-type))
   (unless *formula*
     (return-from event-dom-server-reader
       (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))
@@ -225,7 +225,7 @@ DOM-events."
                 (sw-mvc:with-ignored-sources ()
                   (unless (find formula (formula-cells-of callback-box) :key (lambda (elt) (formula-of ~elt)))
                     (push #~formula (formula-cells-of callback-box))))))
-            (let ((callback-box (make-instance 'callback-box :widget dom-mirror :event-type dom-name)))
+            (let ((callback-box (make-instance 'callback-box :widget dom-mirror :event-type event-type)))
               (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
                 ;; Add *FORMULA* to CALLBACK-BOX to ensure that it isn't GCed unintentionally.
                 (let ((formula *formula*))
@@ -240,15 +240,15 @@ DOM-events."
 (export 'initialize-callback-box)
 
 
-(defmacro define-event-property (lisp-name dom-name &body args)
+(defmacro define-event-property (lisp-name event-type &body args)
   `(progn
-     (define-dom-property ',lisp-name ,dom-name #'(setf event) #'event #'event-remove
+     (define-dom-property ',lisp-name ,event-type #'(setf event) #'event #'event-remove
                           :value-removal-checker
                           nil
 
                           :dom-server-reader
                           (lambda (dom-mirror lisp-accessor-name)
-                            (event-dom-server-reader dom-mirror lisp-accessor-name ,dom-name))
+                            (event-dom-server-reader dom-mirror lisp-accessor-name ,event-type))
 
                           :value-marshaller
                           (lambda (callback)
@@ -256,7 +256,7 @@ DOM-events."
                               ;; TODO: It might not make sense to accept a FUNCTION anymore.
                               ((or function string)
                                (make-instance 'callback-box
-                                              :event-type ,dom-name
+                                              :event-type ,event-type
                                               :callback callback))
 
                               (callback-box
