@@ -19,10 +19,9 @@
                :type string
                :initform (error ":EVENT-TYPE needed."))
 
-   (argument-parser :reader argument-parser-of :initarg :argument-parser
+   (argument-parser :accessor argument-parser-of :initarg :argument-parser
                     :type function
-                    :initform (lambda (args)
-                                args))
+                    :initform (lambda (args) args))
 
    (formula-cells :accessor formula-cells-of
                   :type list
@@ -231,11 +230,11 @@ DOM-events."
                 (let ((formula *formula*))
                   (sw-mvc:with-ignored-sources ()
                     (push #~formula (formula-cells-of callback-box))))
-                (initialize-callback-box callback-box dom-mirror)
+                (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
                 (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror))))))))
 
 
-(defmethod initialize-callback-box ((callback-box callback-box) (dom-mirror dom-mirror))
+(defmethod initialize-callback-box ((dom-mirror dom-mirror) (lisp-accessor-name symbol) (callback-box callback-box))
   )
 (export 'initialize-callback-box)
 
