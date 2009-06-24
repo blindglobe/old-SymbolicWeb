@@ -21,30 +21,35 @@
 
 
 (defmethod initialize-instance :after ((text-input text-input) &key)
-  (setf (on-blur-of text-input
-                    :callback-data `((:value . ,(js-code-of (value-of text-input)))))
-        (mk-cb (text-input value)
-          (setf (value-of text-input :server-only-p t) value)
-          (let ((model ~text-input))
-            (unless (equal ~model
-                           (if-let (input-translator (input-translator-of model))
-                             (funcall input-translator value)
-                             value))
-              (setf ~model value))))
+  (flet ((handle-input (value)
+           (setf (value-of text-input :server-only-p t) value)
+           ;; TODO: Move this to the Model end?
+           (let ((model ~text-input))
+             (unless (equal ~model (if-let (input-translator (input-translator-of model))
+                                     (setf value ;; For return value of HANDLE-INPUT; used by PULSE below.
+                                           (funcall input-translator value))
+                                     value))
+               (setf ~model value)))
+           value))
+    λ(when-let (value (on-blur-of text-input))
+       (handle-input value))
+    λ(when-let (value (on-keyup-of text-input))
+       (pulse ~(slot-value text-input 'enterpress-state)
+              (handle-input value)))))
 
-        (on-keyup-of text-input
-                     :js-before "if(event.which == 13) return true;"
-                     :callback-data `((:value . ,(js-code-of (value-of text-input)))))
-        (mk-cb (text-input value)
-          (setf (value-of text-input :server-only-p t) value)
-          (let ((model ~text-input))
-            (unless (equal ~model
-                           (if-let (input-translator (input-translator-of model))
-                             (funcall input-translator value)
-                             value))
-              (setf ~model value)))
-          (setf ~(slot-value text-input 'enterpress-state) t
-                ~(slot-value text-input 'enterpress-state) nil))))
+
+;; TODO: Think about this.
+(flet ((parse-client-args (args)
+         (cdr (assoc "value" args :test #'string=))))
+
+  (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-blur-of)) callback-box)
+    (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
+          (argument-parser-of callback-box) #'parse-client-args))
+
+  (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-keyup-of)) callback-box)
+    (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
+          (js-before-of callback-box) "if(event.which == 13) return true;"
+          (argument-parser-of callback-box) #'parse-client-args)))
 
 
 (defmethod enterpress-state-of ((text-input text-input))
