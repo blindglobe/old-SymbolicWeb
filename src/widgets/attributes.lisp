@@ -49,6 +49,7 @@
 
 (defun add-class (widget class-name &key server-only-p)
   (declare (widget widget))
+  "Add a CSS class to WIDGET."
   (setf class-name (string-downcase class-name))
   (let ((classes (let ((*js-code-only-p* nil))
                    (css-class-of widget))))
@@ -59,6 +60,7 @@
 
 (defun remove-class (widget class-name &key server-only-p)
   (declare (widget widget))
+  "Remove a CSS class from WIDGET."
   (setf class-name (string-downcase class-name))
   (let ((classes (let ((*js-code-only-p* nil))
                    (css-class-of widget))))
