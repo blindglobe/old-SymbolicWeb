@@ -66,7 +66,7 @@
                 exception-str)))
 
       ((string= "terminate-session" event)
-       (remove-application  app))
+       (remove-application app))
 
       #| TODO: Add this back later.
       ((string= "display-session-info" event)
