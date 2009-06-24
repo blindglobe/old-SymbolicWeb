@@ -9,7 +9,9 @@
    (square-of-x :initform ↑#λ(* ¤x ¤x))
    (sum :initform ↑#λ(+ ¤square-of-x ¤y))
 
-   (x-view :initform ↑(mk-text-input (:model (cell-of ¤x)))))
+   (x-view :initform ↑(mk-text-input (:model (cell-of ¤x))))
+   (x-feedback :initform ↑(letp1 ((span (mk-elt :span "need more cowbell")))
+                            (set-show-on-feedback span (cell-of ¤x)))))
 
   (:metaclass mvc-stm-class))
 
@@ -30,9 +32,8 @@
         (:div
          (:h1 "TEXT-INPUT-APP")
 
-         "X: " (:sw ¤x-view)
-         (:sw (letp1 ((span (mk-elt :span "need more cowbell")))
-                (set-show-on-feedback span (cell-of ¤x))))
+         "X: " (:sw ¤x-view) (:sw ¤x-feedback)
+
          :br
 
          "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x))
