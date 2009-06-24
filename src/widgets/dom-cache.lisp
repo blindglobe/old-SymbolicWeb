@@ -5,13 +5,6 @@
 (declaim #.(optimizations :widgets/dom-cache.lisp))
 
 
-#| TODO:
-There is a chance "value marshalling" isn't needed here anymore since it is
-something the Model -> View connection (SW-MVC) can take care of. Or, well,
-I need to think about stuff like CSS-CLASS-OF.
-|#
-
-
 (defclass dom-mirror ()
   ((dom-mirror-data :reader dom-mirror-data-of
                     :type hash-table
@@ -68,7 +61,6 @@ I need to think about stuff like CSS-CLASS-OF.
                                 (value-marshaller #'princ-to-string)
                                 (value-removal-checker #'not)) ;; Essentially (lambda (value) (eq value nil)).
   (declare (function dom-server-reader dom-server-writer dom-server-remover))
-
 
   ;; Add DOM reader.
   (compile-and-execute

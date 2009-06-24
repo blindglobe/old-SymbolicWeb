@@ -29,14 +29,17 @@
       (mk-html
         (:div
          (:h1 "TEXT-INPUT-APP")
-         "X: " (:sw ¤x-view) (:sw (letp1 ((span (mk-elt :span "need more cowbell" :display "none")))
+         ;; TODO: Find a better way to express this pattern.
+         "X: " (:sw ¤x-view) (:sw (letp1 ((span (mk-elt :span "need more cowbell")))
                                     (setf (formula-of span)
                                           #λ(if (feedback-event-of (cell-of ¤x))
-                                                (setf (display-of span) "inline")
-                                                (setf (display-of span) "none")))))
+                                                (remove-class span :sw-hide)
+                                                (add-class span :sw-hide)))))
          :br
-         "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x)) :br
-         "Y: " (:sw (mk-text-input (:model (cell-of ¤y)))) :br
+         "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x))
+         :br
+         "Y: " (:sw (mk-text-input (:model (cell-of ¤y))))
+         :br
          "(+ SQUARE-OF-X Y): " (:sw (cell-of ¤sum))
          :p
          :hr

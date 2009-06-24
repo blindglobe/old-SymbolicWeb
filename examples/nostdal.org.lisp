@@ -16,15 +16,12 @@
          (mk-html
            (:div
             (:h1 "nostdal.org")
-            (:p "Nothing much here for now. Check out some sauce at "
-                (:a :href "http://gitorious.org/~lnostdal" "gitorious") ".")
 
-            (:p "I'll add something interesting here later.")
             (:ul
+             (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious"))
              (:li (:a :href "text-input" "text-input-app")))
 
             (:hr :width "100%")
-            (:a :href "mailto:larsnostdal@gmail.com" "Lars Rune Nøstdal")
-            (:pre "λ(:linux :lighttpd :sbcl :sw-mvc :sw-stm :sw-db :sw-http :symbolicweb)λ")))))
+            (:pre "λ(:linux :lighttpd :sbcl :sw-http :sw-mvc :sw-stm :sw-db :symbolicweb)λ")))))
     (setf (margin-of main) "1%")
     (add-to (root) main)))
