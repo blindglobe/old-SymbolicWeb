@@ -23,10 +23,6 @@
                     :type function
                     :initform (lambda (args) args))
 
-   (formula-cells :accessor formula-cells-of
-                  :type list
-                  :initform nil)
-
    (callback :reader callback-of :initarg :callback
              :initform (iambda))
 
@@ -218,18 +214,18 @@ DOM-events."
           (dom-server-reader dom-mirror lisp-accessor-name)
         (if found-p
             (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
-              ;; Add *FORMULA* to CALLBACK-BOX if it isn't part of it already.
+              ;; Add *FORMULA* to DOM-MIRROR (VIEW-BASE) if it isn't part of it already.
               ;; This is to ensure that it isn't GCed unintentionally.
               (let ((formula *formula*))
                 (sw-mvc:with-ignored-sources ()
-                  (unless (find formula (formula-cells-of callback-box) :key (lambda (elt) (formula-of ~elt)))
-                    (push #~formula (formula-cells-of callback-box))))))
+                  (unless (find formula (formula-cells-of dom-mirror) :key (lambda (elt) (formula-of ~elt)))
+                    (add-formula dom-mirror formula)))))
             (let ((callback-box (make-instance 'callback-box :widget dom-mirror :event-type event-type)))
               (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
-                ;; Add *FORMULA* to CALLBACK-BOX to ensure that it isn't GCed unintentionally.
+                ;; Add *FORMULA* to DOM-MIRROR to ensure that it isn't GCed unintentionally.
                 (let ((formula *formula*))
                   (sw-mvc:with-ignored-sources ()
-                    (push #~formula (formula-cells-of callback-box))))
+                    (add-formula dom-mirror formula)))
                 (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
                 (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror))))))))
 

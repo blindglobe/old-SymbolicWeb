@@ -7,12 +7,12 @@
 
 (defclass container (widget container-base)
   ;; TODO: I could use (setf (metadata-of .. :insert-event-λ) ..) etc. here.
-  ((insert-event-λ :type (or null formula)
-                   :initform nil)
-   (remove-event-λ :type (or null formula)
-                   :initform nil)
-   (exchange-event-λ :type (or null formula)
-                     :initform nil))
+  (#|(insert-event-λ :type (or null formula)
+                   :initform nil)|#
+   #|(remove-event-λ :type (or null formula)
+                   :initform nil)|#
+   #|(exchange-event-λ :type (or null formula)
+                     :initform nil)|#)
 
   (:default-initargs
    :model (dlist)))
@@ -31,25 +31,25 @@
 
 
 (defmethod (setf model-of) ((model dlist) (container container))
-  (with-object container
-    (unless ¤insert-event-λ
-      (setf ¤insert-event-λ
-            #λ(when-let (event (insert-event-of model))
-                (when (eq model (container-of event))
-                  (when-commit ()
-                    (mvc-container-insert container event))))))
-    (unless ¤remove-event-λ
-      (setf ¤remove-event-λ
-            #λ(when-let (event (remove-event-of model))
-                (when (eq model (container-of event))
-                  (when-commit ()
-                    (mvc-container-remove container event))))))
-    (unless ¤exchange-event-λ
-      (setf ¤exchange-event-λ
-            #λ(when-let (event (exchange-event-of model))
-                (when (eq model (container-of event))
-                  (when-commit ()
-                    (mvc-container-exchange container event)))))))
+  ;; Insert event.
+  (add-formula container
+               λ(when-let (event (insert-event-of model))
+                  (when (eq model (container-of event))
+                    (when-commit ()
+                      (mvc-container-insert container event)))))
+  ;; Remove event.
+  (add-formula container
+               λ(when-let (event (remove-event-of model))
+                  (when (eq model (container-of event))
+                    (when-commit ()
+                      (mvc-container-remove container event)))))
+
+  ;; Exchange event.
+  (add-formula container
+               λ(when-let (event (exchange-event-of model))
+                  (when (eq model (container-of event))
+                    (when-commit ()
+                      (mvc-container-exchange container event)))))
 
   (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
       ((null dlist-node))

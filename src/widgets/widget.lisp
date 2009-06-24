@@ -159,8 +159,8 @@ visible in one or even no context."
 
 (defmethod set-show-on-feedback ((widget widget) (cell cell))
   "WIDGET should only be visible when \"feedback\" from CELL is T."
-  (setf (formula-of widget)
-        λ(if (feedback-event-of cell)
-             (remove-class widget :sw-hide)
-             (add-class widget :sw-hide))))
+  (add-formula widget
+               λ(if (feedback-event-of cell)
+                    (remove-class widget :sw-hide)
+                    (add-class widget :sw-hide))))
 (export 'set-show-on-feedback)
