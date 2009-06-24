@@ -24,6 +24,10 @@
                     :initform (lambda (args)
                                 args))
 
+   (formula-cells :accessor formula-cells-of
+                  :type list
+                  :initform nil)
+
    (callback :reader callback-of :initarg :callback
              :initform (iambda))
 
@@ -206,21 +210,28 @@ DOM-events."
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name)
            (string dom-name))
-  #|(unless (dbg-princ *formula*)
+  (unless *formula*
     (return-from event-dom-server-reader
-      (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))|#
+      (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))
   (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
     (sb-ext:with-locked-hash-table (dom-mirror-data)
       (multiple-value-bind (callback-box found-p)
           (dom-server-reader dom-mirror lisp-accessor-name)
         (if found-p
-            (values ~(event-cell-of callback-box) t)
+            (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
+              (let ((formula *formula*))
+                (sw-mvc:with-ignored-sources ()
+                  (unless (find formula (formula-cells-of callback-box) :key (lambda (elt) (formula-of ~elt)))
+                    (push #~formula (formula-cells-of callback-box))))))
             (let ((callback-box (make-instance 'callback-box
                                                :widget dom-mirror
                                                :event-type dom-name)))
-              (initialize-callback-box callback-box dom-mirror)
-              (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror)
-              (values ~(event-cell-of callback-box) t)))))))
+              (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
+                (let ((formula *formula*))
+                  (sw-mvc:with-ignored-sources ()
+                    (push #~formula (formula-cells-of callback-box))))
+                (initialize-callback-box callback-box dom-mirror)
+                (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror))))))))
 
 
 (defmethod initialize-callback-box ((callback-box callback-box) (dom-mirror dom-mirror))
