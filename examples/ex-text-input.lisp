@@ -33,7 +33,6 @@
          (:h1 "TEXT-INPUT-APP")
 
          "X: " (:sw ¤x-view) (:sw ¤x-feedback)
-
          :br
 
          "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x))
