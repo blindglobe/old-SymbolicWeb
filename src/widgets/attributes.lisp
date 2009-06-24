@@ -43,12 +43,13 @@
 
 
 (define-attribute-property css-class-of "class"
-  :value-marshaller (lambda (value) (format nil "~{~A~^ ~}" value)))
+  :value-marshaller (lambda (value) (format nil "~{~A~^ ~}" value))
+  :value-removal-checker nil)
 
 
 (defun add-class (widget class-name &key server-only-p)
-  (declare (widget widget)
-           (string class-name))
+  (declare (widget widget))
+  (setf class-name (string-downcase class-name))
   (let ((classes (let ((*js-code-only-p* nil))
                    (css-class-of widget))))
     (pushnew class-name classes :test #'string=)
@@ -57,8 +58,8 @@
 
 
 (defun remove-class (widget class-name &key server-only-p)
-  (declare (widget widget)
-           (string class-name))
+  (declare (widget widget))
+  (setf class-name (string-downcase class-name))
   (let ((classes (let ((*js-code-only-p* nil))
                    (css-class-of widget))))
     (deletef classes class-name :test #'string=)
