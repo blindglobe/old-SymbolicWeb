@@ -32,25 +32,25 @@
 
 (defmethod (setf model-of) ((model dlist) (container container))
   ;; Insert event.
-  (add-λ container
-    (when-let (event (insert-event-of model))
-      (when (eq model (container-of event))
-        (when-commit ()
-          (mvc-container-insert container event)))))
+  (add-to container
+    λ(when-let (event (insert-event-of model))
+       (when (eq model (container-of event))
+         (when-commit ()
+           (mvc-container-insert container event)))))
 
   ;; Remove event.
-  (add-λ container
-    (when-let (event (remove-event-of model))
-      (when (eq model (container-of event))
-        (when-commit ()
-          (mvc-container-remove container event)))))
+  (add-to container
+    λ(when-let (event (remove-event-of model))
+       (when (eq model (container-of event))
+         (when-commit ()
+           (mvc-container-remove container event)))))
 
   ;; Exchange event.
-  (add-λ container
-    (when-let (event (exchange-event-of model))
-      (when (eq model (container-of event))
-        (when-commit ()
-          (mvc-container-exchange container event)))))
+  (add-to container
+    λ(when-let (event (exchange-event-of model))
+       (when (eq model (container-of event))
+         (when-commit ()
+           (mvc-container-exchange container event)))))
 
   (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
       ((null dlist-node))
@@ -151,8 +151,8 @@ Returns WIDGET."
       (run (js-remove (id-of widget)) container))))
 
 
-
-(defmethod add-to ((container container) &rest widgets)
+(defmethod add-to* ((container container) widgets)
+  (declare (list widgets))
   "Adds or appends each widget in WIDGETS to CONTAINER in sequence.
 Returns WIDGETS."
   (prog1 widgets

@@ -21,7 +21,7 @@
     (prog1 (call-next-method)
       (when-let ((additional-children (set-difference *html-container-children* (children-of html-container)
                                                       :test #'eq)))
-        (apply #'add-to html-container additional-children))
+        (add-to* html-container additional-children))
       (when-let ((removed-children (set-difference (children-of html-container) *html-container-children*
                                                    :test #'eq)))
         (dolist (child removed-children)
