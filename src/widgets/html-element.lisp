@@ -26,10 +26,10 @@
 
 
 (defmethod (setf model-of) ((model single-value-model) (html-element html-element))
-  (add-formula html-element
-               λ(when-commit ()
-                  (setf (html-content-of html-element)
-                        ~model))))
+  (add-λ html-element
+    (when-commit ()
+      (setf (html-content-of html-element)
+            ~model))))
 
 
 (defmacro mk-elt (element-type &rest args)

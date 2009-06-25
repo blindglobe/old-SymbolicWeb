@@ -32,24 +32,25 @@
 
 (defmethod (setf model-of) ((model dlist) (container container))
   ;; Insert event.
-  (add-formula container
-               λ(when-let (event (insert-event-of model))
-                  (when (eq model (container-of event))
-                    (when-commit ()
-                      (mvc-container-insert container event)))))
+  (add-λ container
+    (when-let (event (insert-event-of model))
+      (when (eq model (container-of event))
+        (when-commit ()
+          (mvc-container-insert container event)))))
+
   ;; Remove event.
-  (add-formula container
-               λ(when-let (event (remove-event-of model))
-                  (when (eq model (container-of event))
-                    (when-commit ()
-                      (mvc-container-remove container event)))))
+  (add-λ container
+    (when-let (event (remove-event-of model))
+      (when (eq model (container-of event))
+        (when-commit ()
+          (mvc-container-remove container event)))))
 
   ;; Exchange event.
-  (add-formula container
-               λ(when-let (event (exchange-event-of model))
-                  (when (eq model (container-of event))
-                    (when-commit ()
-                      (mvc-container-exchange container event)))))
+  (add-λ container
+    (when-let (event (exchange-event-of model))
+      (when (eq model (container-of event))
+        (when-commit ()
+          (mvc-container-exchange container event)))))
 
   (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
       ((null dlist-node))
