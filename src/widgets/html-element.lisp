@@ -33,7 +33,7 @@
 
 
 (defmacro mk-elt (element-type &rest args)
-  (let ((element-type (string-downcase (princ-to-string element-type))))
+  (let ((element-type (string-downcase element-type)))
     (if (listp args)
         `(make-instance 'html-element
                         :element-type ,element-type

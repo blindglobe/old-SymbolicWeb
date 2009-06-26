@@ -140,6 +140,8 @@ Returns WIDGET."
         (render widget)))))
 
 
+;; TODO: I don't think shadowing CL:REMOVE is such a great idea.
+(muffle-compiler-note
 (defmethod remove ((widget widget) &optional (container (error "CONTAINER needed.")))
   "Remove WIDGET.
 Returns WIDGET."
@@ -148,13 +150,13 @@ Returns WIDGET."
     (deletef (slot-value container 'children) widget)
     (when (visible-p-of container)
       (propagate-for-remove widget container)
-      (run (js-remove (id-of widget)) container))))
+      (run (js-remove (id-of widget)) container)))))
 
 
 (defmethod add-to* ((container container) widgets)
-  (declare (list widgets))
   "Adds or appends each widget in WIDGETS to CONTAINER in sequence.
 Returns WIDGETS."
+  (declare (list widgets))
   (prog1 widgets
     (nconcf (slot-value container 'children) widgets)
     (when (visible-p-of container)

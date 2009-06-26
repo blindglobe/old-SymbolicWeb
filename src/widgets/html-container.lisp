@@ -59,6 +59,6 @@ Use the functions in src/widgets/attributes.lisp and css.lisp instead.
 Saw: ~S" res))
   (let ((html (first html)))
     `(make-instance 'html-container
-                    :element-type ,(string-downcase (princ-to-string (first html)))
+                    :element-type ,(string-downcase (first html))
                     :html-content (lambda () (who ,@(rest html))))))
 (export 'mk-html)
