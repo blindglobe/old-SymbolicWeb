@@ -10,8 +10,12 @@
    (sum :initform ↑#λ(+ ¤square-of-x ¤y))
 
    (x-view :initform ↑(mk-text-input (:model (cell-of ¤x))))
-   (x-feedback :initform ↑(letp1 ((span (mk-elt :span "need more cowbell")))
-                            (set-show-on-feedback span (cell-of ¤x)))))
+   (x-feedback :initform ↑(letp1 ((span (mk-elt :span "X needs more cowbell!")))
+                            (set-show-on-feedback span (cell-of ¤x))))
+
+   (y-view :initform ↑(mk-text-input (:model (cell-of ¤y))))
+   (y-feedback :initform ↑(letp1 ((span (mk-elt :span "Y needs more cowbell!")))
+                            (set-show-on-feedback span (cell-of ¤y)))))
 
   (:metaclass mvc-stm-class))
 
@@ -32,21 +36,12 @@
         (:div
          (:h1 "TEXT-INPUT-APP")
 
-         "X: " (:sw ¤x-view) (:sw ¤x-feedback)
-         :br
+         (:p "X: " (:sw ¤x-view) (:sw ¤x-feedback) :br
+             "Y: " (:sw ¤y-view) (:sw ¤y-feedback))
 
-         "SQUARE-OF-X: " (:sw (cell-of ¤square-of-x))
-         :br
-
-         "Y: " (:sw (mk-text-input (:model (cell-of ¤y))))
-         (:sw (letp1 ((span (mk-elt :span "need more cowbell!!")))
-                (set-show-on-feedback span (cell-of ¤y))))
-         :br
-
-         "(+ SQUARE-OF-X Y): " (:sw (cell-of ¤sum))
-         :p
+         (:p "SQUARE-OF-X => " (:sw (cell-of ¤square-of-x)) :br
+             "(+ SQUARE-OF-X Y) => " (:sw (cell-of ¤sum)))
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/master/examples/ex-text-input.lisp"
-             "source code"))))
-    (focus ¤x-view)))
+             "source code"))))))
