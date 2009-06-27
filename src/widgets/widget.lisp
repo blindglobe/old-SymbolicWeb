@@ -164,3 +164,25 @@ visible in one or even no context."
          (remove-class widget :sw-hide)
          (add-class widget :sw-hide))))
 (export 'set-show-on-feedback)
+
+
+(defmethod show ((widget widget) &key server-only-p)
+  (remove-class widget "sw-hide" :server-only-p server-only-p))
+(export 'show)
+
+
+(defmethod show-all ((container container) &key server-only-p)
+  (with-each-widget-in-tree (:root container)
+    (remove-class widget "sw-hide" :server-only-p server-only-p)))
+(export 'show-all)
+
+
+(defmethod hide ((widget widget) &key server-only-p)
+  (add-class widget "sw-hide" :server-only-p server-only-p))
+(export 'hide)
+
+
+(defmethod hide-all ((container container) &key server-only-p)
+  (with-each-widget-in-tree (:root container)
+    (add-class widget "sw-hide" :server-only-p server-only-p)))
+(export 'hide-all)
