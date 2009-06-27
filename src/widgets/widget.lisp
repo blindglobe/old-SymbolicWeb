@@ -6,13 +6,9 @@
 
 
 (defclass widget (widget-base)
-  ((shtml :initarg :shtml
-          :documentation "
-\"Static\" outer HTML shell or wrapping of a widget. This HTML code usually
-maintains or contains the ID attribute (stored in the ID-slot of the OBJECT
-parent class of this class) so the server and client \"versions\" of the
-widget can communicate or refer to each other.
-See the SHTML-OF method.")
+  ((element-type :reader element-type-of :initarg :element-type
+                 ;;:type string ;; TODO: Think about this.
+                 :initform "div")
 
    (static-attributes :reader static-attributes-of
                       :type list)
@@ -38,38 +34,25 @@ Use/see the VISIBLE-P-OF method.")))
       (call-next-method))))
 
 
-(defmethod initialize-instance :after ((widget widget) &key
-                                       (element-type "div")
-                                       ;; NOTE: This gets special treatment to avoid "flashing" when rendering.
-                                       (display nil display-supplied-p))
-  (unless (slot-boundp widget 'shtml)
-    (setf (slot-value widget 'shtml)
-          (catstr "<" element-type " id='" (id-of widget) "'"
-                  (if display-supplied-p
-                      (progn
-                        (setf (display-of widget :server-only-p t) display)
-                        (catstr " style='display: " (princ-to-string display) ";'"))
-                      "")
-                  (if-let (attributes (static-attributes-of widget))
-                    (with-output-to-string (ss)
-                      (dolist (key.value attributes)
-                        (format ss " ~A='~A'"
-                                (car key.value)
-                                (princ-to-string (cdr key.value)))))
-                    "")
-                  "></" element-type ">"))))
+(defmethod shtml-of ((widget widget))
+  (declare (optimize speed (safety 1)))
+  (when *creating-html-container-p*
+    (push widget *html-container-children*))
+  (let ((element-type (element-type-of widget)))
+    (catstr "<" element-type " id='" (id-of widget) "'"
+            (if (hidden-p widget) " class='sw-hide'" "")
+            (with-output-to-string (ss)
+              (dolist (key.value (static-attributes-of widget))
+                (format ss " ~A='~A'"
+                        (car key.value)
+                        (princ-to-string (cdr key.value)))))
+            "></" element-type ">")))
 
 
 #.(maybe-inline 'currently-constructing-p)
 (defun currently-constructing-p (widget)
   (declare (type widget widget))
   (eq widget *currently-constructing-widget*))
-
-
-(defmethod shtml-of ((widget widget))
-  (when *creating-html-container-p*
-    (push widget *html-container-children*))
-  (slot-value widget 'shtml))
 
 
 (defun html<- (obj widget)
