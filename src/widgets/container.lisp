@@ -6,13 +6,7 @@
 
 
 (defclass container (widget container-base)
-  ;; TODO: I could use (setf (metadata-of .. :insert-event-λ) ..) etc. here.
-  (#|(insert-event-λ :type (or null formula)
-                   :initform nil)|#
-   #|(remove-event-λ :type (or null formula)
-                   :initform nil)|#
-   #|(exchange-event-λ :type (or null formula)
-                     :initform nil)|#)
+  ()
 
   (:default-initargs
    :model (dlist)))

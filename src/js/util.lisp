@@ -65,7 +65,7 @@
 (defmethod redraw ((p (eql t)))
   "Redraw all elements on the page without reloading (see RELOAD) the page."
   (declare (ignore p))
-  (render *root*))
+  (render (root)))
 (export 'redraw)
 
 
