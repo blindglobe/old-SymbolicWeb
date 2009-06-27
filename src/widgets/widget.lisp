@@ -22,7 +22,11 @@ or visible in.")
 
    (visible-p :initform nil
               :documentation "
-Use/see the VISIBLE-P-OF method.")))
+Use/see the VISIBLE-P-OF method.")
+
+   (focussable-p :reader focussable-p-of :initarg :focussable-p
+                 :type (or (eql t) (eql nil))
+                 :initform nil)))
 
 
 (defmethod initialize-instance :around ((widget widget) &key)
@@ -103,10 +107,15 @@ in any session in any viewport."
 (export 'render)
 
 
-(defmethod focus ((widget widget))
+(defmethod focus ((widget widget) &key server-only-p)
   (if *js-code-only-p*
       (js-focus (id-of widget))
-      (run (js-focus (id-of widget)) widget)))
+      (progn
+        (with-each-viewport-of-widget (:widget widget)
+          (setf (slot-value (application-of viewport) 'last-focus)
+                widget))
+        (unless server-only-p
+          (run (js-focus (id-of widget)) widget)))))
 
 
 (defmethod scroll-to-bottom ((widget widget))

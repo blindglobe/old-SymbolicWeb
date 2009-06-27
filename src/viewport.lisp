@@ -129,6 +129,19 @@ refresh."
   (run "2+2" viewport))
 
 
+(defmethod render-viewport :after ((viewport viewport) (app application))
+  (if-let ((widget (last-focus-of app)))
+    ;; Ensure that the widget that had focus before page refresh still has it.
+    (when (visible-p-of widget :viewport viewport)
+      (focus widget))
+    ;; No widget is assigned focus; we'll try to find a default candidate.
+    (block nil
+      (with-each-widget-in-tree (:root (root-widget-of viewport))
+        (when (focussable-p-of widget)
+          (focus widget)
+          (return))))))
+
+
 (defun (setf do-at-end-of) (list-of-closures viewport)
   (declare (type viewport viewport))
   (with-recursive-lock-held ((do-at-end-mutex-of viewport))

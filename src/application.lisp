@@ -9,6 +9,10 @@
   ((server :reader server-of
            :type server)
 
+   (last-focus :reader last-focus-of
+               :type (or null widget)
+               :initform nil)
+
    (cookie-value :reader cookie-value-of :initarg :cookie-value
                  :type string
                  :initform (error ":COOKIE-VALUE must be supplied."))
