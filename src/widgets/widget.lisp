@@ -186,3 +186,15 @@ visible in one or even no context."
   (with-each-widget-in-tree (:root container)
     (add-class widget "sw-hide" :server-only-p server-only-p)))
 (export 'hide-all)
+
+
+(defmethod shown-p ((widget widget))
+  "Returns T or NIL."
+  (not (member "sw-hide" (css-class-of widget) :test #'string=)))
+(export 'shown-p)
+
+
+(defmethod hidden-p ((widget widget))
+  "Returns T or NIL."
+  (not (shown-p widget)))
+(export 'hidden-p)
