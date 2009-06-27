@@ -48,6 +48,7 @@
        (#|(:file "form")|#
         (:file "dom-cache")
         (:file "widget")
+        (:file "focussable")
         ;;(:file "manipulation")
         (:file "attributes")
         (:file "css")
