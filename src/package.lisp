@@ -235,8 +235,8 @@
 
    (:export
     #:filtered-container-model #:filter-fn #:filter-fn-of
-    #:hidden-p
-    #:shown-p
+    #:hidden-p-of
+    #:shown-p-of
     #:hide-all
     #:show-all
     #:hide

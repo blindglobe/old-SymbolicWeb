@@ -45,7 +45,7 @@ Use/see the VISIBLE-P-OF method.")))
   (declare #.(optimizations :shtml-of))
   (let ((element-type (element-type-of widget)))
     (catstr "<" element-type " id='" (id-of widget) "'"
-            (if (hidden-p widget) " class='sw-hide'" "")
+            (if (hidden-p-of widget) " class='sw-hide'" "")
             (with-output-to-string (ss)
               (dolist (key.value (static-attributes-of widget))
                 (format ss " ~A='~A'"
@@ -179,11 +179,11 @@ visible in one or even no context."
   (hide widget :server-only-p server-only-p))
 
 
-(defmethod shown-p ((widget widget))
+(defmethod shown-p-of ((widget widget))
   "Returns T or NIL."
   (not (member "sw-hide" (css-class-of widget) :test #'string=)))
 
 
-(defmethod hidden-p ((widget widget))
+(defmethod hidden-p-of ((widget widget))
   "Returns T or NIL."
   (not (shown-p widget)))
