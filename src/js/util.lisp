@@ -70,32 +70,38 @@
 
 
 (defun fade-in (widget &key (speed 400))
-  "Returns WIDGET.
-If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to the server."
   (declare (type widget widget))
   (flet ((js-code ()
-           (catstr "$(\"#" (id-of widget) "\").fadeIn(" (princ-to-string speed) ");")))
+           (catstr "$(\"#" (id-of widget) "\")"
+                   ".css('opacity', 0)" ;; We do not store the opacity server side (page refresh).
+                   ".removeClass('sw-hide')"
+                   ".fadeTo(" (princ-to-string speed)
+                   ", 1" ;; Opacity goal.
+                   ");")))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
         (progn
+          (show widget :server-only-p t)
           (run (js-code) widget)
           widget))))
 (export 'fade-in)
 
 
 (defun fade-out (widget &key (speed 400))
-  "Returns WIDGET.
-If CALLBACK is a string (JS-CODE-OF) it will be executed without a round-trip to the server."
   (declare (type widget widget))
   (flet ((js-code ()
-           (catstr "$(\"#" (id-of widget) "\").fadeOut(" (princ-to-string speed) ");")))
+           (catstr "$(\"#" (id-of widget) "\")"
+                   ".fadeTo(" (princ-to-string speed)
+                   ", 0" ;; Opacity goal.
+                   ", function(){ $(this).addClass('sw-hide'); }"
+                   ");")))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
         (progn
           (run (js-code) widget)
-          (setf (display-of widget :server-only-p t) "none")
+          (hide widget :server-only-p t)
           widget))))
 (export 'fade-out)
 
