@@ -5,7 +5,7 @@
 (declaim #.(optimizations :widgets/text-input.lisp))
 
 
-(defclass text-input (widget)
+(defclass text-input (widget focussable)
   (#|(previous-value :initform "")|#
    (enterpress-state :initform #~nil))
 
