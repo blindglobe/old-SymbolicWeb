@@ -38,3 +38,7 @@
 
 (defmethod optimizations ((context (eql :comet.lisp)) &key)
   '(optimize (speed 3)))
+
+
+(defmethod optimizations ((context (eql :shtml-of)) &key)
+  '(optimize speed (safety 1)))

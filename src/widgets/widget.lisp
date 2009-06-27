@@ -34,10 +34,15 @@ Use/see the VISIBLE-P-OF method.")))
       (call-next-method))))
 
 
-(defmethod shtml-of ((widget widget))
-  (declare (optimize speed (safety 1)))
+(defmethod shtml-of :around ((widget widget))
+  (declare #.(optimizations :shtml-of))
   (when *creating-html-container-p*
     (push widget *html-container-children*))
+  (call-next-method))
+
+
+(defmethod shtml-of ((widget widget))
+  (declare #.(optimizations :shtml-of))
   (let ((element-type (element-type-of widget)))
     (catstr "<" element-type " id='" (id-of widget) "'"
             (if (hidden-p widget) " class='sw-hide'" "")
