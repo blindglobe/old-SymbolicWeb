@@ -149,40 +149,41 @@ visible in one or even no context."
   "WIDGET should only be visible when \"feedback\" from CELL is T."
   (add-to widget
     λ(if (feedback-event-of cell)
-         (remove-class widget :sw-hide)
-         (add-class widget :sw-hide))))
-(export 'set-show-on-feedback)
+         (show widget)
+         (hide widget))))
 
 
 (defmethod show ((widget widget) &key server-only-p)
   (remove-class widget "sw-hide" :server-only-p server-only-p))
-(export 'show)
-
-
-(defmethod show-all ((container container) &key server-only-p)
-  (with-each-widget-in-tree (:root container)
-    (remove-class widget "sw-hide" :server-only-p server-only-p)))
-(export 'show-all)
 
 
 (defmethod hide ((widget widget) &key server-only-p)
   (add-class widget "sw-hide" :server-only-p server-only-p))
-(export 'hide)
+
+
+(defmethod show-all ((container container) &key server-only-p)
+  (with-each-widget-in-tree (:root container)
+    (show widget :server-only-p server-only-p)))
+
+
+(defmethod show-all ((widget widget) &key server-only-p)
+  (show widget :server-only-p server-only-p))
 
 
 (defmethod hide-all ((container container) &key server-only-p)
   (with-each-widget-in-tree (:root container)
-    (add-class widget "sw-hide" :server-only-p server-only-p)))
-(export 'hide-all)
+    (hide widget :server-only-p server-only-p)))
+
+
+(defmethod hide-all ((widget widget) &key server-only-p)
+  (hide widget :server-only-p server-only-p))
 
 
 (defmethod shown-p ((widget widget))
   "Returns T or NIL."
   (not (member "sw-hide" (css-class-of widget) :test #'string=)))
-(export 'shown-p)
 
 
 (defmethod hidden-p ((widget widget))
   "Returns T or NIL."
   (not (shown-p widget)))
-(export 'hidden-p)

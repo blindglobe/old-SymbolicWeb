@@ -234,5 +234,11 @@
     #:filtered-model #:proxied-model #:proxied-model-of)
 
    (:export
-    #:filtered-container-model #:filter-fn #:filter-fn-of)
-   )
+    #:filtered-container-model #:filter-fn #:filter-fn-of
+    #:hidden-p
+    #:shown-p
+    #:hide-all
+    #:show-all
+    #:hide
+    #:show
+    #:set-show-on-feedback))
