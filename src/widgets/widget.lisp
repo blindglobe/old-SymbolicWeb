@@ -195,4 +195,4 @@ visible in one or even no context."
 
 (defmethod hidden-p-of ((widget widget))
   "Returns T or NIL."
-  (not (shown-p widget)))
+  (not (shown-p-of widget)))
