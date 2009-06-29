@@ -38,6 +38,11 @@ Use/see the VISIBLE-P-OF method.")
       (call-next-method))))
 
 
+(defmethod print-slots progn ((widget widget) stream)
+  (when (slot-boundp widget 'element-type)
+    (format stream " ~A" (slot-value widget 'element-type))))
+
+
 (defmethod shtml-of :around ((widget widget))
   (declare #.(optimizations :shtml-of))
   (when *creating-html-container-p*

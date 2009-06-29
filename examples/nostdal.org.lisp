@@ -13,7 +13,7 @@
 
 (defmethod render-viewport ((viewport viewport) (app nostdal-app))
   (let ((main
-         (mk-html
+         (mk-html ()
            (:div
             (:h1 "nostdal.org")
 

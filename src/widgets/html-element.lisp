@@ -25,27 +25,35 @@
     (update-html html-element new-html)))
 
 
-(defmethod (setf model-of) ((model single-value-model) (html-element html-element))
+(defmethod (setf model-of) ((model cell) (html-element html-element))
   (add-to html-element
-    λ(when-commit ()
-       (setf (html-content-of html-element)
-             ~model))))
+    λ(let ((model-value ~model))
+       ;;(dbg-prin1 model-value (fmtn "~A" html-element))
+       (when-commit ()
+         (setf (html-content-of html-element)
+               model-value)))))
 
 
-(defmacro mk-elt (element-type &rest args)
-  (let ((element-type (string-downcase element-type)))
-    (if (listp args)
-        `(make-instance 'html-element
-                        :element-type ,element-type
-                        ,@(if (member :model args)
-                              args
-                              `(:html-content ,(first args) ,@(rest args))))
-        `(make-instance 'html-element
-                        :element-type ,element-type
-                        :html-content ,args))))
+(defmacro mk-elt (args &body html-content)
+  "First element of ARGS should be ELEMENT-TYPE. If it is not supplied
+:DIV is silently assumed."
+  (setf args (mklst args))
+  (let ((element-type (first args)))
+    (unless element-type
+      (setf element-type :div))
+    `(make-instance 'html-element
+                    :element-type ,(if (constantp element-type)
+                                       (string-downcase element-type)
+                                       `(string-downcase ,element-type))
+                    ,@(rest args)
+                    ,@(when (and (not (member :html-content args))
+                                 (not (member :model args))
+                                 html-content)
+                       `(:html-content ,@html-content)))))
 (export 'mk-elt)
 
 
-(defmacro mk-div (&rest args)
-  `(mk-elt :div ,@args))
+(defmacro mk-div (args &body html-content)
+  `(mk-elt (:div ,@args)
+     ,@html-content))
 (export 'mk-div)

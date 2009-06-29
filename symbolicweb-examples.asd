@@ -23,6 +23,6 @@
      ;(:file "urlizing")
      ;(:file "spin-button")
      (:file "nostdal.org")
-     (:file "simple-event-flow")
+     ;;(:file "simple-event-flow")
      (:file "ex-text-input")
      ))))

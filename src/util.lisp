@@ -86,9 +86,7 @@
   `((str (shtml-of (let ((maybe-widget (progn ,@body)))
                      (if (typep maybe-widget 'widget)
                          maybe-widget
-                         (make-instance 'html-element
-                                        :element-type "span"
-                                        :model maybe-widget)))))))
+                         (mk-elt (:span :model maybe-widget))))))))
 
 
 #.(maybe-inline 'for-each-widget-in-tree)

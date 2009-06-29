@@ -32,7 +32,7 @@
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
   (with-object app
     (add-to (root)
-      (mk-html
+      (mk-html ()
         (:div
          (:h1 "TEXT-INPUT-APP")
 

@@ -6,8 +6,7 @@
 
 
 (defclass text-input (widget focussable)
-  (#|(previous-value :initform "")|#
-   (enterpress-state :initform #~nil))
+  ((enterpress-state :initform #~nil))
 
   (:default-initargs
    :element-type "input"
@@ -20,22 +19,19 @@
         (slot-value text-input 'static-attributes)))
 
 
-(defmethod initialize-instance :after ((text-input text-input) &key)
-  (flet ((handle-input (value)
-           (setf (value-of text-input :server-only-p t) value)
-           ;; TODO: Move this to the Model end?
-           (let ((model ~text-input))
-             (unless (equal ~model (if-let (input-translator (input-translator-of model))
-                                     (setf value ;; For return value of HANDLE-INPUT; used by PULSE below.
-                                           (funcall input-translator value))
-                                     value))
-               (setf ~model value)))
-           value))
+(defmethod initialize-instance :after ((text-input text-input) &key
+                                       (sync-on-blur-p t)
+                                       (sync-on-enterpress-p t))
+  (when sync-on-blur-p
     λ(when-let (value (on-blur-of text-input))
-       (handle-input value))
+       (setf (value-of text-input :server-only-p t) value)
+       (setf ~~text-input value)))
+
+  (when sync-on-enterpress-p
     λ(when-let (value (on-keyup-of text-input))
-       (pulse ~(slot-value text-input 'enterpress-state)
-              (handle-input value)))))
+       (let ((model-value (setf ~~text-input value)))
+         (pulse ~(slot-value text-input 'enterpress-state)
+                (or model-value t))))))
 
 
 ;; TODO: Think about this.
@@ -43,10 +39,12 @@
          (cdr (assoc "value" args :test #'string=))))
 
   (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-blur-of)) callback-box)
+    ;; TODO: Client side closure to avoid submitting something that haven't changed.
     (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
           (argument-parser-of callback-box) #'parse-client-args))
 
   (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-keyup-of)) callback-box)
+    ;; TODO: Client side closure to avoid submitting something that haven't changed.
     (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
           (js-before-of callback-box) "if(event.which == 13) return true;"
           (argument-parser-of callback-box) #'parse-client-args)))
@@ -57,35 +55,13 @@
 (export 'enterpress-state-of)
 
 
-#|(defmethod changed-p-of ((text-input text-input))
-  "This will return T if TEXT-INPUT has changed since last time this function was called."
-  (let ((current-value (value-of text-input)))
-    (with-slots (previous-value) text-input
-      (when (not (string= current-value previous-value))
-        (setf previous-value current-value)))))|#
-#|(export 'changed-p-of)|#
-
-
-#|(defmethod (setf value-of) :after (new-value (text-input text-input) &rest args)
-  (declare (ignore args))
-  (when (not (string= *old-value* new-value)) ;; TODO: Magic function STRING=.
-    (handle-address-bar text-input)))|#
-#|(export 'value-of)|#
-
-
-#|(defmethod uri-value<-state ((text-input text-input))
-  (html<- (value-of text-input) text-input))|#
-
-
-#|(defmethod state<-uri-value ((uri-value string) (text-input text-input) from-browser-history-p)
-  (setf (value-of text-input) uri-value))|#
-
-
-(defmethod (setf model-of) ((model single-value-model) (text-input text-input))
-  (add-formula text-input
-               λ(let ((value ~model))
-                  (when-commit ()
-                    (setf (value-of text-input) value)))))
+(defmethod (setf model-of) ((model cell) (text-input text-input))
+  (setf (value-of text-input) ~model)
+  (add-to text-input
+    λ(let ((model-value ~model))
+       (when-commit ()
+         (setf (value-of text-input)
+               model-value)))))
 
 
 (defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))

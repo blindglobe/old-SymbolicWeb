@@ -118,7 +118,6 @@
     (with-each-viewport-of-widget (:widget container)
       (remhash (id-of widget) (widgets-of viewport))
       (remhash (id-of viewport) (viewports-of widget)))
-
     (visible-p-of widget :real-check-p t)))
 
 
