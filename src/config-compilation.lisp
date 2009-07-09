@@ -3,7 +3,9 @@
 (in-package #:sw)
 
 
-(define-global **compilation-inlining-p** nil)
+(define-variable **compilation-inlining-p**
+    :value nil
+    :kind :global)
 
 
 (defmethod maybe-inline (function-name-designator &key)

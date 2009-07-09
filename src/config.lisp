@@ -22,67 +22,92 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 
-(define-global -server-close-connection-p- nil
-  "
+(define-variable -server-close-connection-p-
+    :value nil
+    :kind :global
+    :doc "
 * Lighttpd-1.4.x: this must be T.
 * Lighttpd-1.5.x: this can be NIL.")
 
 
-(define-global -sw-comet-timeout- 30)
+(define-variable -sw-comet-timeout-
+    :value 30
+    :kind :global)
 
 
-(define-global -server-default-type- 'sw-http-server)
+(define-variable -server-default-type-
+    :value 'sw-http-server
+    :kind :global)
 
 
-(define-global -server-default-port- 6001)
+(define-variable -server-default-port-
+    :value 6001
+    :kind :global)
 
 
-(define-global -server-default-static-data-subdomain- nil
-  "A string like `sw-static' (no slash prefix) or NIL.")
+(define-variable -server-default-static-data-subdomain-
+    :value nil
+    :kind :global
+    :doc "A string like `sw-static' (no slash prefix) or NIL.")
 
 
-(define-global -server-default-static-path- "sw-static"
-  "A string like `sw-static' (no dot) or NIL.")
+(define-variable -server-default-static-path-
+    :value "sw-static"
+    :kind :global
+    :doc "A string like `sw-static' (no dot) or NIL.")
 
 
-(define-global -server-default-static-data-fs-path-
-    (catstr (namestring (user-homedir-pathname))
-            "symbolicweb-data/")
-  "This should probably point to the data/ directory of the SymbolicWeb source
+(define-variable -server-default-static-data-fs-path-
+    :value (catstr (namestring (user-homedir-pathname))
+                   "symbolicweb-data/")
+    :kind :global
+    :doc "This should probably point to the data/ directory of the SymbolicWeb source
 code root.")
 
 
-(define-global -server-default-gc-frequency- (* 60     ;; Seconds.
-                                                1000))
+(define-variable -server-default-gc-frequency-
+    :value (* 60 #|seconds|# 1000)
+    :kind :global)
 
 
 (eval-now (use-package :sw-jquery))
 
 
-(defconstant +transport-client-side-exceptions-to-server-p+ nil
-  "If T this will attempt to transport client side JS exceptions back to the
+(define-variable +transport-client-side-exceptions-to-server-p+
+    :value nil
+    :kind :constant
+    :doc "If T this will attempt to transport client side JS exceptions back to the
  server and display them there in the Lisp (slime) condition handler. This
 will generate extra JS code and have some extra overhead though. Use Firebug
 when you can.")
 (export '+transport-client-side-exceptions-to-server-p+)
 
 
-(defconstant +add-newlines-to-js-code-p+ t)
+(define-variable +add-newlines-to-js-code-p+
+    :value t
+    :kind :constant)
 (export '+add-newlines-to-js-code-p+)
 
 
-(define-global -timeout- 10
-  "Time before a non-async call to RUN times out.")
+(define-variable -timeout-
+    :value 10
+    :kind :global
+    :doc "Time before a non-async call to RUN times out.")
 
 
-(define-constant +global-object-access-p+ t
-  :documentation "The GET-OBJ function can be used to access any object in SW when this is T.")
+(define-variable +global-object-access-p+
+    :value t
+    :kind :constant
+    :doc "The GET-OBJ function can be used to access any object in SW when this is T.")
 
 
-(define-constant +auto-set-viewport-support-p+ *sw-debug*)
-(define-global -auto-set-viewport-p- t) (export '-auto-set-viewport-)
-(define-constant +auto-set-app-support-p+ *sw-debug*)
-(define-global -auto-set-app-p- t) (export '-auto-set-app-)
+(define-variable +auto-set-viewport-support-p+ :value *sw-debug* :kind :constant)
+(define-variable -auto-set-viewport-p- :value t :kind :global)
+(export '-auto-set-viewport-)
+
+(define-variable +auto-set-app-support-p+ :value *sw-debug* :kind :constant)
+(define-variable -auto-set-app-p- :value t :kind :global)
+(export '-auto-set-app-)
 
 
 
@@ -90,14 +115,20 @@ when you can.")
 ;;;;;;;;;;;;
 
 ;; This must be less than -SERVER-DEFAULT-GC-FREQUENCY-.
-(define-global -default-long-poll-frequency- (/ -server-default-gc-frequency- 1000
-                                                2))
+(define-variable -default-long-poll-frequency-
+    :value (/ -server-default-gc-frequency- 1000
+              2)
+    :kind :global)
 (export '-default-long-poll-frequency-)
 
 ;; This must be larger than *DEFAULT-LONG-POLL-FREQUENCY*
-(define-global -app-visible-p-timeout- (+ 10 -default-long-poll-frequency-))
+(define-variable -app-visible-p-timeout-
+    :value (+ 10 -default-long-poll-frequency-)
+    :kind :global)
 (export '-app-visible-p-timeout-)
 
 
-(define-global -viewport-visible-p-timeout- -app-visible-p-timeout-)
+(define-variable -viewport-visible-p-timeout-
+    :value -app-visible-p-timeout-
+    :kind :global)
 (export '-viewport-visible-p-timeout-)
