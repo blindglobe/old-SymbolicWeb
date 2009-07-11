@@ -77,16 +77,14 @@
 (export 'who)
 
 
-;; TODO: The use of STR here expands to less than optimal code; it expands to
-;; a WHEN check that will always yield T.
 (defmethod convert-tag-to-string-list ((tag (eql :sw)) attr-list body body-fn)
   (declare (ignore tag attr-list body-fn))
   ;; TODO: Optimize this. Check if body is in fact an atom. Check if it is
   ;; constant and whether it is a widget or not.
   `((str (shtml-of (let ((maybe-widget (progn ,@body)))
-                     (if (typep maybe-widget 'widget)
-                         maybe-widget
-                         (mk-elt (:span :model maybe-widget))))))))
+                     (typecase maybe-widget
+                       (widget maybe-widget)
+                       (t (mk-elt (:span :model maybe-widget)))))))))
 
 
 #.(maybe-inline 'for-each-widget-in-tree)
