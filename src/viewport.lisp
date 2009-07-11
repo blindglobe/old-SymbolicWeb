@@ -157,7 +157,10 @@ refresh."
       (nilf (slot-value viewport 'do-at-end))
       (unless (eq *request-type* :comet)
         ;; TODO: At least output a warning?
-        (ignore-errors (funcall (comet-callback-of viewport)))))))
+        (handler-case
+            (funcall (comet-callback-of viewport))
+          (error (c)
+            (warn "HANDLE-DO-AT-END-OF: ~A" c)))))))
 
 
 (defmethod response-data-of ((viewport viewport))
