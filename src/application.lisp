@@ -135,7 +135,7 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
           "  margin: 0; padding: 0; border: 0;"
           "}"
           ".sw-hide {"
-          "  display: none ! important;"
+          "  display: none !important;"
           "}"))
 
        (:body
