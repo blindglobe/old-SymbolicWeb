@@ -23,15 +23,18 @@
                                        (sync-on-blur-p t)
                                        (sync-on-enterpress-p t))
   (when sync-on-blur-p
-    λ(when-let (value (on-blur-of text-input))
-       (setf (value-of text-input :server-only-p t) value)
-       (setf ~~text-input value)))
+    (with-lifetime text-input
+      #λ(when-let (value (on-blur-of text-input))
+          (setf (value-of text-input :server-only-p t) value)
+          (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
-    λ(when-let (value (on-keyup-of text-input))
-       (let ((model-value (setf ~~text-input value)))
-         (pulse ~(slot-value text-input 'enterpress-state)
-                (or model-value t))))))
+    (with-lifetime text-input
+      #λ(when-let (value (on-keyup-of text-input))
+          (setf (value-of text-input :server-only-p t) value)
+          (let ((model-value (setf ~~text-input value)))
+            (pulse ~(slot-value text-input 'enterpress-state)
+                   (or model-value t)))))))
 
 
 ;; TODO: Think about this.
@@ -56,12 +59,9 @@
 
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
-  (setf (value-of text-input) ~model)
-  (add-to text-input
-    λ(let ((model-value ~model))
-       (when-commit ()
-         (setf (value-of text-input)
-               model-value)))))
+  #λ(let ((model-value ~model))
+      (when-commit ()
+        (setf (value-of text-input) model-value))))
 
 
 (defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))

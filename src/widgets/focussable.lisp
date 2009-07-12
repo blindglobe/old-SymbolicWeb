@@ -12,5 +12,7 @@
 
 
 (defmethod initialize-instance :after ((widget focussable) &key)
-  λ(when (on-focus-of widget)
-     (focus widget :server-only-p t)))
+  (with-lifetime widget
+    ;; Keep server in sync with focus state on client.
+    #λ(when (on-focus-of widget)
+        (focus widget :server-only-p t))))

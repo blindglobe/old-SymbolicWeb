@@ -26,12 +26,9 @@
 
 
 (defmethod (setf model-of) ((model cell) (html-element html-element))
-  (add-to html-element
-    λ(let ((model-value ~model))
-       ;;(dbg-prin1 model-value (fmtn "~A" html-element))
-       (when-commit ()
-         (setf (html-content-of html-element)
-               model-value)))))
+  #λ(let ((model-value ~model))
+      (when-commit ()
+        (setf (html-content-of html-element) model-value))))
 
 
 (defmacro mk-elt (args &body html-content)

@@ -3,13 +3,21 @@
 (in-package #:sw)
 
 
-(defclass text-input-app (application)
-  ((x :initform #~5)
-   (y :initform #~17)
+(defclass text-input-app-model (self-ref)
+  ((x :initform #λ5)
+   (y :initform #λ17)
    (square-of-x :initform ↑#λ(* ¤x ¤x))
-   (sum :initform ↑#λ(+ ¤square-of-x ¤y))
+   (sum :initform ↑#λ(+ ¤square-of-x ¤y)))
 
-   (x-view :initform ↑(mk-text-input (:model (cell-of ¤x))))
+  (:metaclass mvc-class))
+
+
+#| X-VIEW and Y-VIEW are "session bound" (created "inside" the DEFCLASS form) to ensure that focus tracking
+works between page refreshing. |#
+
+
+(defclass text-input-app (text-input-app-model application)
+  ((x-view :initform ↑(mk-text-input (:model (cell-of ¤x))))
    (x-feedback :initform ↑(letp1 ((span (mk-elt :span "X needs more cowbell!")))
                             (set-show-on-feedback span (cell-of ¤x))))
 
@@ -17,20 +25,21 @@
    (y-feedback :initform ↑(letp1 ((span (mk-elt :span "Y needs more cowbell!")))
                             (set-show-on-feedback span (cell-of ¤y)))))
 
-  (:metaclass mvc-stm-class))
+  (:metaclass mvc-class))
+
 
 (set-uri 'text-input-app "/text-input")
 
 
 (defmethod main ((app text-input-app))
   (with-object app
-    (allf #'number-input-translator
-          (input-translator-of (cell-of ¤x))
-          (input-translator-of (cell-of ¤y)))))
+    (add-writer-fn (cell-of ¤x) (make-number-parser (cell-of ¤x) t))
+    (add-writer-fn (cell-of ¤y) (make-number-parser (cell-of ¤y) t))))
 
 
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
   (with-object app
+    (remove-all (root))
     (add-to (root)
       (mk-html ()
         (:div

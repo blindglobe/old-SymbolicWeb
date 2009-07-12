@@ -6,7 +6,7 @@
 (defclass nostdal-app (application)
   ()
 
-  (:metaclass mvc-stm-class))
+  (:metaclass mvc-class))
 
 (set-uri 'nostdal-app "/nostdal.org")
 
@@ -16,6 +16,8 @@
          (mk-html ()
            (:div
             (:h1 "nostdal.org")
+            (:em "NOTE: This is being served from an ADSL connection. "
+                 "This'll be very slow or even down at random.")
 
             (:ul
              (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious"))

@@ -104,9 +104,8 @@
            (list args))
   (let ((*current-event-widget* (widget-of callback-box)))
     (pulse ~(event-cell-of callback-box)
-           (if args
-               (funcall (argument-parser-of callback-box) args)
-               t))))
+           (or (funcall (argument-parser-of callback-box) args) t))))
+
 
 
 (defmethod (setf js-before-of) :after (new-js (callback-box callback-box))
@@ -177,7 +176,7 @@
                   js-before js-after callback-data
                   (browser-default-action-p t))
   (declare (ignorable server-only-p js-before js-after callback-data browser-default-action-p))
-  (assert *formula*)
+  #|(assert *formula*)|#
   (write-line "TODO: event"))
 (export 'event)
 
@@ -205,29 +204,22 @@ DOM-events."
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name)
            (string event-type))
-  (unless *formula*
+  (unless =cell=
     (return-from event-dom-server-reader
       (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))
   (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
     (sb-ext:with-locked-hash-table (dom-mirror-data)
       (multiple-value-bind (callback-box found-p)
           (dom-server-reader dom-mirror lisp-accessor-name)
-        (if found-p
-            (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
-              ;; Add *FORMULA* to DOM-MIRROR (VIEW-BASE) if it isn't part of it already.
-              ;; This is to ensure that it isn't GCed unintentionally.
-              (let ((formula *formula*))
-                (sw-mvc:with-ignored-sources ()
-                  (unless (find formula (formula-cells-of dom-mirror) :key (lambda (elt) (formula-of ~elt)))
-                    (add-formula dom-mirror formula)))))
-            (let ((callback-box (make-instance 'callback-box :widget dom-mirror :event-type event-type)))
-              (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
-                ;; Add *FORMULA* to DOM-MIRROR to ensure that it isn't GCed unintentionally.
-                (let ((formula *formula*))
-                  (sw-mvc:with-ignored-sources ()
-                    (add-formula dom-mirror formula)))
-                (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
-                (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror))))))))
+        (unless found-p
+          (setf callback-box (make-instance 'callback-box :widget dom-mirror :event-type event-type)))
+        (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
+          ;; Ensure that the (possibly) anonymous CELL isn't GCed too early.
+          #|(with-lifetime dom-mirror =cell=)|#
+          (unless found-p
+            (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
+            ;; Trigger client side magic; (setf (on-click-of widget) callback-box).
+            (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror)))))))
 
 
 (defmethod initialize-callback-box ((dom-mirror dom-mirror) (lisp-accessor-name symbol) (callback-box callback-box))
@@ -249,10 +241,10 @@ DOM-events."
                           (lambda (callback)
                             (typecase callback
                               ;; TODO: It might not make sense to accept a FUNCTION anymore.
-                              ((or function string)
+                              #|((or function string)
                                (make-instance 'callback-box
                                               :event-type ,event-type
-                                              :callback callback))
+                                              :callback callback))|#
 
                               (callback-box
                                callback)

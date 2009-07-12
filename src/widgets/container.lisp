@@ -25,31 +25,18 @@
 
 
 (defmethod (setf model-of) ((model dlist) (container container))
-  ;; Insert event.
-  (add-to container
-    λ(when-let (event (insert-event-of model))
-       (when (eq model (container-of event))
-         (when-commit ()
-           (mvc-container-insert container event)))))
+  (prog1
+      #λ(when-let (event (event-of model))
+          ;; TODO: Why am I not using a method here?
+          (typecase event
+            (container-insert   (when-commit () (mvc-container-insert   container event)))
+            (container-remove   (when-commit () (mvc-container-remove   container event)))
+            (container-exchange (when-commit () (mvc-container-exchange container event)))))
 
-  ;; Remove event.
-  (add-to container
-    λ(when-let (event (remove-event-of model))
-       (when (eq model (container-of event))
-         (when-commit ()
-           (mvc-container-remove container event)))))
-
-  ;; Exchange event.
-  (add-to container
-    λ(when-let (event (exchange-event-of model))
-       (when (eq model (container-of event))
-         (when-commit ()
-           (mvc-container-exchange container event)))))
-
-  (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
-      ((null dlist-node))
-    (when-commit ()
-      (add (view-in-context-of container ~dlist-node) container))))
+      (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
+          ((null dlist-node))
+        (when-commit ()
+          (add (view-in-context-of container ~dlist-node) container)))))
 
 
 (defun mvc-container-insert (container event)
