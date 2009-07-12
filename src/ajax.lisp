@@ -53,7 +53,7 @@
          ;; part of the users session (by ways of the WIDGETS slot in APPLICATION).
          ;; So this is safe; no cross-session manipulation is possible.
          ;;(sync-widgets new-url-hash nil)
-         (dbg-princ new-url-hash "TODO: ajax.lisp/url-hash-changed")
+         t ;;(dbg-princ new-url-hash "TODO: ajax.lisp/url-hash-changed")
          (warn "[SW]: Got an URL-HASH-CHANGED message but no NEW-URL-HASH argument.")))
 
       ;; FIXME: Test this.
