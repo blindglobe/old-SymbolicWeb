@@ -161,10 +161,10 @@ visible in one or even no context."
 
 (defmethod set-show-on-feedback ((widget widget) (cell cell))
   "WIDGET should only be visible when \"feedback\" from CELL is T."
-  (with-lifetime widget
-    #λ(if ~(feedback-event-of cell)
-          (show widget)
-          (hide widget))))
+  (with-formula widget
+    (if ~(feedback-event-of cell)
+        (show widget)
+        (hide widget))))
 
 
 (defmethod show ((widget widget) &key server-only-p)
