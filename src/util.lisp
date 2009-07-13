@@ -84,7 +84,8 @@
   `((str (shtml-of (let ((maybe-widget (progn ,@body)))
                      (typecase maybe-widget
                        (widget maybe-widget)
-                       (t (mk-elt (:span :model maybe-widget)))))))))
+                       (single-value-model (mk-elt (:span :model maybe-widget)))
+                       (t (error "CL-WHO syntax for :SW doesn't know what to do with: ~S" maybe-widget))))))))
 
 
 #.(maybe-inline 'for-each-widget-in-tree)
