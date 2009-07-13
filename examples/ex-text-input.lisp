@@ -4,23 +4,27 @@
 
 
 (defclass text-input-app-model (self-ref)
-  ((x :initform (with1 #λ5 (add-number-parser it t)))
-   (y :initform (with1 #λ17 (add-number-parser it t)))
+  ((x :initform #λ5)
+   (y :initform #λ17)
    (square-of-x :initform ↑#λ(* ¤x ¤x))
    (sum :initform ↑#λ(+ ¤square-of-x ¤y)))
 
   (:metaclass mvc-class))
 
 
-
+;; TODO: Using inheritance to "assign the Model" is wrong.
 (defclass text-input-app (text-input-app-model application)
-  ((x-view :initform ↑(mk-text-input (:model (cell-of ¤x))))
+  ((x-view :initform ↑(mk-text-input (:model (with1 #λ5
+                                               (forward-cell (mk-number-parser it t) (cell-of ¤x))
+                                               (forward-cell (cell-of ¤x) it)))))
    (x-feedback :initform ↑(with1 (mk-elt :span "X needs more cowbell!")
-                            (set-show-on-feedback it (cell-of ¤x))))
+                            (set-show-on-feedback it ~¤x-view)))
 
-   (y-view :initform ↑(mk-text-input (:model (cell-of ¤y))))
+   (y-view :initform ↑(mk-text-input (:model (with1 #λ17
+                                               (forward-cell (mk-number-parser it t) (cell-of ¤y))
+                                               (forward-cell (cell-of ¤y) it)))))
    (y-feedback :initform ↑(with1 (mk-elt :span "Y needs more cowbell!")
-                            (set-show-on-feedback it (cell-of ¤y)))))
+                            (set-show-on-feedback it ~¤y-view))))
 
   (:metaclass mvc-class))
 
