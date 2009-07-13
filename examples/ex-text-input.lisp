@@ -18,15 +18,9 @@
                                                (forward-cell (mk-number-parser it t)
                                                              (cell-of ¤x))))))
 
-   (x-feedback :initform ↑(with1 (mk-elt :span "X needs more cowbell!")
-                            (set-show-on-feedback it ~¤x-view)))
-
    (y-view :initform ↑(mk-text-input (:model (with1 #λ¤y
                                                (forward-cell (mk-number-parser it t)
-                                                             (cell-of ¤y))))))
-
-   (y-feedback :initform ↑(with1 (mk-elt :span "Y needs more cowbell!")
-                            (set-show-on-feedback it ~¤y-view))))
+                                                             (cell-of ¤y)))))))
 
   (:metaclass mvc-class))
 
@@ -40,12 +34,16 @@
         (:div
          (:h1 "TEXT-INPUT-APP")
 
-         (:p "X: " (:sw ¤x-view) (:sw ¤x-feedback) :br
-             "Y: " (:sw ¤y-view) (:sw ¤y-feedback))
+         (:p "X: " (:sw ¤x-view) (:sw (with1 (mk-elt :span "X needs more cowbell!")
+                                        (set-show-on-feedback it ~¤x-view))) :br
+             "Y: " (:sw ¤y-view) (:sw (with1 (mk-elt :span "Y needs more cowbell!")
+                                        (set-show-on-feedback it ~¤y-view))))
 
          (:p "SQUARE-OF-X => " (:sw (cell-of ¤square-of-x)) :br
              "(+ SQUARE-OF-X Y) => " (:sw (cell-of ¤sum)))
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/master/examples/ex-text-input.lisp"
-             "source code"))))))
+             "source code")
+         :br
+         "Hosted on a crummy ADSL line...")))))
