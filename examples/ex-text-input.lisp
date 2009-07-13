@@ -14,15 +14,14 @@
 
 ;; TODO: Using inheritance to "assign the Model" is wrong.
 (defclass text-input-app (text-input-app-model application)
-  ((x-view :initform ↑(mk-text-input (:model (with1 #λ5
-                                               (forward-cell (mk-number-parser it t) (cell-of ¤x))
-                                               (forward-cell (cell-of ¤x) it)))))
+  ((x-view :initform ↑(mk-text-input (:model (with1 #λ¤x
+                                               (forward-cell (mk-number-parser it t) (cell-of ¤x))))))
+
    (x-feedback :initform ↑(with1 (mk-elt :span "X needs more cowbell!")
                             (set-show-on-feedback it ~¤x-view)))
 
-   (y-view :initform ↑(mk-text-input (:model (with1 #λ17
-                                               (forward-cell (mk-number-parser it t) (cell-of ¤y))
-                                               (forward-cell (cell-of ¤y) it)))))
+   (y-view :initform ↑(mk-text-input (:model (with1 #λ¤y
+                                               (forward-cell (mk-number-parser it t) (cell-of ¤y))))))
    (y-feedback :initform ↑(with1 (mk-elt :span "Y needs more cowbell!")
                             (set-show-on-feedback it ~¤y-view))))
 
