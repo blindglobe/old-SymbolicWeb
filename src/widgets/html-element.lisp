@@ -54,3 +54,9 @@
   `(mk-elt (:div ,@args)
      ,@html-content))
 (export 'mk-div)
+
+
+(defmacro mk-span (args &body html-content)
+  `(mk-elt (:span ,@args)
+     ,@html-content))
+(export 'mk-span)
