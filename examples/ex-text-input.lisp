@@ -36,17 +36,17 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign). |#
   (with-object view
     (list (setf ~¤x (with-object model
-                      (with1 #λ¤x (forward-cell (mk-number-parser it t) (cell-of ¤x)))))
+                      (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
           (set-show-on-feedback ¤x-feedback ~¤x)
 
           (setf ~¤y (with-object model
-                      (with1 #λ¤y (forward-cell (mk-number-parser it t) (cell-of ¤y)))))
+                      (with1 #λ¤y (forward-cell (mk-number-parser it) (cell-of ¤y)))))
           (set-show-on-feedback ¤y-feedback ~¤y)
 
           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
           ;; A second View of the the SQUARE-OF-X Model.
           (setf ~¤square-of-x-str (with-object model #λ(handler-case (format nil "~R" ¤square-of-x)
-                                                         (error () "Too darn big to print."))))
+                                                         (error () "Can't show this number as text."))))
 
           (setf ~¤sum (with-object model #λ¤sum)))))
 
