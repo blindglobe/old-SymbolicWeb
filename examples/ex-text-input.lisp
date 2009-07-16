@@ -80,7 +80,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
         (:div
          (:h1 "TEXT-INPUT-APP")
 
+         (:h2 "VIEW-1")
          (:sw ¤view-1)
+
+         (:h2 "VIEW-2")
          (:sw ¤view-2)
 
          :hr
