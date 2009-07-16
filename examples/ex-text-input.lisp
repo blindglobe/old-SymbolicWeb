@@ -6,7 +6,7 @@
 This isn't optimized for LOC; I'm trying to "do the right thing" by separating data and presentation proper. |#
 
 
-(defclass text-input-app-model (self-ref)
+(defclass text-input-widget-model (self-ref)
   ((x :initform #λ(random 100))
    (y :initform #λ(random 100))
    (square-of-x :initform ↑#λ(* ¤x ¤x))
@@ -16,7 +16,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 
-(defclass text-input-app-view (html-container)
+(defclass text-input-widget-view (html-container)
   ((x :initform (mk-text-input ()))
    (x-feedback :initform (mk-span () "X needs more cowbell!"))
 
@@ -27,10 +27,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
    (sum :initform (mk-span ())))
 
   (:default-initargs
-   :model (make-instance 'text-input-app-model)))
+   :model (make-instance 'text-input-widget-model)))
 
 
-(defmethod (setf model-of) ((model text-input-app-model) (view text-input-app-view))
+(defmethod (setf model-of) ((model text-input-widget-model) (view text-input-widget-view))
   #| We connect MODEL and VIEW for automatic dataflow. At the same time, we make sure to return a list of the
   connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign). |#
   (with-object view
@@ -46,7 +46,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
           (setf ~¤sum (with-object model #λ¤sum)))))
 
 
-(defmethod generate-html ((view text-input-app-view))
+(defmethod generate-html ((view text-input-widget-view))
   (with-object view
     (who
       (:p "X: " (:sw ¤x) (:sw ¤x-feedback) :br
@@ -58,7 +58,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 (defclass text-input-app (application)
-  ((view :initform (make-instance 'text-input-app-view)))
+  ((view :initform (make-instance 'text-input-widget-view)))
 
   (:metaclass mvc-class))
 
