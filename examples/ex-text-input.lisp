@@ -16,7 +16,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 
-(defclass text-input-app-view (html-container self-ref)
+(defclass text-input-app-view (html-container)
   ((x :initform (mk-text-input ()))
    (x-feedback :initform (mk-span () "X needs more cowbell!"))
 
