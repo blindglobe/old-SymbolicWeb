@@ -32,8 +32,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 (defmethod (setf model-of) ((model text-input-widget-model) (view text-input-widget-view))
   #| We connect MODEL and VIEW for automatic dataflow. At the same time, we make sure to return a list of the
-  connections so the framework can instantly disconnect stuff later if we where to assign another Model to
-  VIEW (reassign). GC will actually clean up connections pointing to stale Views, but that is not instant. |#
+  connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign). |#
   (with-object view
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it t) (cell-of ¤x)))))
