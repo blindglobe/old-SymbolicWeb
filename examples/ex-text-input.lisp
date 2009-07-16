@@ -24,6 +24,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
    (y-feedback :initform (mk-span () "Y needs more cowbell!"))
 
    (square-of-x :initform (mk-span ()))
+   (square-of-x-str :initform (mk-span ()))
    (sum :initform (mk-span ())))
 
   (:default-initargs
@@ -43,6 +44,8 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
           (set-show-on-feedback ¤y-feedback ~¤y)
 
           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
+          ;; A second View of the the SQUARE-OF-X model.
+          (setf ~¤square-of-x-str (with-object model #λ(format nil "~R" ¤square-of-x)))
           (setf ~¤sum (with-object model #λ¤sum)))))
 
 
@@ -53,12 +56,17 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
           "Y: " (:sw ¤y) (:sw ¤y-feedback))
 
       (:p "SQUARE-OF-X => " (:sw ¤square-of-x) :br
-          "(+ SQUARE-OF-X Y) => " (:sw ¤sum)))))
+          "(+ SQUARE-OF-X Y) => " (:sw ¤sum))
+
+      (:p "SQUARE-OF-X-STR => " (:sw ¤square-of-x-str)))))
 
 
 
 (defclass text-input-app (application)
-  ((view :initform (make-instance 'text-input-widget-view)))
+  ((shared-model :initform (make-instance 'text-input-widget-model))
+   ;; Two Views viewing/observing the same Model instance.
+   (view-1 :initform ↑(make-instance 'text-input-widget-view :model ¤shared-model))
+   (view-2 :initform ↑(make-instance 'text-input-widget-view :model ¤shared-model)))
 
   (:metaclass mvc-class))
 
@@ -72,7 +80,8 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
         (:div
          (:h1 "TEXT-INPUT-APP")
 
-         (:sw ¤view)
+         (:sw ¤view-1)
+         (:sw ¤view-2)
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/master/examples/ex-text-input.lisp"
