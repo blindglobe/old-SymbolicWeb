@@ -23,18 +23,18 @@
                                        (sync-on-blur-p t)
                                        (sync-on-enterpress-p t))
   (when sync-on-blur-p
-    (with-lifetime text-input
-      #λ(when-let (value (on-blur-of text-input))
-          (setf (value-of text-input :server-only-p t) value)
-          (setf ~~text-input value))))
+    (with-formula text-input
+      (when-let (value (on-blur-of text-input))
+        (setf (value-of text-input :server-only-p t) value)
+        (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
-    (with-lifetime text-input
-      #λ(when-let (value (on-keyup-of text-input))
-          (setf (value-of text-input :server-only-p t) value)
-          (let ((model-value (setf ~~text-input value)))
-            (pulse ~(slot-value text-input 'enterpress-state)
-                   (or model-value t)))))))
+    (with-formula text-input
+      (when-let (value (on-keyup-of text-input))
+        (setf (value-of text-input :server-only-p t) value)
+        (let ((model-value (setf ~~text-input value)))
+          (pulse ~(slot-value text-input 'enterpress-state)
+                 (or model-value t)))))))
 
 
 ;; TODO: Think about this.
