@@ -44,8 +44,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
           (set-show-on-feedback ¤y-feedback ~¤y)
 
           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
-          ;; A second View of the the SQUARE-OF-X model.
-          (setf ~¤square-of-x-str (with-object model #λ(format nil "~R" ¤square-of-x)))
+          ;; A second View of the the SQUARE-OF-X Model.
+          (setf ~¤square-of-x-str (with-object model #λ(handler-case (format nil "~R" ¤square-of-x)
+                                                         (error () "Too darn big to print."))))
+
           (setf ~¤sum (with-object model #λ¤sum)))))
 
 
