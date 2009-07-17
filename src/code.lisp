@@ -16,18 +16,17 @@ RUN instead."
 
 
 #.(maybe-inline 'run)
-(defun run (code-str viewport-or-widget &key)
+(defun run (code-str target)
   (declare (string code-str)
-           ((or viewport widget) viewport-or-widget))
+           ((or viewport widget) target))
   "Send JavaScript code to client(s) for execution.
 
 CODE-STR: The JavaScript code.
 
-VIEWPORT-OR-WIDGET: If supplied with a WIDGET this will transmit the JS code to all
-                contexts (browser sessions (users), tabs and windows) where that
-                widget is visible; see WITH-VISIBLE-CONTEXTS-OF.
-                If supplied with a VIEWPORT this will transmit the JS code to that
-                single viewport for execution there."
+TARGET: If supplied with a WIDGET this will transmit the JS code to
+all contexts (browser sessions (users), tabs and windows) where that widget is
+visible; see WITH-VISIBLE-CONTEXTS-OF. If supplied with a VIEWPORT this will
+transmit the JS code to that single viewport for execution there."
   (when (string= code-str "")
     (warn "RUN: (STRING= CODE-STR \"\") => T. Returning from RUN with no effect.")
     (return-from run))
@@ -38,9 +37,9 @@ VIEWPORT-OR-WIDGET: If supplied with a WIDGET this will transmit the JS code to 
     (declare (inline js-code))
     (if *creating-code-block-p*
         (push (js-code) *code-block*)
-        (if (typep viewport-or-widget 'viewport)
-            (run-js (js-code) viewport-or-widget)
-            (with-visible-contexts-of viewport-or-widget viewport
+        (if (typep target 'viewport)
+            (run-js (js-code) target)
+            (with-visible-contexts-of target viewport
               (run-js (js-code) viewport))))))
 
 
