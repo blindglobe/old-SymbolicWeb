@@ -47,17 +47,27 @@ in return, make sure that you understand:
 ;; TODO: Think about this.
 (flet ((parse-client-args (args)
          (cdr (assoc "value" args :test #'string=))))
+  (let ((before-check
+         (catstr "if(event.currentTarget.sw_text_input_value == event.currentTarget.value){"
+                 " return(false);"
+                 "}else{"
+                 " event.currentTarget.sw_text_input_value = event.currentTarget.value;"
+                 " return true;"
+                 "}")))
 
-  (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-blur-of)) callback-box)
-    ;; TODO: Client side closure to avoid submitting something that haven't changed.
-    (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
-          (argument-parser-of callback-box) #'parse-client-args))
 
-  (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-keyup-of)) callback-box)
-    ;; TODO: Client side closure to avoid submitting something that haven't changed.
-    (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
-          (js-before-of callback-box) "if(event.which == 13) { return true; }"
-          (argument-parser-of callback-box) #'parse-client-args)))
+    (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-blur-of)) callback-box)
+      (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
+            (argument-parser-of callback-box) #'parse-client-args
+            (js-before-of callback-box)
+            before-check))
+
+
+    (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-keyup-of)) callback-box)
+      (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
+            (argument-parser-of callback-box) #'parse-client-args
+            (js-before-of callback-box)
+            (catstr "if(event.which == 13){ " before-check "}")))))
 
 
 (defmethod enterpress-state-of ((text-input text-input))
