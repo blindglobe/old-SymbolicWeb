@@ -5,12 +5,21 @@
 (declaim #.(optimizations :widgets/text-input.lisp))
 
 
+#| NOTE: Before wasting time here trying to ensure that the client that sent the update does not get a useless update
+in return, make sure that you understand:
+
+  * A single widget instance can be visible in multiple VIEWPORTs at the same time.
+|#
+
+
+
 (defclass text-input (widget focussable)
-  ((enterpress-state :initform #~nil))
+  ((enterpress-state :initform #λnil)
+   (view-value :initform #λ""))
 
   (:default-initargs
    :element-type "input"
-   :model #~""))
+   :model #λ""))
 (export 'text-input)
 
 
@@ -25,16 +34,14 @@
   (when sync-on-blur-p
     (with-formula text-input
       (when-let (value (on-blur-of text-input))
-        (setf (value-of text-input :server-only-p t) value)
         (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
     (with-formula text-input
       (when-let (value (on-keyup-of text-input))
-        (setf (value-of text-input :server-only-p t) value)
-        (let ((model-value (setf ~~text-input value)))
-          (pulse ~(slot-value text-input 'enterpress-state)
-                 (or model-value t)))))))
+        (setf ~~text-input value)
+        (pulse ~(slot-value text-input 'enterpress-state)
+               (or ~~text-input t))))))
 
 
 ;; TODO: Think about this.
@@ -49,7 +56,7 @@
   (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-keyup-of)) callback-box)
     ;; TODO: Client side closure to avoid submitting something that haven't changed.
     (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
-          (js-before-of callback-box) "if(event.which == 13) return true;"
+          (js-before-of callback-box) "if(event.which == 13) { return true; }"
           (argument-parser-of callback-box) #'parse-client-args)))
 
 
@@ -60,11 +67,13 @@
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
   (let ((value-marshaller (value-marshaller-of 'value-of)))
-    #λ(let ((model-value ~model))
-        (unless (string= (funcall value-marshaller model-value)
+    #λ(let ((value ~model))
+        ;; Dodge cases where we can with 100% certainty determine that things are in sync at all viewports.
+        (unless (string= (funcall value-marshaller value)
                          (funcall value-marshaller (value-of text-input)))
           (when-commit ()
-            (setf (value-of text-input) model-value))))))
+            (setf (value-of text-input) value))))))
+
 
 
 (defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))
