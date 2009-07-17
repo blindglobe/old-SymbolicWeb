@@ -60,7 +60,6 @@ fixing this.
 (defun sw-http-server-request-handler (server connection)
   (declare (sw-http-server server))
   (with-thread ((cons server (sw-http::cn-socket connection)))
-    (declare (optimize speed))
     (with-timeout (10 (warn "SW-HTTP-SERVER-REQUEST-HANDLER: Timeout!")
                       (invoke-restart 'skip-body))
       (swh:with-swh-context connection (:parse-get-parameters-p t

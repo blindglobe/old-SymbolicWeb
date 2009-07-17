@@ -190,8 +190,8 @@ refresh."
       (with-recursive-lock-held ((do-at-end-mutex-of viewport))
         (if (dirty-p-of viewport)
             (unless (do-at-end-of viewport)
-              ;; FIXME: This is a nasty thing that seems to happen once in a while; I got to figure this out proper later, but for now
-              ;; this works as a workaround.
+              ;; FIXME: This is a nasty thing that seems to happen once in a while; I got to figure this out proper
+              ;; later, but for now this works as a workaround.
               ;;(warn "(SETF RESPONSE-DATA-OF): DIRTY-P is T and DO-AT-END slot in VIEWPORT (~A) in ~A is empty! Setting DIRTY-P to NIL and waking up comet thread."
               ;;      (id-of viewport) (id-of (application-of viewport)))
               (nilf (slot-value viewport 'dirty-p))

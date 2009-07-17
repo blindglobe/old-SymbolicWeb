@@ -146,5 +146,5 @@
 (defun value-marshaller-of (lisp-accessor-name)
   (declare (symbol lisp-accessor-name))
   (with1 (get lisp-accessor-name 'value-marshaller)
-    (assert (functionp it))))
+    (check-type it function)))
 (export 'value-marshaller-of)
