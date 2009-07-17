@@ -62,6 +62,8 @@
                                 (value-removal-checker #'not)) ;; Essentially (lambda (value) (eq value nil)).
   (declare (function dom-server-reader dom-server-writer dom-server-remover))
 
+  (setf (get lisp-accessor-name 'value-marshaller) value-marshaller)
+
   ;; Add DOM reader.
   (compile-and-execute
     `(defun ,lisp-reader-name (dom-mirror)
@@ -139,3 +141,10 @@
                                     (make-instance 'eql-specializer :object lisp-accessor-name)
                                     (find-class 't)))))
 (export 'remove-dom-property)
+
+
+(defun value-marshaller-of (lisp-accessor-name)
+  (declare (symbol lisp-accessor-name))
+  (with1 (get lisp-accessor-name 'value-marshaller)
+    (assert (functionp it))))
+(export 'value-marshaller-of)

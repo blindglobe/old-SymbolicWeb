@@ -59,9 +59,12 @@
 
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
-  #λ(let ((model-value ~model))
-      (when-commit ()
-        (setf (value-of text-input) model-value))))
+  (let ((value-marshaller (value-marshaller-of 'value-of)))
+    #λ(let ((model-value ~model))
+        (unless (string= (funcall value-marshaller model-value)
+                         (funcall value-marshaller (value-of text-input)))
+          (when-commit ()
+            (setf (value-of text-input) model-value))))))
 
 
 (defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))
