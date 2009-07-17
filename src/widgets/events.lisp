@@ -102,10 +102,9 @@
 (defun execute-callback (callback-box args)
   (declare (callback-box callback-box)
            (list args))
-  (let ((*current-event-widget* (widget-of callback-box)))
+  (let ((*current-event-cb* callback-box))
     (pulse ~(event-cell-of callback-box)
            (or (funcall (argument-parser-of callback-box) args) t))))
-
 
 
 (defmethod (setf js-before-of) :after (new-js (callback-box callback-box))

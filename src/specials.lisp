@@ -39,7 +39,8 @@
 
 
 ;; (ajax.lisp)
-(defvar *current-event-widget* nil)
+(defvar *current-event-cb* nil
+  "This will contain an instance of CALLBACK-BOX (widgets/events.lisp).")
 
 
 ;; Used by WITH-CODE-BLOCK (code.lisp).
