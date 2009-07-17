@@ -5,19 +5,6 @@
 (declaim #.(optimizations :util.lisp))
 
 
-;; TODO: This should use the ID-GENERATOR* stuff from Aromyxo.
-(let ((counter 0)
-      (lock (make-lock)))
-  (defun generate-id ()
-    (declare (optimize speed (debug 0) (safety 0) (compilation-speed 0)))
-    (with-lock-held (lock)
-      (write-to-string (locally (declare (sb-ext:muffle-conditions sb-ext:compiler-note))
-                         (incf counter))
-                       :pretty nil
-                       :base 36))))
-(export 'generate-id)
-
-
 (defun js-sw-headers (application)
   (declare (application application)
            (optimize speed))
@@ -33,7 +20,7 @@
 
     ;; It is important that this is done before sw-ajax.js (below) is loaded+evaled.
     "<script type='text/javascript'>"
-    "sw_viewport_id = \"" (generate-id) "\";"
+    "sw_viewport_id = \"" (id-generator-next-str -id-generator-) "\";"
     "sw_dynamic_subdomain = \""
     (if-let ((dynamic-data-subdomain (generate-dynamic-subdomain application)))
       (catstr (the string dynamic-data-subdomain) ".")

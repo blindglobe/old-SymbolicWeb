@@ -68,7 +68,8 @@ which normally might have delayed the end (it might be sleeping).")
 Each instance of VIEWPORT represents a browser window or tab."))
 
 
-(defmethod initialize-instance :after ((viewport viewport) &key)
+(defmethod initialize-instance :after ((viewport viewport) &key (id (error ":ID needed.")))
+  (declare (ignore id))
   (with-slots (id root-widget address-bar application) viewport
     (assert (subtypep 'container root-widget)) ;; The reason for this is the (RENDER CONTAINER) :AROUND method in container.lisp. This is needed because of the (render *root*) call in comet.lisp. Update; I suppose a with-code-block here would work, but it doesn't matter much for now.
     (setf address-bar (make-instance 'address-bar :viewport viewport)
@@ -85,9 +86,9 @@ Each instance of VIEWPORT represents a browser window or tab."))
 
 #.(maybe-inline 'find-or-create-viewport)
 (defun find-or-create-viewport (viewport-id app)
-  "Find an existing or create a new viewport based on the viewport-id parameter sent from
-the client.
-Returns two values; the viewport and whether a new one was created or not."
+  "Find an existing or create a new viewport based on the VIEWPORT-ID parameter
+ sent from the client.
+Returns two values; a VIEWPORT instance and whether a new one was created or not."
   (declare (string viewport-id)
            (application app)
            (optimize speed))
@@ -106,7 +107,7 @@ Returns two values; the viewport and whether a new one was created or not."
 (defun for-each-viewport-in-app (fn &optional (app *app*))
   "FN is a function that takes one argument; the viewport.
 Also see FOR-EACH-VIEWPORT-OF-WIDGET."
-  (declare (type application app)
+  (declare (application app)
            ((function (viewport)) fn)
            (optimize speed))
   (maphash (lambda (%not-used viewport)

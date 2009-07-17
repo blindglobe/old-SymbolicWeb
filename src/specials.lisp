@@ -2,8 +2,12 @@
 
 (in-package #:sw)
 
-(defvar *id->object*
-  (make-hash-table :test #'equal :weakness :value :synchronized t))
+
+;; TODO: Not a special.
+(define-variable -id-generator-
+    :kind :global
+    :value (mk-id-generator))
+
 
 (defvar *server* nil)
 (export '*server*)
@@ -15,11 +19,12 @@
 (export '*viewport*)
 
 
-;; Ok, this might be somewhat of a "wrong" thing to do..
+;; Ok, this might be somewhat of a "wrong" thing to do.. TODO: Not a special variable.
 (define-symbol-macro *root* (root-widget-of *viewport*))
 (export '*root*)
 
 
+;; TODO: Is this really useful? It seems be bound in server-sw-http.lisp then only used in viewport.lisp.
 (defvar *request-type* :unknown
   ":AJAX, :COMET, :REGULAR or :UNKNOWN.")
 (export '*request-type*)
@@ -33,7 +38,7 @@
 (defvar *currently-constructing-widget* nil)
 
 
-;; ajax.lisp
+;; (ajax.lisp)
 (defvar *current-event-widget* nil)
 
 
@@ -42,19 +47,12 @@
 (defvar *creating-code-block-p* nil)
 
 
-;; Used by things like MAYBE-VALUE-CHANGE.
-(defvar *old-value*)
-(export '*old-value*)
-(defvar *new-value*)
-(export '*new-value*)
-
-
-;;; Stuff for HTML-CONTAINER.
+;;; Stuff for HTML-CONTAINER (widgets/html-container.lisp).
 (defvar *creating-html-container-p* nil)
 (defvar *html-container-children* nil)
 
 
-;; Other stuff.
+;; Other stuff. ;; TODO: Not a special variable.
 (define-symbol-macro +newline+ #.(format nil "~C" #\Newline))
 (export '+newline+)
 

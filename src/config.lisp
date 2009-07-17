@@ -7,9 +7,9 @@
 (pushnew :symbolicweb *features*)
 
 
+#| TODO: Think about this; this is only used by code below in this file. |#
 (eval-now (defvar *sw-debug* t))
 (export '*sw-debug*)
-
 
 
 ;; Make random random.
@@ -71,16 +71,6 @@ code root.")
 
 
 (eval-now (use-package :sw-jquery))
-
-
-(define-variable +transport-client-side-exceptions-to-server-p+
-    :value nil
-    :kind :constant
-    :doc "If T this will attempt to transport client side JS exceptions back to the
- server and display them there in the Lisp (slime) condition handler. This
-will generate extra JS code and have some extra overhead though. Use Firebug
-when you can.")
-(export '+transport-client-side-exceptions-to-server-p+)
 
 
 (define-variable +add-newlines-to-js-code-p+

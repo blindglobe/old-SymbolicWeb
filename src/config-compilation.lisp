@@ -3,19 +3,19 @@
 (in-package #:sw)
 
 
-(define-variable **compilation-inlining-p**
+(define-variable -compilation-inlining-p-
     :value nil
     :kind :global)
 
 
 (defmethod maybe-inline (function-name-designator &key)
-  (if **compilation-inlining-p**
+  (if -compilation-inlining-p-
       `(declaim (inline ,function-name-designator))
       nil))
 
 
 (defmethod maybe-inline ((function-name-designator (eql 'run)) &key)
-  nil)
+  t)
 
 
 (defmethod optimizations ((context t) &key)
@@ -43,4 +43,8 @@
 
 
 (defmethod optimizations ((context (eql :shtml-of)) &key)
+  '(optimize speed (safety 1)))
+
+
+(defmethod optimizations ((context (eql :code.lisp)) &key)
   '(optimize speed (safety 1)))

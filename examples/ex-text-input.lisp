@@ -82,6 +82,15 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
         (:div
          (:h1 "TEXT-INPUT-APP")
 
+         #|(:sw (with1 (mk-button "(DECF X)")
+                (with-formula viewport
+                  (when (on-click-of it)
+                    (decf (slot-value ¤shared-model 'x))))))|#
+         #|(:sw (with1 (mk-button "(INCF X)")
+                (with-formula viewport
+                  (when (on-click-of it)
+                    (incf (slot-value ¤shared-model 'x))))))|#
+
          (:h2 "VIEW-1")
          (:sw ¤view-1)
 
