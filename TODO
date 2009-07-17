@@ -1,21 +1,8 @@
-UPDATE-CACHE-ONLY-P
-===================
+Consider sending response-data for AJAX-requests also; not only COMET-requests
+==============================================================================
 
-This name is used several places, a better name would be SERVER-ONLY-P.
+Title speaks for itself.
 
-
-
-Repetition
-==========
-
-* In INITIALIZE-INSTANCE methods for widgets things like:
-
-    (unless (slot-boundp span 'html)
-      (setf (slot-value span 'html)
-            ...))
-
-            
-..is repeated alot.
 
 
 
@@ -26,21 +13,7 @@ The RENDER method for subclasses of CONTAINER has some code repetition.
 
 
 
-More repetition of code
-=======================
 
-Patterns like these happen in places that deal with the :ON-STATE-CHANGE,
-:ON-ADD-FN, :ON-REMOVE-FN,:ON-RENDER-FN, :ON-VISIBILITY-CHANGE-FN initargs:
-
-(defmethod initialize-instance :after ((state-propagation state-propagation) &key
-                                       (on-state-change-fn nil on-state-change-fn-supplied-p))
-  (when (and on-state-change-fn-supplied-p
-             (or (functionp on-state-change-fn)
-                 (error ":ON-STATE-CHANGE-FN must be supplied with a function; got ~A" on-state-change-fn)))
-    (push on-state-change-fn (on-state-change-fns-of state-propagation))))
-
-
-    
 Redesign low-level protocol
 ===========================
 
