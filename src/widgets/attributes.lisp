@@ -77,7 +77,8 @@
 
 
 (define-attribute-property disabled-p-of "disabled"
-  :value-marshaller (lambda (value) (if value "disabled" "")))
+  :value-marshaller (lambda (value) (if value "disabled" ""))
+  :value-removal-checker nil)
 
 
 (define-attribute-property name-of "name")
