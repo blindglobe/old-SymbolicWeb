@@ -36,22 +36,32 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign).
 
   A lot of stuff is going on here. The first SETF expression sets up something that looks like this (we use X-MODEL
-  to denote the slot X in TEXT-INPUT-WIDGET-MODEL, and X-VIEW to denote the slot X in TEXT-INPUT-WIDGET-VIEW etc.):
+  to denote the slot X in TEXT-INPUT-WIDGET-MODEL, and X-VIEW to denote the slot X in TEXT-INPUT-WIDGET-VIEW etc.,
+  and IT denotes the CELL created at the first argument for the WITH1 macro):
 
 
-          (sync-back)
-       - - - - - - - - - -
-       |                 |
-       v                 |
-    X-VIEW --> IT --> X-MODEL
-                         |
-                         v
-                 SQUARE-OF-X-MODEL
+                      (sync-back)
+         -----------------------------------
+         |                                 |
+         v                                 |
+      X-MODEL --> IT --------------> NUMBER-PARSER
+         |        ^
+         |        |
+         |        | (two-way: from X-VIEW to IT is user-input (a string))
+         |        |
+         |        v
+         |      X-VIEW
+         |
+         |
+         v
+  SQUARE-OF-X-MODEL
+         |
+         V
+  SQUARE-OF-X-VIEW
 
 
-  SQUARE-OF-X-MODEL is further connected with SQUARE-OF-X-VIEW (or the SQUARE-OF-X slot in TEXT-INPUT-WIDGET-VIEW).
 
-  An important feature of SW-MVC is that the 'sync-back' connection does not cause things to get stuck propagating
+  An important feature of SW-MVC is that the 'sync-back' connections do not cause things to get stuck propagating
   in circles. |#
   (with-object view
     (list (setf ~¤x (with-object model
