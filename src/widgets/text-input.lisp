@@ -70,19 +70,33 @@ in return, make sure that you understand:
             (catstr "if(event.which == 13){ " before-check "}")))))
 
 
+(defmethod render ((text-input text-input))
+  (declare (optimize speed (safety 2)))
+  ;; TODO: This code is repeated in (SETF MODEL-OF) below and should probably be placed in or around the
+  ;; dom-cache.lisp stuff.
+  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \""
+               (funcall (the function (value-marshaller-of 'value-of)) (value-of text-input))
+               "\";")
+       text-input))
+
+
 (defmethod enterpress-state-of ((text-input text-input))
   ~(slot-value text-input 'enterpress-state))
 (export 'enterpress-state-of)
 
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
+  (declare (optimize speed (safety 2)))
   (let ((value-marshaller (value-marshaller-of 'value-of)))
-    #λ(let ((value ~model))
+    (declare (function value-marshaller))
+    #λ(let* ((value ~model)
+             (value-str (funcall value-marshaller value)))
         ;; Dodge cases where we can with 100% certainty determine that things are in sync at all viewports.
-        (unless (string= (funcall value-marshaller value)
-                         (funcall value-marshaller (value-of text-input)))
+        (unless (string= value-str (funcall value-marshaller (value-of text-input)))
           (when-commit ()
-            (setf (value-of text-input) value))))))
+            (setf (value-of text-input) value)
+            (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" value-str "\";")
+                 text-input))))))
 
 
 
