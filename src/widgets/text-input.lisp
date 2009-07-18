@@ -48,12 +48,14 @@ in return, make sure that you understand:
 (flet ((parse-client-args (args)
          (cdr (assoc "value" args :test #'string=))))
   (let ((before-check
-         (catstr "if(event.currentTarget.sw_text_input_value == event.currentTarget.value){"
-                 " return(false);"
-                 "}else{"
-                 " event.currentTarget.sw_text_input_value = event.currentTarget.value;"
-                 " return true;"
-                 "}")))
+         ;; TODO: This should probably be placed in or somewhere around the dom-cache.lisp stuff.
+         """
+if(event.currentTarget.sw_text_input_value == event.currentTarget.value){
+  return(false);
+}else{
+  event.currentTarget.sw_text_input_value = event.currentTarget.value;
+  return true;
+}"""))
 
 
     (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-blur-of)) callback-box)
@@ -72,11 +74,10 @@ in return, make sure that you understand:
 
 (defmethod render ((text-input text-input))
   (declare (optimize speed (safety 2)))
-  ;; TODO: This code is repeated in (SETF MODEL-OF) below and should probably be placed in or around the
+  ;; TODO: This code is repeated in (SETF MODEL-OF) below and should probably be placed in or somewhere around the
   ;; dom-cache.lisp stuff.
   (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \""
-               (funcall (the function (value-marshaller-of 'value-of)) (value-of text-input))
-               "\";")
+               (funcall (the function (value-marshaller-of 'value-of)) (value-of text-input)) "\";")
        text-input))
 
 
@@ -90,8 +91,7 @@ in return, make sure that you understand:
   (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
     ;; Dodge cases where we can with 100% certainty determine that things are in sync at all viewports.
     (setf (equal-p-fn-of model)
-          (lambda (old new)
-            (string= (value-marshaller old) (value-marshaller new))))
+          (lambda (old new) (string= (value-marshaller old) (value-marshaller new))))
     #λ(let* ((value ~model)
              (value-str (value-marshaller value)))
         (when-commit ()
