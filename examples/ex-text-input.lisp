@@ -35,19 +35,24 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   #| We connect MODEL and VIEW for automatic dataflow. At the same time, we make sure to return a list of the
   connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign).
 
-  A lot of stuff happens here. The first SETF expression basically:
+  A lot of stuff is going on here. The first SETF expression sets up something that looks like this (we use X-MODEL
+  to denote the slot X in TEXT-INPUT-WIDGET-MODEL, and X-VIEW to denote the slot X in TEXT-INPUT-WIDGET-VIEW etc.):
 
-    * Assigns a Model to the TEXT-INPUT widget/View 'X'.
 
-    * This Model will forward changes from the back-end ("Model-end") to the front-end ("View-end").
+          (sync-back)
+       - - - - - - - - - -
+       |                 |
+       v                 |
+    X-VIEW --> IT --> X-MODEL
+                         |
+                         v
+                 SQUARE-OF-X-MODEL
 
-    * It will forward user input from the front-end ("View-end") to the back-end ("Model-end"), but do so
-      by going via a temporary CELL created by MK-NUMBER-PARSER which will parse the input converting it from
-      a string to a number type.
 
-    * In addition, this parsing might signal a condition and we handle that (any condition; in this case we don't
-      care about details) by stating that we'd like the X-FEEDBACK widget to become visible when this happens.
-  |#
+  SQUARE-OF-X-MODEL is further connected with SQUARE-OF-X-VIEW (or the SQUARE-OF-X slot in TEXT-INPUT-WIDGET-VIEW).
+
+  An important feature of SW-MVC is that the 'sync-back' connection does not cause things to get stuck propagating
+  in circles. |#
   (with-object view
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
