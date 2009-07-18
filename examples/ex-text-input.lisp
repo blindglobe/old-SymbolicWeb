@@ -33,7 +33,21 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 (defmethod (setf model-of) ((model text-input-widget-model) (view text-input-widget-view))
   #| We connect MODEL and VIEW for automatic dataflow. At the same time, we make sure to return a list of the
-  connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign). |#
+  connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign).
+
+  A lot of stuff happens here. The first SETF expression basically:
+
+    * Assigns a Model to the TEXT-INPUT widget/View 'X'.
+
+    * This Model will forward changes from the back-end ("Model-end") to the front-end ("View-end").
+
+    * It will forward user input from the front-end ("View-end") to the back-end ("Model-end"), but do so
+      by going via a temporary CELL created by MK-NUMBER-PARSER which will parse the input converting it from
+      a string to a number type.
+
+    * In addition, this parsing might signal a condition and we handle that (any condition; in this case we don't
+      care about details) by stating that we'd like the X-FEEDBACK widget to become visible when this happens.
+  |#
   (with-object view
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
