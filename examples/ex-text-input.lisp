@@ -61,8 +61,8 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 
-  An important feature of SW-MVC is that the 'sync-back' connections do not cause things to get stuck propagating
-  in circles. |#
+  NUMBER-PARSER is the CELL created and returned by MK_NUMBER-PARSER. An important feature of SW-MVC is that the
+  'sync-back' connections do not cause things to get stuck propagating in circles. |#
   (with-object view
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
