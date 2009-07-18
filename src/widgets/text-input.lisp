@@ -87,16 +87,17 @@ in return, make sure that you understand:
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
   (declare (optimize speed (safety 2)))
-  (let ((value-marshaller (value-marshaller-of 'value-of)))
-    (declare (function value-marshaller))
+  (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
+    ;; Dodge cases where we can with 100% certainty determine that things are in sync at all viewports.
+    (setf (equal-p-fn-of model)
+          (lambda (old new)
+            (string= (value-marshaller old) (value-marshaller new))))
     #λ(let* ((value ~model)
-             (value-str (funcall value-marshaller value)))
-        ;; Dodge cases where we can with 100% certainty determine that things are in sync at all viewports.
-        (unless (string= value-str (funcall value-marshaller (value-of text-input)))
-          (when-commit ()
-            (setf (value-of text-input) value)
-            (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" value-str "\";")
-                 text-input))))))
+             (value-str (value-marshaller value)))
+        (when-commit ()
+          (setf (value-of text-input) value)
+          (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" value-str "\";")
+               text-input)))))
 
 
 
