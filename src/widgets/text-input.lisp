@@ -63,15 +63,13 @@ if(event.currentTarget.sw_text_input_value == event.currentTarget.value){
     (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-blur-of)) callback-box)
       (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
             (argument-parser-of callback-box) #'parse-client-args
-            (js-before-of callback-box)
-            before-check))
+            (js-before-of callback-box) before-check))
 
 
     (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-keyup-of)) callback-box)
       (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
             (argument-parser-of callback-box) #'parse-client-args
-            (js-before-of callback-box)
-            (catstr "if(event.which == 13){ " before-check "}")))))
+            (js-before-of callback-box) (catstr "if(event.which == 13){ " before-check "}")))))
 
 
 (defmethod render ((text-input text-input))

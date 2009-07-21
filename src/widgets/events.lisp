@@ -252,6 +252,7 @@ DOM-events."
           (setf callback-box (make-instance 'callback-box :widget dom-mirror :event-type event-type)))
         (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
           ;; Ensure that the (possibly) anonymous CELL isn't GCed too early.
+          ;; NOTE: Commented out because of composition wrt. multiple Model-View connections (container.lisp).
           #|(with-lifetime dom-mirror =cell=)|#
           (unless found-p
             (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
