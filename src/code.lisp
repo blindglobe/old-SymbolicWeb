@@ -16,31 +16,41 @@ RUN instead."
 
 
 #.(maybe-inline 'run)
-(defun run (code-str target)
+(defun run (code-str target &key except-viewport)
   (declare (string code-str)
-           ((or viewport widget) target))
+           ((or viewport widget) target)
+           ((or viewport null) except-viewport))
   "Send JavaScript code to client(s) for execution.
 
 CODE-STR: The JavaScript code.
 
 TARGET: If supplied with a WIDGET this will transmit the JS code to
 all contexts (browser sessions (users), tabs and windows) where that widget is
-visible; see WITH-VISIBLE-CONTEXTS-OF. If supplied with a VIEWPORT this will
-transmit the JS code to that single viewport for execution there."
+visible. If supplied with a VIEWPORT this will transmit the JS code to that
+single viewport for execution there.
+
+:EXCEPT-VIEWPORT: This assumes the TARGET parameter was given a WIDGET and does
+what you think it does (see doc. for the TARGET parameter)."
   (when (string= code-str "")
     (warn "RUN: (STRING= CODE-STR \"\") => T. Returning from RUN with no effect.")
     (return-from run))
   (flet ((js-code ()
-           (if +add-newlines-to-js-code-p+
-               (catstr code-str +newline+)
-               code-str)))
+           (muffle-compiler-note
+             (if +add-newlines-to-js-code-p+
+                 (catstr code-str +newline+)
+                 code-str))))
     (declare (inline js-code))
     (if *creating-code-block-p*
         (push (js-code) *code-block*)
         (if (typep target 'viewport)
             (run-js (js-code) target)
-            (with-visible-contexts-of target viewport
-              (run-js (js-code) viewport))))))
+            (if except-viewport
+                ;; TODO: Change WITH-VISIBLE-CONTEXTS-OF to accept an :EXCEPT-VIEWPORT argument.
+                (with-visible-contexts-of target viewport
+                  (unless (eq viewport except-viewport)
+                    (run-js (js-code) viewport)))
+                (with-visible-contexts-of target viewport
+                  (run-js (js-code) viewport)))))))
 
 
 (defmacro with-code-block ((&key (execute-p t execute-p-supplied-p)
