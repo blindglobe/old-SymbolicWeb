@@ -94,9 +94,7 @@ if(event.currentTarget.sw_text_input_value == event.currentTarget.value){
               (string= (value-marshaller old) (value-marshaller new)))))
 
     #λ(let ((new-value (value-marshaller ~model)))
-        (let ((except-viewport (when (and *current-event*
-                                          (eq text-input (widget-of *current-event*)))
-                                 (viewport-of *current-event*))))
+        (let ((except-viewport (maybe-except-viewport text-input)))
           (when-commit ()
             (setf (value-of text-input :except-viewport except-viewport) new-value)
             (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
