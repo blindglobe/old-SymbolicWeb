@@ -5,6 +5,24 @@
 (declaim #.(optimizations :widgets/events.lisp))
 
 
+(defclass event ()
+  ((callback-box :reader callback-box-of :initarg :callback-box
+                 :type callback-box)
+
+   (viewport :reader viewport-of :initarg :viewport
+             :type viewport)
+
+   (parsed-args :reader parsed-args-of :initarg :parsed-args))
+
+  (:documentation "
+Instances of this is bound to *CURRENT-EVENT*."))
+
+
+(defmethod widget-of ((event event))
+  (widget-of (callback-box-of event)))
+
+
+
 (defclass callback-box ()
   ((id :reader id-of)
 
@@ -102,9 +120,12 @@
 (defun execute-callback (callback-box args)
   (declare (callback-box callback-box)
            (list args))
-  (let ((*current-event-cb* callback-box))
+  (let ((*current-event* (make-instance 'event
+                                        :callback-box callback-box
+                                        :viewport *viewport*)))
     (pulse ~(event-cell-of callback-box)
-           (or (funcall (argument-parser-of callback-box) args) t))))
+           (with1 (or (funcall (argument-parser-of callback-box) args) t)
+             (setf (slot-value *current-event* 'parsed-args) it)))))
 
 
 (defmethod (setf js-before-of) :after (new-js (callback-box callback-box))
