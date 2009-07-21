@@ -83,22 +83,30 @@
     `(defun ,lisp-writer-name (property-value dom-mirror &rest args)
        (declare #.(optimizations :dom-property)
                 (dom-mirror dom-mirror))
-       (prog1 property-value
-         (unless *js-code-only-p*
-           (muffle-compiler-note ;; For the (IF (AND ..)) check.
-             (if (and ,value-removal-checker (funcall ,value-removal-checker property-value))
-                 ;; Remove entry.
-                 (progn
-                   (funcall ,dom-server-remover dom-mirror ',lisp-accessor-name)
-                   (apply ,dom-client-remover ,dom-name dom-mirror args))
-                 ;; Add and/or set entry.
-                 (progn
-                   (funcall ,dom-server-writer dom-mirror ',lisp-accessor-name property-value)
-                   (apply ,dom-client-writer
-                          ,(if value-marshaller
-                               `(funcall ,value-marshaller property-value)
-                               `property-value)
-                          ,dom-name dom-mirror args))))))))
+       (let ((remove-entry-p
+              (and ,value-removal-checker (funcall ,value-removal-checker property-value))))
+         (flet ((client-writer ()
+                  (if remove-entry-p
+                      ;; Remove entry on client side.
+                      (apply ,dom-client-remover ,dom-name dom-mirror args)
+                      ;; Add and/or set entry on client side.
+                      (apply ,dom-client-writer
+                             ,(if value-marshaller
+                                  `(funcall ,value-marshaller property-value)
+                                  `property-value)
+                             ,dom-name dom-mirror args)))
+                (server-writer ()
+                  (if remove-entry-p
+                      ;; Remove entry on server side.
+                      (funcall ,dom-server-remover dom-mirror ',lisp-accessor-name)
+                      ;; Add and/or set entry on server side.
+                      (funcall ,dom-server-writer dom-mirror ',lisp-accessor-name property-value))))
+           (declare (inline client-writer server-writer))
+           (if *js-code-only-p*
+               (client-writer)
+               (prog1 property-value
+                 (server-writer)
+                 (client-writer)))))))
 
   ;; Add DOM renderer.
   (compile-and-execute
