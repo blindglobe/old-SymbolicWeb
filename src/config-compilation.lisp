@@ -3,29 +3,40 @@
 (in-package #:sw)
 
 
-(define-variable -compilation-inlining-p-
+(define-variable -allow-compilation-inlining-p-
     :value nil
     :kind :global)
 
 
-(defmethod maybe-inline (function-name-designator &key)
-  (if -compilation-inlining-p-
-      `(declaim (inline ,function-name-designator))
+(define-variable -default-compilation-inlining-p-
+    :value nil
+    :kind :global)
+
+
+(defmethod maybe-inline :around (function-name &key)
+  (if (and -allow-compilation-inlining-p- (call-next-method))
+      `(declaim (inline ,function-name))
+      nil))
+
+
+(defmethod maybe-inline (function-name &key)
+  (if -default-compilation-inlining-p-
+      `(declaim (inline ,function-name))
       nil))
 
 
 
 ;;; INLINE declarations.
 
-(defmethod maybe-inline ((function-name-designator (eql 'run-js)) &key)
+(defmethod maybe-inline ((function-name (eql 'run-js)) &key)
   t)
 
 
-(defmethod maybe-inline ((function-name-designator (eql 'run)) &key)
+(defmethod maybe-inline ((function-name (eql 'run)) &key)
   t)
 
 
-(defmethod maybe-inline ((function-name-designator (eql 'append-to-response-data-of)) &key)
+(defmethod maybe-inline ((function-name (eql 'append-to-response-data-of)) &key)
   t)
 
 
