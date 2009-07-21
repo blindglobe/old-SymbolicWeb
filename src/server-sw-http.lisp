@@ -35,8 +35,7 @@ fixing this.
 
 
     :application-finder-fn
-    (lambda (sw-http-server connection callback)
-      (declare (ignore callback))
+    (lambda (sw-http-server connection)
       (sw-http-server-request-handler sw-http-server connection))))
 
 
