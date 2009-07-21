@@ -12,15 +12,17 @@
 (export 'css)
 
 
-(defun (setf css) (new-value property widget &key server-only-p)
+(defun (setf css) (new-value property widget &key server-only-p except-viewport)
   (declare (string new-value property)
-           (widget widget))
+           (widget widget)
+           ((member t nil) server-only-p)
+           ((or viewport null) except-viewport))
   (flet ((js-code ()
            (js-set-css (id-of widget) property new-value)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
-        (unless server-only-p (run (js-code) widget)))))
+        (unless server-only-p (run (js-code) widget :except-viewport except-viewport)))))
 (export 'css)
 
 

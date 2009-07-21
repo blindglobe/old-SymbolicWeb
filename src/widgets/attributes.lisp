@@ -12,22 +12,24 @@
 (export 'attribute)
 
 
-(defun (setf attribute) (new-value attribute widget &key server-only-p)
+(defun (setf attribute) (new-value attribute widget &key server-only-p except-viewport)
   (declare (string new-value attribute)
-           (widget widget))
+           (widget widget)
+           ((member t nil) server-only-p)
+           ((or viewport null) except-viewport))
   (flet ((js-code ()
            (js-set-attribute (id-of widget) attribute new-value)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
-        (unless server-only-p (run (js-code) widget)))))
+        (unless server-only-p (run (js-code) widget :except-viewport except-viewport)))))
 (export 'attribute)
 
 
 (defun attribute-remove (attribute widget &key server-only-p)
   (declare (string attribute)
            (widget widget))
-  (write-line "TODO: ATTRIBUTE-REMOVE"))
+  (warn "TODO: ATTRIBUTE-REMOVE"))
 (export 'attribute-remove)
 
 
