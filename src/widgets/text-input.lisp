@@ -43,7 +43,7 @@ in return, make sure that you understand:
         (nilf (flow-back-to-origin-p-of *current-event*))
         (setf ~~text-input value)
         (pulse ~(slot-value text-input 'enterpress-state)
-               (or ~~text-input t))))))
+               (or value t))))))
 
 
 ;; TODO: Think about this.
