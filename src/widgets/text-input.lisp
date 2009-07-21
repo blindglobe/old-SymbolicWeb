@@ -87,17 +87,20 @@ if(event.currentTarget.sw_text_input_value == event.currentTarget.value){
 
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
-  (declare (optimize speed (safety 2)))
   (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
-    ;; Dodge cases where we can with 100% certainty determine that things are in sync at all viewports.
     (setf (equal-p-fn-of model)
-          (lambda (old new) (string= (value-marshaller old) (value-marshaller new))))
-    #λ(let* ((value ~model)
-             (value-str (value-marshaller value)))
-        (when-commit ()
-          (setf (value-of text-input) value)
-          (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" value-str "\";")
-               text-input)))))
+          (lambda (old new)
+            (muffle-compiler-note
+              (string= (value-marshaller old) (value-marshaller new)))))
+
+    #λ(let ((new-value (value-marshaller ~model)))
+        (let ((except-viewport (when (and *current-event*
+                                          (eq text-input (widget-of *current-event*)))
+                                 (viewport-of *current-event*))))
+          (when-commit ()
+            (setf (value-of text-input :except-viewport except-viewport) new-value)
+            (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
+                 text-input :except-viewport except-viewport))))))
 
 
 
