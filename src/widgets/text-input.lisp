@@ -89,17 +89,20 @@ if(event.currentTarget.sw_text_input_value == event.currentTarget.value){
 (defmethod (setf model-of) ((model cell) (text-input text-input))
   (declare (optimize speed (safety 2)))
   (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
-    ;; NOTE: We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
-    ;; representation (TEXT-INPUTs VALUE-MARSHALLER is really just PRINC-TO-STRING) might not actually be equal
-    ;; at all wrt. other stuff depending on MODEL. We do the check (STRING=) below, or later, instead.
+    #| NOTE: We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
+    representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
+    at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
     #λ(let ((new-value (value-marshaller ~model)))
         (unless (string= new-value (value-marshaller (value-of text-input)))
           (let ((except-viewport (withp (maybe-except-viewport text-input)
-                                   (muffle-compiler-note
-                                     ;; TODO: This is a weak point in the API. We don't know what event this actually
-                                     ;; is, so we don't know what PARSED-ARGS-OF will return if the user defines his
-                                     ;; own events for his TEXT-INPUT instance (or creates a subclass etc.).
-                                     (string= new-value (parsed-args-of *current-event*))))))
+                                   #| TODO: This is a weak point in the API. We make assumptions about what
+                                   PARSED-ARGS-OF returns when the user could have changed this. We try to check
+                                   by looking at EVENT-TYPE, but this is probably not enough. A custom 'ti-submit'
+                                   event is needed. The ability to define custom events is needed in general. |#
+                                   (let ((event-type (the string (event-type-of *current-event*))))
+                                     (and (or (string= "keyup" event-type)
+                                              (string= "blur" event-type))
+                                          (string= new-value (parsed-args-of *current-event*)))))))
             (when-commit ()
               (setf (value-of text-input :except-viewport except-viewport) new-value)
               (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
