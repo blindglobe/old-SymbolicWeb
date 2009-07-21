@@ -18,3 +18,10 @@
   (catstr "$(\"#" widget-id "\").attr(\"" attribute "\", "
           "decodeURIComponent(\"" (url-encode new-value) "\"));"))
 (export 'js-set-attribute)
+
+
+(declaim (inline js-remove-attribute))
+(defun js-remove-attribute (widget-id attribute)
+  (declare (string widget-id attribute))
+  (catstr "$(\"#" widget-id "\").removeAttr(\"" attribute "\");"))
+(export 'js-remove-attribute)

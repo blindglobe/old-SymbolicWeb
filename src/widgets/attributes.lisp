@@ -26,10 +26,16 @@
 (export 'attribute)
 
 
-(defun attribute-remove (attribute widget &key server-only-p)
+(defun attribute-remove (attribute widget &key server-only-p except-viewport)
   (declare (string attribute)
-           (widget widget))
-  (warn "TODO: ATTRIBUTE-REMOVE"))
+           (widget widget)
+           ((member t nil) server-only-p)
+           ((or viewport null) except-viewport))
+  (flet ((js-code ()
+           (js-remove-attribute (id-of widget) attribute)))
+    (if *js-code-only-p*
+        (js-code)
+        (unless server-only-p (run (js-code) widget :except-viewport except-viewport)))))
 (export 'attribute-remove)
 
 
@@ -75,12 +81,13 @@
 
 
 (define-attribute-property readonly-p-of "readonly"
-  :value-marshaller (lambda (value) (if value "readonly" "")))
+  :value-marshaller (lambda (value) (if value "readonly" ""))
+  :value-removal-checker (lambda (value) (eq :dom-property-remove value)))
 
 
 (define-attribute-property disabled-p-of "disabled"
   :value-marshaller (lambda (value) (if value "disabled" ""))
-  :value-removal-checker nil)
+  :value-removal-checker (lambda (value) (eq :dom-property-remove value)))
 
 
 (define-attribute-property name-of "name")
