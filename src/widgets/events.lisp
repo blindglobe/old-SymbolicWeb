@@ -12,7 +12,10 @@
    (viewport :reader viewport-of :initarg :viewport
              :type viewport)
 
-   (parsed-args :reader parsed-args-of :initarg :parsed-args))
+   (parsed-args :reader parsed-args-of :initarg :parsed-args)
+
+   (flow-back-to-origin-p :accessor flow-back-to-origin-p-of #|:initarg :flow-back-to-origin-p|#
+                          :initform t))
 
   (:documentation "
 Instances of this is bound to *CURRENT-EVENT*."))
@@ -21,19 +24,19 @@ Instances of this is bound to *CURRENT-EVENT*."))
 (defmethod widget-of ((event event))
   (widget-of (callback-box-of event)))
 
+(defmethod event-type-of ((event event))
+  (event-type-of (callback-box-of event)))
+
 
 (defun maybe-except-viewport (widget)
-  "If WIDGET is the widget that caused the event (e.g. user-input) then this'll
-return the VIEWPORT where that event originated from. This is meant to be passed
-to the :EXCEPT-VIEWPORT keyarg of RUN and is useful to avoid having user-input
-wrt. a TEXT-INPUT widget \"race with itself\" as it comes back from the Model
-end."
+  "If WIDGET is the widget where the *CURRENT-EVENT* (e.g., user-input) originated
+from then this'll return the VIEWPORT where that event originated from."
   (declare (widget widget))
   (the (values (or null viewport) &optional)
-    (with *current-event*
-      (and it
-           (eq widget (widget-of it))
-           (viewport-of it)))))
+    (when-let ((event *current-event*))
+      (and (eq widget (widget-of event))               ;; Event or user-input origin?
+           (not (flow-back-to-origin-p-of event))      ;; Trying to avoid user-input racing with "itself"?
+           (viewport-of event)))))                     ;; Ok, return the VIEWPORT instance we are to dodge.
 
 
 

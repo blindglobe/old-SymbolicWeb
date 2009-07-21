@@ -34,11 +34,13 @@ in return, make sure that you understand:
   (when sync-on-blur-p
     (with-formula text-input
       (when-let (value (on-blur-of text-input))
+        (nilf (flow-back-to-origin-p-of *current-event*))
         (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
     (with-formula text-input
       (when-let (value (on-keyup-of text-input))
+        (nilf (flow-back-to-origin-p-of *current-event*))
         (setf ~~text-input value)
         (pulse ~(slot-value text-input 'enterpress-state)
                (or ~~text-input t))))))
@@ -87,18 +89,23 @@ if(event.currentTarget.sw_text_input_value == event.currentTarget.value){
 
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
+  (declare (optimize speed (safety 2)))
   (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
-    (setf (equal-p-fn-of model)
-          (lambda (old new)
-            (muffle-compiler-note
-              (string= (value-marshaller old) (value-marshaller new)))))
-
+    ;; NOTE: We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
+    ;; representation (TEXT-INPUTs VALUE-MARSHALLER is really just PRINC-TO-STRING) might not actually be equal
+    ;; at all wrt. other stuff depending on MODEL. We do the check (STRING=) below, or later, instead.
     #λ(let ((new-value (value-marshaller ~model)))
-        (let ((except-viewport (maybe-except-viewport text-input)))
-          (when-commit ()
-            (setf (value-of text-input :except-viewport except-viewport) new-value)
-            (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
-                 text-input :except-viewport except-viewport))))))
+        (unless (string= new-value (value-marshaller (value-of text-input)))
+          (let ((except-viewport (withp (maybe-except-viewport text-input)
+                                   (muffle-compiler-note
+                                     ;; TODO: This is a weak point in the API. We don't know what event this actually
+                                     ;; is, so we don't know what PARSED-ARGS-OF will return if the user defines his
+                                     ;; own events for his TEXT-INPUT instance (or creates a subclass etc.).
+                                     (string= new-value (parsed-args-of *current-event*))))))
+            (when-commit ()
+              (setf (value-of text-input :except-viewport except-viewport) new-value)
+              (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
+                   text-input :except-viewport except-viewport)))))))
 
 
 
