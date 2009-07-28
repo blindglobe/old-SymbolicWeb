@@ -16,7 +16,7 @@
 (export 'js-genid)
 
 
-#|(declaim (inline js-callback-data))|#
+(declaim (inline js-callback-data))
 (defun js-callback-data (callback-data)
   "Convert from Lisp ((\"key\" . \"value\"))
 to URL type string; \"key=value&other-key=other-value\""
@@ -45,6 +45,7 @@ to URL type string; \"key=value&other-key=other-value\""
 (export 'js-callback-data)
 
 
+(declaim (inline js-msg))
 (defun js-msg (widget-id callback-id &key
                (js-before '(lambda () (return t)))
                (callback-data nil)
