@@ -81,7 +81,7 @@ fixing this.
                                (session-expired-response)
                                (invoke-restart 'skip-body)))
                            (create-new-session server))))
-            (let ((viewport (when-let* ((viewport-id (sw-http:get-parameter "_sw-viewport-id"))
+            (let ((viewport (when-let* ((viewport-id (sw-http:get-parameter "_sw_viewport-id"))
                                         (viewport (find-or-create-viewport viewport-id app)))
                               (setf (last-ping-time-of viewport) *request-time*)
                               (when (and +auto-set-viewport-support-p+ -auto-set-viewport-p-)
@@ -102,7 +102,7 @@ fixing this.
 
 
 (defmethod session-expired-response ()
-  (let ((request-type (sw-http:get-parameter "_sw-request-type")))
+  (let ((request-type (sw-http:get-parameter "_sw_request-type")))
     (cond
       ((or (string= "ajax" request-type)
            (string= "comet" request-type))
@@ -172,7 +172,7 @@ fixing this.
                            (viewport viewport))
   (let ((*app* app)
         (*viewport* viewport)
-        (*request-type* (let ((request-type (sw-http:get-parameter "_sw-request-type")))
+        (*request-type* (let ((request-type (sw-http:get-parameter "_sw_request-type")))
                           (cond
                             ((string= request-type "comet") :comet)
                             ((string= request-type "ajax")  :ajax)

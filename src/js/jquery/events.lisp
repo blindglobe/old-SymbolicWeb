@@ -28,42 +28,9 @@
 (export 'js-unbind)
 
 
-(declaim (inline js-bind))
-(defun js-bind (widget-id event-type callback-id &key client-side-only-p
-                callback-data js-before js-after
-                browser-default-action-p)
-  (declare (string widget-id event-type callback-id))
-  (unless js-before (setf js-before *js-before*)) ;; Because NIL is always supplied from the stuff in dom-cache.lisp
-  (unless js-after (setf js-after *js-after*))
-  ;; TODO: Code here isn't very "nice".
-  ;; Convert (("key" . "value")) => "&key=value"
-  (let ((callback-data
-         (if callback-data
-             (subseq (with-output-to-string (s)
-                       (dolist (name-value-pair callback-data)
-                         (princ "&" s)
-                         (princ (url-encode (let ((name (car name-value-pair)))
-                                              (if (keywordp name)
-                                                  (string-downcase (string name))
-                                                  name)))
-                                s)
-                         (princ "=" s)
-                         ;; Not url-encoding this because it is usually JS code.
-                         (princ (catstr "\" + encodeURIComponent((function(){" (cdr name-value-pair) "})()) + \"") s)))
-                     1)
-             "")))
-    (catstr "
-$(\"#" widget-id "\").unbind(\"" event-type "\");
-$(\"#" widget-id "\").bind(\"" event-type "\", function(event)
-{
-" (if client-side-only-p
-      ;; TODO: Need to add a try/catch wrapper for this, and it needs to be moved to sw-ajax.js.
-      (catstr "if((function(){" js-before "})()) " client-side-only-p js-after)
-      (catstr "swHandleEvent(\"" callback-id "\","
-              "function(){ " js-before "},"
-              "\"" callback-data "\","
-              "function(data, text_status){" js-after "});"))
-" return " (if browser-default-action-p "true" "false") "; });")))
+(defun js-bind (widget-id event-type callback-js)
+  (declare (string widget-id event-type callback-js))
+  (catstr "$('#" widget-id "').bind('" event-type "', " callback-js ");"))
 (export 'js-bind)
 
 

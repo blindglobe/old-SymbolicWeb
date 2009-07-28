@@ -16,6 +16,51 @@
 (export 'js-genid)
 
 
+#|(declaim (inline js-callback-data))|#
+(defun js-callback-data (callback-data)
+  "Convert from Lisp ((\"key\" . \"value\"))
+to URL type string; \"key=value&other-key=other-value\""
+  (declare (list callback-data))
+  (unless callback-data (return-from js-callback-data ""))
+  ;; TODO: Try to make this faster/nicer.
+  (subseq (with-output-to-string (s)
+            (dolist (name-value-pair callback-data)
+              (princ "&" s)
+              (princ (url-encode (let ((name (car name-value-pair)))
+                                   (if (keywordp name)
+                                       (string-downcase name)
+                                       name)))
+                     s)
+              (princ "=" s)
+              ;; The values must really be JS expressions like "return 42;" because this allows us to also return
+              ;; results of evaluating JS code on the client-side.
+              (princ (catstr "\" + encodeURIComponent((function(){ "
+                             (let ((value (cdr name-value-pair)))
+                               (etypecase value
+                                 (string value)
+                                 (list (ps:ps* value))))
+                             " })()) + \"")
+                     s)))
+          1))
+(export 'js-callback-data)
+
+
+(defun js-msg (widget-id callback-id &key
+               (js-before '(lambda () (return t)))
+               (callback-data nil)
+               (js-after '(lambda (data text-status)))
+               (browser-default-action-p t)
+               (context-sym 'context))
+  (declare (string widget-id callback-id))
+  (ps:ps* `(lambda (,context-sym)
+             (sw-msg ,widget-id ,callback-id
+                     ,js-before
+                     ,(js-callback-data callback-data)
+                     ,js-after)
+             (return ,browser-default-action-p))))
+(export 'js-msg)
+
+
 (declaim (inline js-focus))
 (defun js-focus (selector)
   (declare (string selector))

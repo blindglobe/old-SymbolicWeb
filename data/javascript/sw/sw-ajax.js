@@ -33,7 +33,10 @@ else
 /////////////
 
 function swURL(){
-  return [window.location.protocol, "//", sw_dynamic_subdomain, window.location.host, window.location.pathname].join('');
+  return [window.location.protocol, "//",
+          sw_dynamic_subdomain,
+          window.location.host,
+          window.location.pathname].join('');
 }
 
 
@@ -67,14 +70,19 @@ swAjax = (function(){
       if(queue.push(function(){
             var options = {
               type: "POST",
-              url: [window.location.pathname, "?_sw-request-type=ajax", "&_sw-viewport-id=", sw_viewport_id, params].join(''),
+              // NOTE: I think the reason I'm not using swURL here has to do with HTTP POST requests not working vs.
+              // "dynamic subdomains". // TODO: Confirm that this is the reason?
+              url: [window.location.pathname,
+                    "?_sw_request-type=ajax",
+                    "&_sw_viewport-id=", sw_viewport_id,
+                    params].join(''),
               data: callback_data,
               dataType: "script",
-              beforeSend: function(){ if(!timer){ timer = setTimeout(displaySpinner, 500); }}, // TODO: 500 should be configurable.
+              // TODO: 500 should be configurable.
+              beforeSend: function(){ if(!timer){ timer = setTimeout(displaySpinner, 500); }},
               complete: handleRestOfQueue
             };
-            if(after_fn)
-              options.success = after_fn;
+            if(after_fn) options.success = after_fn;
             $.ajax(options);
           }) == 1)
         queue[0]();
@@ -99,7 +107,7 @@ swComet = (function(){
     function doIt(params){
       $.ajax({
           type: "GET",
-          url: [swURL(), "?_sw-request-type=comet", "&_sw-viewport-id=", sw_viewport_id, params].join(''),
+          url: [swURL(), "?_sw_request-type=comet", "&_sw_viewport-id=", sw_viewport_id, params].join(''),
           dataType: "script",
           complete: callback});
     }
@@ -108,7 +116,6 @@ swComet = (function(){
       return doIt;
     else
       // NOTE: This gets rid of the "always loading" thing in FF for the mouse pointer and the tab icon/favicon.
-      // FIXME: Chrome is still stuck always "loading.." though.
       return function(params){ setTimeout(function(){ doIt(params); }, 0); };
   })();
 
@@ -118,16 +125,23 @@ swComet = (function(){
 /////////////////////
 
 function swHandleEvent(callback_id, js_before, callback_data, js_after){
-  try{
-    if(js_before())
-      swAjax("&event=dom-event&callback-id=" + callback_id,
-             callback_data,
-             js_after());
-  }
-  catch(exception){
-    swAjax("&event=event-exception&callback-id=" + callback_id,
-           "&exception-str=" + encodeURIComponent(exception.toString()));
-  }
+  if(js_before())
+    swAjax("&_sw_event=dom-event&_sw_callback-id=" + callback_id,
+           callback_data,
+           js_after());
+}
+
+
+
+
+/// swMsg ///
+/////////////
+
+function swMsg(widget_id, callback_id, js_before, callback_data, js_after){
+  if(js_before())
+    swAjax("&_sw_event=dom-event" + "&_sw_widget-id=" + widget_id + "&_sw_callback-id=" + callback_id,
+           callback_data,
+           js_after());
 }
 
 
@@ -136,7 +150,7 @@ function swHandleEvent(callback_id, js_before, callback_data, js_after){
 //////////////////////////
 
 function swTerminateSession(){
-  swAjax("&event=terminate-session", "", function(){ window.location.reload(); });
+  swAjax("&_sw_event=terminate-session", "", function(){ window.location.reload(); });
 }
 
 
@@ -145,7 +159,7 @@ function swTerminateSession(){
 ////////////////////////////
 
 function swDisplaySessionInfo(){
-  swAjax("&event=display-session-info", "");
+  swAjax("&_sw_event=display-session-info", "");
 }
 
 
@@ -192,7 +206,7 @@ function swRun(code_id, async_p, func){
 
 $.address.change(function(event){
     //alert(event.value);
-    swAjax("&event=url-hash-changed",
+    swAjax("&_sw_event=url-hash-changed",
            "&new-url-hash=" + encodeURIComponent(event.value));
   });
 

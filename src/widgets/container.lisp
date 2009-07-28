@@ -90,8 +90,7 @@
            (container container))
   (with-each-widget-in-tree (:root widget)
     (with-each-viewport-of-widget (:widget container)
-      (setf (gethash (id-of widget) (widgets-of viewport)) widget
-            (gethash (id-of widget) (widgets-of (application-of viewport))) widget
+      (setf (gethash (id-of widget) (widgets-of (application-of viewport))) widget
             (gethash (id-of viewport) (viewports-of widget)) viewport))
     (unless (visible-p-of widget)
       (tf (slot-value widget 'visible-p)))))
@@ -103,7 +102,6 @@
            (container container))
   (with-each-widget-in-tree (:root widget)
     (with-each-viewport-of-widget (:widget container)
-      (remhash (id-of widget) (widgets-of viewport))
       (remhash (id-of viewport) (viewports-of widget)))
     (visible-p-of widget :real-check-p t)))
 

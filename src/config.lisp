@@ -17,6 +17,10 @@
       (make-random-state t))
 
 
+;;(setf who:*attribute-quote-char* #\')
+(setf ps:*js-string-delimiter* #\") ;; CL-WHO defaults to #\' and Parenscript does too.
+
+
 
 ;;; Stuff for SERVER
 ;;;;;;;;;;;;;;;;;;;;

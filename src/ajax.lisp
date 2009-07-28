@@ -5,47 +5,26 @@
 (declaim #.(optimizations :ajax.lisp))
 
 
-;; TODO: This thing doesn't actually work yet ..
 (defmethod on-invalid-callback-id ((server server) (app application) (viewport viewport))
+  (warn "SW:ON-INVALID-CALLBACK-ID: Reloading ~S" viewport)
   (reload viewport))
 
 
 (defmethod handle-ajax-request ((server sw-http-server) (app application) (viewport viewport))
-  (let ((event (sw-http:get-parameter "event")))
+  (let ((event (sw-http:get-parameter "_sw_event")))
     (cond
       ((string= "dom-event" event)
-       (let* ((callback-id (sw-http:get-parameter "callback-id"))
-              (callback-box (or (find-callback-box callback-id viewport)
-                               (progn
-                                 (warn "[SW] HANDLE-AJAX-REQUEST: No callback-box with ID ~S found in viewport ~S." callback-id (id-of viewport))
-                                 (on-invalid-callback-id server app viewport)
-                                 (return-from handle-ajax-request))))
+       (let* ((widget-id (sw-http:get-parameter "_sw_widget-id"))
+              (callback-id (sw-http:get-parameter "_sw_callback-id"))
+              (callback-box (or (find-callback-box widget-id callback-id app)
+                                (progn
+                                  (warn "[SW] HANDLE-AJAX-REQUEST: No callback-box with ID ~S found in  ~S."
+                                        callback-id viewport)
+                                  (on-invalid-callback-id server app viewport)
+                                  (return-from handle-ajax-request))))
               (arguments sw-http::*post-parameters*))
          (setf (last-user-activity-time-of app) (get-universal-time))
          (execute-callback callback-box arguments)))
-
-      #|
-      ((string= "js-ack" event)
-       (let* ((code-id (sw-http:get-parameter "code-id"))
-              (code (code-of code-id)))
-         (if code
-             (progn
-               (setf (return-value-of code) (sw-http:post-parameter "return-value")
-                     (status-of code) :success)
-               (wake-up (sleeper-of code)))
-             (format t "[SW] (js-ack) Warning: code-id \"~A\" not found in app \"~A\"~%"
-                     code-id (id-of app)))))
-
-      ((string= "js-fail" event)
-       (let ((code (code-of (sw-http:get-parameter "code-id"))))
-         (if code
-             (progn
-               (setf (exception-str-of code) (sw-http:post-parameter "exception-str")
-                     (status-of code) :failed)
-               (wake-up (sleeper-of code)))
-             (format t "[SW] (js-fail) Warning: Client JS exception: ~A~%"
-                     (sw-http:post-parameter "exception-str")))))
-      |#
 
       ((string= "url-hash-changed" event)
        (if-let (new-url-hash (sw-http:post-parameter "new-url-hash"))
@@ -55,15 +34,6 @@
          ;;(sync-widgets new-url-hash nil)
          t ;;(dbg-princ new-url-hash "TODO: ajax.lisp/url-hash-changed")
          (warn "[SW]: Got an URL-HASH-CHANGED message but no NEW-URL-HASH argument.")))
-
-      ;; FIXME: Test this.
-      ((string= "event-exception" event)
-       (let* ((exception-str (url-decode (sw-http:post-parameter "exception-str")))
-              (callback-id (url-decode (sw-http:get-parameter "callback-id"))))
-         ;; TODO: should add a way for the user to catch the exception higher in the call stack
-         (error "A DOM event exception occurred for callback-id ~A~%~A"
-                callback-id
-                exception-str)))
 
       ((string= "terminate-session" event)
        (remove-application app))

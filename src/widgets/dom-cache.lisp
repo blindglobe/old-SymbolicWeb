@@ -8,14 +8,24 @@
 (defclass dom-mirror ()
   ((dom-mirror-data :reader dom-mirror-data-of
                     :type hash-table
+                    ;; SOME-ID??->JS-CODE
                     :initform (make-hash-table :test #'eq))
 
    (callbacks-of :reader callbacks-of
                  :type hash-table
-                 :initform (make-hash-table :test #'equal))))
+                 :initform (make-hash-table :test #'equal)
+                 :documentation "
+Strong hash table; ID->CALLBACK-BOX.")))
 
 
+#| TOOD:
+Maybe storing "the real value" in the DOM-MIRROR-DATA hash is a bad idea in general. Maybe storing closures there is
+better. |#
 (defgeneric render-dom (dom-mirror property-name property-vaule))
+
+#|(defmethod render-dom (dom-mirror property-name (property-value callback-box))
+  (declare (ignore property-name))
+  (run (code-of property-value) dom-mirror))|#
 
 
 (defmethod render :after ((dom-mirror dom-mirror))
@@ -47,20 +57,39 @@
   (remhash lisp-accessor-name (dom-mirror-data-of dom-mirror)))
 
 
-(defmethod define-dom-property ((lisp-accessor-name symbol) (dom-name string)
-                                (dom-client-writer function)
-                                (dom-client-reader function)
-                                (dom-client-remover function)
+(defmethod define-dom-property ((lisp-accessor-name symbol)
                                 &key
+                                #|(dom-name "")|#
                                 (lisp-reader-name lisp-accessor-name)
                                 (lisp-writer-name (list 'setf lisp-accessor-name))
+
+                                (dom-client-reader
+                                 (lambda (%not-used dom-mirror)
+                                   (declare (ignore %not-used))
+                                   (error "~A: A DOM-CLIENT-READER for ~A isn't implemented."
+                                          lisp-accessor-name dom-mirror)))
+
+                                (dom-client-writer
+                                 (lambda (%not-used dom-mirror)
+                                   (declare (ignore %not-used))
+                                   (error "~A: A DOM-CLIENT-WRITER for ~A isn't implemented."
+                                          lisp-accessor-name dom-mirror)))
+
+                                (dom-client-remover
+                                 (lambda (%not-used dom-mirror)
+                                   (declare (ignore %not-used))
+                                   (error "~A: A DOM-CLIENT-REMOVER for ~A isn't implemented."
+                                          lisp-accessor-name dom-mirror)))
+
                                 (dom-server-reader-fallback-value nil dom-server-reader-fallback-value-supplied-p)
                                 (dom-server-reader #'dom-server-reader)
                                 (dom-server-writer #'dom-server-writer)
                                 (dom-server-remover #'dom-server-remover)
                                 (value-marshaller #'princ-to-string)
                                 (value-removal-checker #'not)) ;; Essentially (lambda (value) (eq value nil)).
-  (declare (function dom-server-reader dom-server-writer dom-server-remover))
+  (declare (function
+            dom-client-reader dom-client-writer dom-client-remover
+            dom-server-reader dom-server-writer dom-server-remover))
 
   (setf (get lisp-accessor-name 'value-marshaller) value-marshaller)
 
@@ -70,7 +99,7 @@
        (declare #.(optimizations :dom-property)
                 (dom-mirror dom-mirror))
        (if *js-code-only-p*
-           (funcall ,dom-client-reader ,dom-name dom-mirror)
+           (funcall ,dom-client-reader #|,dom-name|# dom-mirror)
            (multiple-value-bind (value found-p)
                (funcall ,dom-server-reader dom-mirror ',lisp-accessor-name)
              (if found-p
@@ -88,13 +117,13 @@
          (flet ((client-writer ()
                   (if remove-entry-p
                       ;; Remove entry on client side.
-                      (apply ,dom-client-remover ,dom-name dom-mirror args)
+                      (apply ,dom-client-remover #|,dom-name|# dom-mirror args)
                       ;; Add and/or set entry on client side.
                       (apply ,dom-client-writer
                              ,(if value-marshaller
                                   `(funcall ,value-marshaller property-value)
                                   `property-value)
-                             ,dom-name dom-mirror args)))
+                             #|,dom-name|# dom-mirror args)))
                 (server-writer ()
                   (if remove-entry-p
                       ;; Remove entry on server side.
@@ -110,19 +139,20 @@
 
   ;; Add DOM renderer.
   (compile-and-execute
+    ;; TOOD: Using a method to dispatch wrt. PROPERTY-NAME might be a bit overkill; try to think of a faster way?
     `(defmethod render-dom ((dom-mirror dom-mirror) (property-name (eql ',lisp-accessor-name)) property-value)
        (declare #.(optimizations :dom-property))
        (run (js-code-of (funcall ,dom-client-writer
                                  ,(if value-marshaller
                                       `(funcall ,value-marshaller property-value)
                                       `property-value)
-                                 ,dom-name
+                                 #|,dom-name|#
                                  dom-mirror))
             dom-mirror))))
 (export 'define-dom-property)
 
 
-(defmethod remove-dom-property ((lisp-accessor-name symbol) (dom-name string) (dom-client-remover function)
+(defmethod remove-dom-property ((lisp-accessor-name symbol) #|(dom-name string)|# (dom-client-remover function)
                                 &key
                                 (lisp-reader-name lisp-accessor-name)
                                 (lisp-writer-name (list 'setf lisp-accessor-name))
@@ -133,7 +163,7 @@
   (with-each-viewport-in-server ()
     (with-each-widget-in-tree (:root (root-widget-of *viewport*))
       (funcall dom-server-remover widget lisp-accessor-name)
-      (funcall dom-client-remover dom-name widget)))
+      #|(funcall dom-client-remover dom-name widget)|#))
 
   ;; Remove DOM reader.
   (fmakunbound lisp-reader-name)

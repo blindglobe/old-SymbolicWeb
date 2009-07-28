@@ -5,17 +5,8 @@
 (declaim #.(optimizations :widgets/text-input.lisp))
 
 
-#| NOTE: Before wasting time here trying to ensure that the client that sent the update does not get a useless update
-in return, make sure that you understand:
-
-  * A single widget instance can be visible in multiple VIEWPORTs at the same time.
-|#
-
-
-
 (defclass text-input (widget focussable)
-  ((enterpress-state :initform #λnil)
-   (view-value :initform #λ""))
+  ()
 
   (:default-initargs
    :element-type "input"
@@ -33,76 +24,73 @@ in return, make sure that you understand:
                                        (sync-on-enterpress-p t))
   (when sync-on-blur-p
     (with-formula text-input
-      (when-let (value (on-blur-of text-input))
+      (when-let (value (on-text-input-blur-of text-input))
         (nilf (flow-back-to-origin-p-of *current-event*))
         (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
     (with-formula text-input
-      (when-let (value (on-keyup-of text-input))
+      (when-let (value (on-enterpress-of text-input))
         (nilf (flow-back-to-origin-p-of *current-event*))
-        (setf ~~text-input value)
-        (pulse ~(slot-value text-input 'enterpress-state)
-               (or value t))))))
+        (setf ~~text-input value)))))
 
 
-;; TODO: Think about this.
+(let ((js '(if (= (slot-value (slot-value event 'current-target) 'sw_text_input_value)
+                  (slot-value (slot-value event 'current-target) 'value))
+            (return false)
+            (progn
+              (setf (slot-value (slot-value event 'current-target) 'sw_text_input_value)
+                    (slot-value (slot-value event 'current-target) 'value))
+              (return t)))))
+  (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of)))
+    `(lambda () ,js))
+
+  (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of)))
+    `(lambda ()
+       (unless (= (slot-value event 'which) 13)
+         (return false))
+       ,js)))
+
+
+(define-event-property
+    (on-enterpress-of "keyup" :callback-data (list (cons "value" (js-code-of (value-of widget))))))
+
+(define-event-property
+    (on-text-input-blur-of "blur" :callback-data (list (cons "value" (js-code-of (value-of widget))))))
+
+
 (flet ((parse-client-args (args)
          (cdr (assoc "value" args :test #'string=))))
-  (let ((before-check
-         ;; TODO: This should probably be placed in or somewhere around the dom-cache.lisp stuff.
-         """
-if(event.currentTarget.sw_text_input_value == event.currentTarget.value){
-  return(false);
-}else{
-  event.currentTarget.sw_text_input_value = event.currentTarget.value;
-  return true;
-}"""))
 
+  (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of))
+                                      (callback-box callback-box))
+    (setf (argument-parser-of callback-box) #'parse-client-args))
 
-    (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-blur-of)) callback-box)
-      (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
-            (argument-parser-of callback-box) #'parse-client-args
-            (js-before-of callback-box) before-check))
-
-
-    (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-keyup-of)) callback-box)
-      (setf (callback-data-of callback-box) `((:value . ,(js-code-of (value-of text-input))))
-            (argument-parser-of callback-box) #'parse-client-args
-            (js-before-of callback-box) (catstr "if(event.which == 13){ " before-check "}")))))
+  (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of))
+                                      (callback-box callback-box))
+    (setf (argument-parser-of callback-box) #'parse-client-args)))
 
 
 (defmethod render ((text-input text-input))
   (declare (optimize speed (safety 2)))
-  ;; TODO: This code is repeated in (SETF MODEL-OF) below and should probably be placed in or somewhere around the
-  ;; dom-cache.lisp stuff.
+  ;; TODO: This code is repeated in (SETF MODEL-OF) below.
   (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \""
                (funcall (the function (value-marshaller-of 'value-of)) (value-of text-input)) "\";")
        text-input))
 
 
-(defmethod enterpress-state-of ((text-input text-input))
-  ~(slot-value text-input 'enterpress-state))
-(export 'enterpress-state-of)
-
-
 (defmethod (setf model-of) ((model cell) (text-input text-input))
   (declare (optimize speed (safety 2)))
   (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
-    #| NOTE: We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
+    #| We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
     representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
     at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
     #λ(let ((new-value (value-marshaller ~model)))
         (unless (string= new-value (value-marshaller (value-of text-input)))
           (let ((except-viewport (withp (maybe-except-viewport text-input)
-                                   #| TODO: This is a weak point in the API. We make assumptions about what
-                                   PARSED-ARGS-OF returns when the user could have changed this. We try to check
-                                   by looking at EVENT-TYPE, but this is probably not enough. A custom 'ti-submit'
-                                   event is needed. The ability to define custom events is needed in general. |#
-                                   (let ((event-type (the string (event-type-of *current-event*))))
-                                     (and (or (string= "keyup" event-type)
-                                              (string= "blur" event-type))
-                                          (string= new-value (parsed-args-of *current-event*)))))))
+                                   ;; This might happen if a custom ARGUMENT-PARSER is being used.
+                                   (string= new-value (value-marshaller (parsed-args-of *current-event*))))))
+
             (when-commit ()
               (setf (value-of text-input :except-viewport except-viewport) new-value)
               (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")

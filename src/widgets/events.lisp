@@ -6,11 +6,14 @@
 
 
 (defclass event ()
-  ((callback-box :reader callback-box-of :initarg :callback-box
-                 :type callback-box)
+  ((application :reader application-of :initarg :application
+                :type application)
 
    (viewport :reader viewport-of :initarg :viewport
              :type viewport)
+
+   (callback-box :reader callback-box-of :initarg :callback-box
+                 :type callback-box)
 
    (parsed-args :reader parsed-args-of :initarg :parsed-args)
 
@@ -24,8 +27,9 @@ Instances of this is bound to *CURRENT-EVENT*."))
 (defmethod widget-of ((event event))
   (widget-of (callback-box-of event)))
 
-(defmethod event-type-of ((event event))
-  (event-type-of (callback-box-of event)))
+
+(defmethod id-of ((event event))
+  (id-of (callback-box-of event)))
 
 
 (defun maybe-except-viewport (widget)
@@ -41,97 +45,48 @@ from then this'll return the VIEWPORT where that event originated from."
 
 
 (defclass callback-box ()
-  ((id :reader id-of)
+  ((id :reader id-of :initarg :id
+       :type string
+       :initform (id-generator-next-str -id-generator-))
 
-   (widget :accessor widget-of
-           :type widget)
+   (widget :reader widget-of :initarg :widget
+           :type widget
+           :initform (error ":WIDGET needed"))
 
    (event-cell :reader event-cell-of :initarg :event-cell
                :type cell
                :initform #~nil)
 
-   (event-type :reader event-type-of :initarg :event-type
-               :type string
-               :initform (error ":EVENT-TYPE needed."))
-
    (argument-parser :accessor argument-parser-of :initarg :argument-parser
                     :type function
-                    :initform (lambda (args) args))
+                    :initform #'identity)
 
-   (callback :reader callback-of :initarg :callback
-             :initform (iambda))
-
-   (callback-data :accessor callback-data-of :initarg :callback-data
-                  :initform nil)
-
-   (js-before :accessor js-before-of :initarg :js-before
-              :initform *js-before*)
-
-   (js-after :accessor js-after-of :initarg :js-after
-             :initform *js-after*)
-
-   (browser-default-action-p :accessor browser-default-action-p-of :initarg :browser-default-action-p
-                             :initform t)))
+   (code :accessor code-of :initarg :code
+         :type (or null string)
+         :initform nil)))
 
 
-(defmethod initialize-instance :after ((callback-box callback-box) &key widget)
-  (when widget
-    (setf (widget-of callback-box) widget)))
+(defmethod initialize-instance :after ((callback-box callback-box) &key)
+  ;; STORE-CALLBACK-BOX
+  (setf (gethash (id-of callback-box) (callbacks-of (widget-of callback-box)))
+        callback-box))
 
 
-(defmethod (setf widget-of) :after ((widget widget) (callback-box callback-box))
-  (setf (slot-value callback-box 'id)
-        (js-callback-id-of (id-of (widget-of callback-box))
-                           (event-type-of callback-box))))
+(defmethod deref ((callback-box callback-box))
+  (sw-mvc::cell-deref (event-cell-of callback-box)))
 
 
-(defmethod has-client-side-side-effects-p-of ((callback-box callback-box))
-  (and (callback-data-of callback-box)
-       ;; TODO: Add some :AFTER methods for JS-BEFORE and JS-AFTER that set a flag
-       ;; instead of checking the strings every time like this.
-       (string= *js-before* (js-before-of callback-box))
-       (string= *js-after* (js-after-of callback-box))))
-(export 'has-client-side-side-effects-p-of)
-
-
-(defun store-callback-box (callback-box widget)
+(defun remove-callback-box (callback-box widget)
   (declare (callback-box callback-box)
            (widget widget))
-  (let ((id (id-of callback-box)))
-    ;; Weak links.
-    (with-visible-contexts-of widget viewport
-      (setf (gethash id (callbacks-of viewport))
-            callback-box))
-    ;; Hard links.
-    (setf (gethash id (callbacks-of widget))
-          callback-box)))
+  (remhash (id-of callback-box) (callbacks-of widget)))
 
 
-(defun remove-callback-box (event-type widget)
-  (declare (string event-type)
-           (widget widget))
-  (let ((id (js-callback-id-of (id-of widget) event-type)))
-    (with-visible-contexts-of widget viewport
-      (remhash id (callbacks-of viewport)))
-    (remhash id (callbacks-of widget))))
-
-
-(defun find-callback-box (id viewport)
-  (declare (string id)
-           (viewport viewport))
-  (gethash id (callbacks-of viewport)))
-
-
-(defmethod trigger ((callback-box callback-box) &rest args)
-  (let ((js-code (js-trigger (id-of (widget-of callback-box))
-                             (event-type-of callback-box))))
-    (if *js-code-only-p*
-        js-code
-        (if (and (null args)
-                 (has-client-side-side-effects-p-of callback-box))
-            (run js-code (widget-of callback-box))
-            (execute-callback callback-box args)))))
-(export 'trigger)
+(defun find-callback-box (widget-id callback-id app)
+  (declare (string widget-id callback-id)
+           (application app))
+  (when-let (widget (gethash widget-id (widgets-of app)))
+    (gethash callback-id (callbacks-of widget))))
 
 
 (defun execute-callback (callback-box args)
@@ -139,125 +94,36 @@ from then this'll return the VIEWPORT where that event originated from."
            (list args))
   (let ((*current-event* (make-instance 'event
                                         :callback-box callback-box
+                                        :application *app*
                                         :viewport *viewport*)))
     (pulse ~(event-cell-of callback-box)
            (with1 (or (funcall (argument-parser-of callback-box) args) t)
              (setf (slot-value *current-event* 'parsed-args) it)))))
 
 
-(defmethod (setf js-before-of) :after (new-js (callback-box callback-box))
-  (declare (ignore new-js))
-  (bind-widget (widget-of callback-box) (event-type-of callback-box) callback-box))
-
-(defmethod (setf js-after-of) :after (new-js (callback-box callback-box))
-  (declare (ignore new-js))
-  (bind-widget (widget-of callback-box) (event-type-of callback-box) callback-box))
-
-(defmethod (setf callback-data-of) :after (new-data (callback-box callback-box))
-  (declare (ignore new-data))
-  (bind-widget (widget-of callback-box) (event-type-of callback-box) callback-box))
-
-(defmethod (setf browser-default-action-p-of) :after (pred (callback-box callback-box))
-  (declare (ignore pred))
-  (bind-widget (widget-of callback-box) (event-type-of callback-box) callback-box))
-
-
-(defun bind-widget (widget event-type callback)
-  (declare (widget widget)
-           (string event-type)
-           ((or callback-box string null) callback))
-  (let ((js-code (if callback
-                     (js-bind (id-of widget) (event-type-of callback) (id-of callback)
-                              :client-side-only-p (when (stringp (callback-of callback))
-                                                    (callback-of callback))
-                              :callback-data (callback-data-of callback)
-                              :js-before (js-before-of callback)
-                              :js-after (js-after-of callback)
-                              :browser-default-action-p (browser-default-action-p-of callback))
-                     (js-unbind (id-of widget) event-type))))
-    (if *js-code-only-p*
-        js-code
-        (run js-code widget))))
-
-
-(defun (setf event) (callback event-type widget &key
-                     server-only-p
-                     js-before js-after callback-data
-                     (browser-default-action-p t))
-  (declare (callback-box callback)
-           (string event-type)
-           (widget widget)
-           ((or string null) js-before js-after)
-           ((or list null) callback-data))
-  (setf (widget-of callback) widget)
-  (when js-before
-    (setf (slot-value callback 'js-before) js-before))
-  (when js-after
-    (setf (slot-value callback 'js-after) js-after))
-  (when callback-data
-    (setf (slot-value callback 'callback-data) callback-data))
-  (when (typep callback 'callback-box)
-    (setf (slot-value callback 'browser-default-action-p) browser-default-action-p))
-
-  ;; setup @ server side
-  (store-callback-box callback widget)
-
-  ;; setup @ client side
-  (unless server-only-p (bind-widget widget event-type callback)))
-(export 'event)
-
-
-;; TODO: Finish this.
-(defmethod event ((event-type string) (widget widget) &key
-                  server-only-p
-                  js-before js-after callback-data
-                  (browser-default-action-p t))
-  (declare (ignorable server-only-p js-before js-after callback-data browser-default-action-p))
-  #|(assert *formula*)|#
-  (write-line "TODO: event"))
-(export 'event)
-
-
-(defun event-remove (event-type widget &key server-only-p)
+;; TODO: I think I need to implement something using this http://docs.jquery.com/Namespaced_Events
+;; to do this proper.
+#|(defun event-remove (event-type widget &key server-only-p)
   (declare (string event-type)
            (widget widget)
            (ignore server-only-p))
   (declare (ignore event-type widget))
   #|(setf (event event-type widget) nil)|#
-  #|(remove-callback-box event-type widget)|#)
-(export 'event-remove)
+  #|(remove-callback-box event-type widget)|#)|#
+#|(export 'event-remove)|#
 
 
-
-(defmacro mk-cb ((widget-sym &rest args) &body body)
-  "\"Make callback.\". Creates the Lisp side function or callback for
-DOM-events."
-  `(lambda (,widget-sym &key ,@args)
-     ,@body))
-(export 'mk-cb)
+(defmethod js-before-check ((widget widget) (lisp-accessor-name symbol))
+  '(lambda () (return t)))
 
 
-(defun event-dom-server-reader (dom-mirror lisp-accessor-name event-type)
-  (declare (dom-mirror dom-mirror)
-           (symbol lisp-accessor-name)
-           (string event-type))
-  (unless =cell=
-    (return-from event-dom-server-reader
-      (gethash lisp-accessor-name (dom-mirror-data-of dom-mirror))))
-  (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
-    (sb-ext:with-locked-hash-table (dom-mirror-data)
-      (multiple-value-bind (callback-box found-p)
-          (dom-server-reader dom-mirror lisp-accessor-name)
-        (unless found-p
-          (setf callback-box (make-instance 'callback-box :widget dom-mirror :event-type event-type)))
-        (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
-          ;; Ensure that the (possibly) anonymous CELL isn't GCed too early.
-          ;; NOTE: Commented out because of composition wrt. multiple Model-View connections (container.lisp).
-          #|(with-lifetime dom-mirror =cell=)|#
-          (unless found-p
-            (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
-            ;; Trigger client side magic; (setf (on-click-of widget) callback-box).
-            (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror)))))))
+;; (SETF EVENT)
+(defun event-dom-client-writer (widget cb js-code-fn &rest args)
+  (let ((js-code (or (code-of cb)
+                     (setf (code-of cb) (funcall js-code-fn)))))
+    (if *js-code-only-p*
+        js-code
+        (apply #'run js-code widget args))))
 
 
 (defmethod initialize-callback-box ((dom-mirror dom-mirror) (lisp-accessor-name symbol) (callback-box callback-box))
@@ -265,50 +131,65 @@ DOM-events."
 (export 'initialize-callback-box)
 
 
-(defmacro define-event-property (lisp-name event-type &body args)
+(defun event-dom-server-reader (dom-mirror lisp-accessor-name)
+  (declare (dom-mirror dom-mirror)
+           (symbol lisp-accessor-name))
+  (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
+    (sb-ext:with-locked-hash-table (dom-mirror-data)
+      (multiple-value-bind (callback-box found-p)
+          (dom-server-reader dom-mirror lisp-accessor-name)
+        (if =cell=
+            (progn
+              (unless found-p
+                (setf callback-box (make-instance 'callback-box :widget dom-mirror)))
+              (multiple-value-prog1 (values ~callback-box t)
+                (unless found-p
+                  (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
+                  (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror))))
+            (values callback-box found-p))))))
+
+
+(defmacro define-event-property ((lisp-name event-type &rest js-msg-args) &rest args)
   `(progn
-     (define-dom-property ',lisp-name ,event-type #'(setf event) #'event #'event-remove
-                          :value-removal-checker
-                          nil
-
-                          :dom-server-reader
-                          (lambda (dom-mirror lisp-accessor-name)
-                            (event-dom-server-reader dom-mirror lisp-accessor-name ,event-type))
-
-                          :value-marshaller
-                          (lambda (callback)
-                            (typecase callback
-                              ;; TODO: It might not make sense to accept a FUNCTION anymore.
-                              #|((or function string)
-                               (make-instance 'callback-box
-                                              :event-type ,event-type
-                                              :callback callback))|#
-
-                              (callback-box
-                               callback)
-
-                              (t
-                               (error "Don't know what to do with ~S." callback))))
-                          ,@args)
+     (define-dom-property ',lisp-name
+       :dom-client-writer
+       (lambda (cb widget &rest args)
+         (declare (callback-box cb)
+                  (widget widget))
+         (apply #'event-dom-client-writer widget cb
+                (lambda ()
+                  (js-bind (id-of widget) ,event-type
+                           (js-msg (id-of widget) (id-of cb)
+                                   :context-sym 'event
+                                   :js-before (js-before-check widget ',lisp-name)
+                                   ,@js-msg-args)))
+                args))
+       :dom-server-reader #'event-dom-server-reader
+       :value-marshaller nil
+       :value-removal-checker nil
+       ,@args)
      (export ',lisp-name)))
 
 
 
-(define-event-property on-blur-of "blur")
-(define-event-property on-change-of "change")
-(define-event-property on-click-of "click")
-(define-event-property on-dblclick-of "dblclick")
-(define-event-property on-focus-of "focus")
-(define-event-property on-keydown-of "keydown")
-(define-event-property on-keypress-of "keypress")
-(define-event-property on-keyup-of "keyup")
-(define-event-property on-load-of "load")
-(define-event-property on-mousedown-of "mousedown")
-(define-event-property on-mousemove-of "mousemove")
-(define-event-property on-mouseout-of "mouseout")
-(define-event-property on-mouseover-of "mouseover")
-(define-event-property on-mouseup-of "mouseup")
-(define-event-property on-resize-of "resize")
-(define-event-property on-scroll-of "scroll")
-(define-event-property on-select-of "select")
-(define-event-property on-unload "unload")
+(define-event-property (on-blur-of "blur"))
+(define-event-property (on-change-of "change"))
+(define-event-property (on-click-of "click"))
+(define-event-property (on-dblclick-of "dblclick"))
+(define-event-property (on-focus-of "focus"))
+
+(let ((js-which (ps:ps (return (slot-value event 'which)))))
+  (define-event-property (on-keyup-of "keydown" :callback-data (list (cons "which" js-which))))
+  (define-event-property (on-keyup-of "keypress" :callback-data (list (cons "which" js-which))))
+  (define-event-property (on-keyup-of "keyup" :callback-data (list (cons "which" js-which)))))
+
+(define-event-property (on-load-of "load"))
+(define-event-property (on-mousedown-of "mousedown"))
+(define-event-property (on-mousemove-of "mousemove"))
+(define-event-property (on-mouseout-of "mouseout"))
+(define-event-property (on-mouseover-of "mouseover"))
+(define-event-property (on-mouseup-of "mouseup"))
+(define-event-property (on-resize-of "resize"))
+(define-event-property (on-scroll-of "scroll"))
+(define-event-property (on-select-of "select"))
+(define-event-property (on-unload "unload"))

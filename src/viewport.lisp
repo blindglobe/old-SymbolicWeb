@@ -14,16 +14,6 @@
                 :type (or symbol widget)
                 :initform 'container)
 
-   (widgets :reader widgets-of
-            :type hash-table
-            :initform (make-hash-table :test #'equal :weakness :value)
-            :documentation "
-A weak hash of ID->WIDGETs of all currently active widgets in viewport.")
-
-   (callbacks :reader callbacks-of
-              :type hash-table
-              :initform (make-hash-table :test #'equal :weakness :value))
-
    (address-bar :reader address-bar-of)
 
    (dirty-p :reader dirty-p-of

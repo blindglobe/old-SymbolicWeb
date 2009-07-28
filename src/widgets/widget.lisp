@@ -152,8 +152,6 @@ visible in one or even no context."
 
 
 (defmethod remove-widget-from-viewport ((widget widget) (viewport viewport))
-  ;; VIEWPORT -/-> WIDGET.
-  (remhash (id-of widget) (widgets-of viewport))
   ;; WIDGET -/-> VIEWPORT.
   (remhash (id-of viewport) (viewports-of widget))
   (visible-p-of widget :real-check-p t))

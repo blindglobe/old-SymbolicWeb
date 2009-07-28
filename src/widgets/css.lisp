@@ -36,8 +36,14 @@
 
 (defmacro define-css-property (lisp-name dom-name &body args)
   `(progn
-     (define-dom-property ',lisp-name ,dom-name #'(setf css) #'css #'css-remove
-                          ,@args)
+     (define-dom-property ',lisp-name
+         :dom-client-writer (lambda (new-value widget &rest args)
+                              (setf (apply #'css ,dom-name widget args) new-value))
+         :dom-client-reader (lambda (widget)
+                              (css ,dom-name widget))
+         :dom-client-remover (lambda (widget &rest args)
+                               (apply #'css-remove ,dom-name widget args))
+         ,@args)
      (export ',lisp-name)))
 
 

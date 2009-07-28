@@ -16,10 +16,11 @@ RUN instead."
 
 
 #.(maybe-inline 'run)
-(defun run (code-str target &key except-viewport)
+(defun run (code-str target &key except-viewport server-only-p)
   (declare (string code-str)
            ((or viewport widget) target)
-           ((or viewport null) except-viewport))
+           ((or viewport null) except-viewport)
+           ((member t nil) server-only-p))
   "Send JavaScript code to client(s) for execution.
 
 CODE-STR: The JavaScript code.
@@ -33,6 +34,8 @@ single viewport for execution there.
 what you think it does (see doc. for the TARGET parameter)."
   (when (string= code-str "")
     (warn "RUN: (STRING= CODE-STR \"\") => T. Returning from RUN with no effect.")
+    (return-from run))
+  (when server-only-p
     (return-from run))
   (flet ((js-code ()
            (muffle-compiler-note

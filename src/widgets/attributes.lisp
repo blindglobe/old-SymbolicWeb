@@ -41,8 +41,14 @@
 
 (defmacro define-attribute-property (lisp-name dom-name &body args)
   `(progn
-     (define-dom-property ',lisp-name ,dom-name #'(setf attribute) #'attribute #'attribute-remove
-                          ,@args)
+     (define-dom-property ',lisp-name
+         :dom-client-writer (lambda (new-value widget &rest args)
+                              (setf (apply #'attribute ,dom-name widget args) new-value))
+         :dom-client-reader (lambda (widget)
+                              (attribute ,dom-name widget))
+         :dom-client-remover (lambda (widget &rest args)
+                               (apply #'attribute-remove ,dom-name widget args))
+         ,@args)
      (export ',lisp-name)))
 
 
