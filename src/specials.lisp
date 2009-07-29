@@ -43,11 +43,6 @@
   "This will contain an instance of EVENT (widgets/events.lisp).")
 
 
-;; Used by WITH-CODE-BLOCK (code.lisp).
-(defvar *code-block*)
-(defvar *creating-code-block-p* nil)
-
-
 ;;; Stuff for HTML-CONTAINER (widgets/html-container.lisp).
 (defvar *creating-html-container-p* nil)
 (defvar *html-container-children* nil)

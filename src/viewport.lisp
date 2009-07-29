@@ -64,8 +64,7 @@ Each instance of VIEWPORT represents a browser window or tab."))
     (assert (subtypep 'container root-widget)) ;; The reason for this is the (RENDER CONTAINER) :AROUND method in container.lisp. This is needed because of the (render *root*) call in comet.lisp. Update; I suppose a with-code-block here would work, but it doesn't matter much for now.
     (setf address-bar (make-instance 'address-bar :viewport viewport)
           root-widget (make-instance root-widget :id "sw-root")
-          (slot-value root-widget 'visible-p) t
-          (gethash id (viewports-of root-widget)) viewport
+          (viewport-of root-widget) viewport
           (gethash id (viewports-of application)) viewport)))
 
 
@@ -116,7 +115,8 @@ refresh."
 
 (defmethod render-viewport ((viewport viewport) (app application))
   (declare (ignore app))
-  ;; TODO: This is pretty stupid; but it gets rid of the "always loading" thing in Firefox when using random subdomains and the "page" is empty on initial load.
+  ;; TODO: This is pretty stupid; but it gets rid of the "always loading" thing in Firefox when using random
+  ;; subdomains and the "page" is empty on initial load.
   (run "2+2" viewport))
 
 

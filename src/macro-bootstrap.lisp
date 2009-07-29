@@ -3,18 +3,6 @@
 (in-package #:sw)
 
 
-(defmacro with-visible-contexts-of (widget viewport-sym &body body)
-  "Execute BODY in context of all viewports where WIDGET is visible.
-VIEWPORT-SYM is bound to a new viewport on each iteration.
-
-NOTE: *VIEWPORT* is still bound to the \"original\" viewport, unless VIEWPORT-SYM
-is supplied with the symbol *VIEWPORT*."
-  (once-only (widget)
-    `(with-each-viewport-of-widget (:widget ,widget :viewport-sym ,viewport-sym)
-       (when (visible-p-of ,widget :viewport ,viewport-sym)
-         ,@body))))
-
-
 (defmacro with-each-widget-in-tree ((&key (root (error ":ROOT required."))
                                           (widget-sym 'widget)) &body body)
   `(for-each-widget-in-tree ,root
@@ -22,18 +10,6 @@ is supplied with the symbol *VIEWPORT*."
                               (declare (type widget ,widget-sym))
                               ,@body)))
 (export '(with-each-widget-in-tree widget))
-
-
-(defmacro with-each-viewport-of-widget ((&key (widget (error ":WIDGET needed."))
-                                          (viewport-sym 'viewport))
-                                    &body body)
-  "BODY is executed with VIEWPORT-SYM bound to each viewport in WIDGET.
-Also see WITH-EACH-VIEWPORT-IN-APP."
-  `(for-each-viewport-of-widget ,widget
-                            (lambda (,viewport-sym)
-                              (declare (type viewport ,viewport-sym))
-                              ,@body)))
-(export '(with-each-viewport-of-widget viewport))
 
 
 (defmacro with-each-viewport-in-app ((&key (viewport-sym 'viewport) (app '*app*)) &body body)

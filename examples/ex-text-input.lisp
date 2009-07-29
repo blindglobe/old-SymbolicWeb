@@ -94,10 +94,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 (defclass text-input-app (application)
-  ((shared-model :initform (make-instance 'text-input-widget-model))
-   ;; Two Views viewing/observing the same Model instance.
-   (view-1 :initform ↑(make-instance 'text-input-widget-view :model ¤shared-model))
-   (view-2 :initform ↑(make-instance 'text-input-widget-view :model ¤shared-model)))
+  ((shared-model :initform (make-instance 'text-input-widget-model)))
 
   (:metaclass mvc-class))
 
@@ -112,10 +109,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
          (:h1 "TEXT-INPUT-APP")
 
          (:h2 "VIEW-1")
-         (:sw ¤view-1)
+         (:sw (make-instance 'text-input-widget-view :model ¤shared-model))
 
          (:h2 "VIEW-2")
-         (:sw ¤view-2)
+         (:sw (make-instance 'text-input-widget-view :model ¤shared-model))
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/master/examples/ex-text-input.lisp"

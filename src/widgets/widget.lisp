@@ -13,16 +13,9 @@
    (static-attributes :reader static-attributes-of
                       :type list)
 
-   (viewports :reader viewports-of
-              :type hash-table
-              :initform (make-hash-table :test #'equal :weakness :value :synchronized t)
-              :documentation "
-The viewports, all browser tabs/windows regardless of user/session, the widget is part of
-or visible in.")
-
-   (visible-p :initform nil
-              :documentation "
-Use/see the VISIBLE-P-OF method.")
+   (viewport :accessor viewport-of
+             :type (or viewport null)
+             :initform nil)
 
    (focussable-p :reader focussable-p-of :initarg :focussable-p
                  :type (or (eql t) (eql nil))
@@ -31,11 +24,10 @@ Use/see the VISIBLE-P-OF method.")
 
 (defmethod initialize-instance :around ((widget widget) &key)
   (setf (slot-value widget 'static-attributes) (list))
-  ;; Let the RENDER method send stuff to the client when things are ready instead.
-  (with-code-block (:execute-p nil)
-    (let ((*currently-constructing-widget* widget)
-          (*creating-html-container-p* nil)) ;; To avoid SHTML-OF to screw up when nesting WITH-HTML-CONTAINER type stuff.
-      (call-next-method))))
+  (let ((*currently-constructing-widget* widget)
+        ;; To avoid SHTML-OF to screw up when nesting HTML-CONTAINER and other stuff.
+        (*creating-html-container-p* nil))
+    (call-next-method)))
 
 
 (defmethod print-slots progn ((widget widget) stream)
@@ -83,28 +75,19 @@ Use/see the VISIBLE-P-OF method.")
 
 
 (defmethod visible-p-of ((widget widget) &key
-                         (app nil app-supplied-p) (viewport nil viewport-supplied-p)
-                         real-check-p)
+                         (app nil app-supplied-p)
+                         (viewport nil viewport-supplied-p))
   "If VIEWPORT is supplied this will determine whether WIDGET is visible in that viewport.
 If APP is supplied this will determine whether WIDGET is visible within any of
 the viewports within that session.
 If neither APP nor VIEWPORT is supplied this will determine wheter WIDGET is visible
 in any session in any viewport."
-  (declare (ignore app))
+  (declare (ignore app real-check-p))
   (when app-supplied-p
     (error "TODO: Not implemented yet."))
-  (if real-check-p
-      (if (and (visible-p-of widget)
-               (zerop (hash-table-count (viewports-of widget))))
-          ;; WIDGET isn't part of any viewport anymore.
-          (nilf (slot-value widget 'visible-p))
-          t)
-      (and (slot-value widget 'visible-p)
-           (if viewport-supplied-p
-               (and (visible-p-of viewport)
-                    ;; The widget and viewport supplied is visible, but is the widget really part of this viewport?
-                    (gethash (id-of viewport) (viewports-of widget)))
-               t))))
+  (if viewport-supplied-p
+      (eq (viewport-of widget) viewport)
+      (viewport-of widget)))
 
 
 (defmethod render ((widget widget))
@@ -116,9 +99,8 @@ in any session in any viewport."
   (if *js-code-only-p*
       (js-focus (id-of widget))
       (progn
-        (with-each-viewport-of-widget (:widget widget)
-          (setf (slot-value (application-of viewport) 'last-focus)
-                widget))
+        (setf (slot-value (application-of (viewport-of widget)) 'last-focus)
+              widget)
         (unless server-only-p
           (run (js-focus (id-of widget)) widget)))))
 
@@ -129,32 +111,9 @@ in any session in any viewport."
       (run (js-scroll-to-bottom (id-of widget)) widget)))
 
 
-#.(maybe-inline 'for-each-viewport-of-widget)
-(defun for-each-viewport-of-widget (widget fn)
-  "FN is a function that takes one argument; the viewport.
-Also see FOR-EACH-VIEWPORT-IN-APP."
-  (declare (type widget widget)
-           (type (function (viewport)) fn))
-  (maphash (lambda (%not-used viewport)
-             (declare (ignore %not-used)
-                      (type viewport viewport))
-             (funcall fn viewport))
-           (viewports-of widget)))
-
-
-(defmethod shared-p-of ((widget widget))
-  "Returns T if widget is visible in multiple contexts.
-This might not be 100% accurate; it might return T when the widget is only
-visible in one or even no context."
-  (declare (inline visible-p-of))
-  (and (visible-p-of widget)
-       (< 1 (hash-table-count (viewports-of widget)))))
-
-
 (defmethod remove-widget-from-viewport ((widget widget) (viewport viewport))
   ;; WIDGET -/-> VIEWPORT.
-  (remhash (id-of viewport) (viewports-of widget))
-  (visible-p-of widget :real-check-p t))
+  (nilf (viewport-of widget)))
 
 
 (defmethod set-show-on-feedback ((widget widget) (cell cell))

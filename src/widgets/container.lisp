@@ -72,11 +72,6 @@
             (view-in-context-of container ~(target-position-of event))))
 
 
-(defmethod render :around ((container container))
-  (with-code-block (:widget container)
-    (call-next-method)))
-
-
 (defmethod render ((container container))
   (let ((container-id (id-of container)))
     (dolist (child (children-of container))
@@ -88,22 +83,23 @@
 (defun propagate-for-add (widget container)
   (declare (widget widget)
            (container container))
-  (with-each-widget-in-tree (:root widget)
-    (with-each-viewport-of-widget (:widget container)
-      (setf (gethash (id-of widget) (widgets-of (application-of viewport))) widget
-            (gethash (id-of viewport) (viewports-of widget)) viewport))
-    (unless (visible-p-of widget)
-      (tf (slot-value widget 'visible-p)))))
+  (let* ((viewport (viewport-of container))
+         (widgets (widgets-of (application-of viewport))))
+    (with-each-widget-in-tree (:root widget)
+      (setf (gethash (id-of widget) widgets) widget
+            (viewport-of widget) viewport))))
 
 
 #.(maybe-inline 'propagate-for-remove)
 (defun propagate-for-remove (widget container)
   (declare (widget widget)
-           (container container))
-  (with-each-widget-in-tree (:root widget)
-    (with-each-viewport-of-widget (:widget container)
-      (remhash (id-of viewport) (viewports-of widget)))
-    (visible-p-of widget :real-check-p t)))
+           (container container)
+           (ignore container))
+  (let* ((viewport (viewport-of widget))
+         (widgets (widgets-of (application-of viewport))))
+    (with-each-widget-in-tree (:root widget)
+      (remhash (id-of widget) widgets)
+      (nilf (viewport-of widget)))))
 
 
 (defmethod add ((widget widget) (container container))
@@ -114,8 +110,7 @@ Returns WIDGET."
     (when (visible-p-of container)
       (run (js-iappend (shtml-of widget) (id-of container)) container)
       (propagate-for-add widget container)
-      (with-code-block (:widget container)
-        (render widget)))))
+      (render widget))))
 
 
 ;; TODO: I don't think shadowing CL:REMOVE is such a great idea.
@@ -141,8 +136,7 @@ Returns WIDGETS."
       (dolist (widget widgets)
         (run (js-iappend (shtml-of widget) (id-of container)) container)
         (propagate-for-add widget container)
-        (with-code-block (:widget container)
-          (render widget))))))
+        (render widget)))))
 
 
 (defmethod oadd ((container container) (widget widget) (left-widget widget))
@@ -156,8 +150,7 @@ Returns WIDGET."
                        (the string (id-of left-widget)))
            container)
       (propagate-for-add widget container)
-      (with-code-block (:widget container)
-        (render widget)))))
+      (render widget))))
 
 
 (defmethod insert ((container container) (new-widget widget) &key before after)
@@ -187,8 +180,7 @@ Returns WIDGET."
     (when (visible-p-of container)
       (run (js-iprepend (shtml-of widget) (id-of container)) container)
       (propagate-for-add widget container)
-      (with-code-block (:widget container)
-        (render widget)))))
+      (render widget))))
 
 
 (defmethod oprepend ((container container) (widget widget) (right-widget widget))
@@ -200,8 +192,7 @@ Returns WIDGET."
     (when (visible-p-of container)
       (run (js-oprepend (shtml-of widget) (id-of right-widget)) container)
       (propagate-for-add widget container)
-      (with-code-block (:widget container)
-        (render widget)))))
+      (render widget))))
 
 
 #|(defmethod prepend ((container container) (widget widget) (right-widget widget))
@@ -221,8 +212,7 @@ Returns WIDGETS."
       (dolist (widget widgets)
         (run (js-iprepend (shtml-of widget) (id-of container)) container)
         (propagate-for-add widget container)
-        (with-code-block (:widget container)
-          (render widget))))))
+        (render widget)))))
 
 
 #|(defmethod replace ((container container) (old-widget widget) (new-widget widget))
@@ -234,8 +224,7 @@ returns new-widget."
       (propagate-for-remove old-widget container)
       (run (js-replace-with (id-of old-widget) (shtml-of new-widget)) container)
       (propagate-for-add new-widget container)
-      (with-code-block (:widget container)
-        (render new-widget))))
+      (render new-widget)))
   new-widget)|#
 
 
@@ -263,8 +252,7 @@ already be in."
     (dolist (child new-child-widgets)
       (run (js-iappend (shtml-of child) (id-of container)) container)
       (propagate-for-add child container)
-      (with-code-block (:widget container)
-        (render child)))))|#
+      (render child))))|#
 
 
 (defmethod exchange ((container container) (widget-a widget) (widget-b widget))

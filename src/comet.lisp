@@ -16,8 +16,6 @@
       (cond
         ((string= do "refresh")
          (let ((*replace-address-bar-p* t))
-           (with-each-widget-in-tree (:root *root*)
-             (setf (gethash (id-of viewport) (viewports-of widget)) viewport))
 
            (nilf (slot-value viewport 'response-data)
                  (slot-value viewport 'prev-response-data))
@@ -26,9 +24,8 @@
              (tf (slot-value app 'initialized-p))
              (main app))
 
-           (with-code-block (:viewport viewport)
-             (render-viewport viewport app)
-             (sync-widgets (sw-http:get-parameter "hash") t))
+           (render-viewport viewport app)
+           (sync-widgets (sw-http:get-parameter "hash") t)
            (on-refresh app viewport)))
 
         ((string= do "ack")

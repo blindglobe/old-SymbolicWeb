@@ -25,13 +25,13 @@
   (when sync-on-blur-p
     (with-formula text-input
       (when-let (value (on-text-input-blur-of text-input))
-        (nilf (flow-back-to-origin-p-of *current-event*))
+        (setf (value-of text-input :server-only-p t) value)
         (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
     (with-formula text-input
       (when-let (value (on-enterpress-of text-input))
-        (nilf (flow-back-to-origin-p-of *current-event*))
+        (setf (value-of text-input :server-only-p t) value)
         (setf ~~text-input value)))))
 
 
@@ -80,21 +80,18 @@
 
 
 (defmethod (setf model-of) ((model cell) (text-input text-input))
-  (declare (optimize speed (safety 2)))
+  ;;(declare (optimize speed (safety 2)))
   (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
     #| We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
     representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
     at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
     #λ(let ((new-value (value-marshaller ~model)))
         (unless (string= new-value (value-marshaller (value-of text-input)))
-          (let ((except-viewport (withp (maybe-except-viewport text-input)
-                                   ;; This might happen if a custom ARGUMENT-PARSER is being used.
-                                   (string= new-value (value-marshaller (parsed-args-of *current-event*))))))
-
-            (when-commit ()
-              (setf (value-of text-input :except-viewport except-viewport) new-value)
-              (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
-                   text-input :except-viewport except-viewport)))))))
+          (when-commit ()
+            ;; Update UI.
+            (setf (value-of text-input) new-value)
+            (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
+                 text-input))))))
 
 
 
