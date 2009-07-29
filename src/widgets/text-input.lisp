@@ -35,13 +35,14 @@
         (setf ~~text-input value)))))
 
 
-(let ((js '(if (= (slot-value (slot-value event 'current-target) 'sw_text_input_value)
-                  (slot-value (slot-value event 'current-target) 'value))
-            (return false)
-            (progn
-              (setf (slot-value (slot-value event 'current-target) 'sw_text_input_value)
-                    (slot-value (slot-value event 'current-target) 'value))
-              (return t)))))
+(let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
+       '(if (= (slot-value (slot-value event 'current-target) 'sw_text_input_value)
+               (slot-value (slot-value event 'current-target) 'value))
+         (return false)
+         (progn
+           (setf (slot-value (slot-value event 'current-target) 'sw_text_input_value)
+                 (slot-value (slot-value event 'current-target) 'value))
+           (return t)))))
   (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of)))
     `(lambda () ,js))
 
@@ -71,27 +72,27 @@
     (setf (argument-parser-of callback-box) #'parse-client-args)))
 
 
-(defmethod render ((text-input text-input))
-  (declare (optimize speed (safety 2)))
-  ;; TODO: This code is repeated in (SETF MODEL-OF) below.
-  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \""
-               (funcall (the function (value-marshaller-of 'value-of)) (value-of text-input)) "\";")
-       text-input))
-
-
-(defmethod (setf model-of) ((model cell) (text-input text-input))
-  ;;(declare (optimize speed (safety 2)))
+(flet ((update-client-cache (new-value widget)
+         (run (catstr "$('#" (id-of widget) "')[0].sw_text_input_value = \"" new-value "\";")
+              widget)))
+  (declare (inline update-client-cache))
   (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
-    #| We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
-    representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
-    at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
-    #λ(let ((new-value (value-marshaller ~model)))
-        (unless (string= new-value (value-marshaller (value-of text-input)))
-          (when-commit ()
-            ;; Update UI.
-            (setf (value-of text-input) new-value)
-            (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" new-value "\";")
-                 text-input))))))
+
+    (defmethod render ((text-input text-input))
+      (declare (optimize speed (safety 2)))
+      (update-client-cache (value-marshaller (value-of text-input)) text-input))
+
+    (defmethod (setf model-of) ((model cell) (text-input text-input))
+      (declare (optimize speed (safety 2)))
+      #| We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
+      representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
+      at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
+      #λ(let ((new-value (value-marshaller ~model)))
+          (unless (string= new-value (value-marshaller (value-of text-input)))
+            (when-commit ()
+              ;; Update UI.
+              (setf (value-of text-input) new-value)
+              (update-client-cache new-value text-input)))))))
 
 
 
