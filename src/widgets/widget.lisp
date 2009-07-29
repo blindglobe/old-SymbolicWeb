@@ -18,7 +18,7 @@
              :initform nil)
 
    (focussable-p :reader focussable-p-of :initarg :focussable-p
-                 :type (or (eql t) (eql nil))
+                 :type (member t nil)
                  :initform nil)))
 
 
@@ -78,11 +78,14 @@
                          (app nil app-supplied-p)
                          (viewport nil viewport-supplied-p))
   "If VIEWPORT is supplied this will determine whether WIDGET is visible in that viewport.
+
 If APP is supplied this will determine whether WIDGET is visible within any of
 the viewports within that session.
+
 If neither APP nor VIEWPORT is supplied this will determine wheter WIDGET is visible
 in any session in any viewport."
-  (declare (ignore app real-check-p))
+  (declare (ignore app)
+           ((or viewport null) viewport))
   (when app-supplied-p
     (error "TODO: Not implemented yet."))
   (if viewport-supplied-p
@@ -100,7 +103,7 @@ in any session in any viewport."
       (js-focus (id-of widget))
       (progn
         (setf (slot-value (application-of (viewport-of widget)) 'last-focus)
-              widget)
+              (id-of widget))
         (unless server-only-p
           (run (js-focus (id-of widget)) widget)))))
 
