@@ -35,8 +35,7 @@
         (setf ~~text-input value)
         (when (clear-on-enterpress-p-of text-input)
           (when-commit ()
-            ;; TODO: A :CLIENT-ONLY-P option would be useful for doing stuff like this.
-            (run (js-code-of (setf (value-of text-input) "")) text-input)))))))
+            (setf (value-of text-input :client-only-p t) "")))))))
 
 
 (let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
