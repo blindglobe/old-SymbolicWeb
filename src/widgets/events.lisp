@@ -6,19 +6,10 @@
 
 
 (defclass event ()
-  ((application :reader application-of :initarg :application
-                :type application)
-
-   (viewport :reader viewport-of :initarg :viewport
-             :type viewport)
-
-   (callback-box :reader callback-box-of :initarg :callback-box
+  ((callback-box :reader callback-box-of :initarg :callback-box
                  :type callback-box)
 
-   (parsed-args :reader parsed-args-of :initarg :parsed-args)
-
-   (flow-back-to-origin-p :accessor flow-back-to-origin-p-of #|:initarg :flow-back-to-origin-p|#
-                          :initform t))
+   (parsed-args :reader parsed-args-of :initarg :parsed-args))
 
   (:documentation "
 Instances of this is bound to *CURRENT-EVENT*."))
@@ -30,17 +21,6 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
 (defmethod id-of ((event event))
   (id-of (callback-box-of event)))
-
-
-(defun maybe-except-viewport (widget)
-  "If WIDGET is the widget where the *CURRENT-EVENT* (e.g., user-input) originated
-from then this'll return the VIEWPORT where that event originated from."
-  (declare (widget widget))
-  (the (values (or null viewport) &optional)
-    (when-let ((event *current-event*))
-      (and (eq widget (widget-of event))               ;; Event or user-input origin?
-           (not (flow-back-to-origin-p-of event))      ;; Trying to avoid user-input racing with "itself"?
-           (viewport-of event)))))                     ;; Ok, return the VIEWPORT instance we are to dodge.
 
 
 
@@ -92,10 +72,7 @@ from then this'll return the VIEWPORT where that event originated from."
 (defun execute-callback (callback-box args)
   (declare (callback-box callback-box)
            (list args))
-  (let ((*current-event* (make-instance 'event
-                                        :callback-box callback-box
-                                        :application *app*
-                                        :viewport *viewport*)))
+  (let ((*current-event* (make-instance 'event :callback-box callback-box)))
     (pulse ~(event-cell-of callback-box)
            (with1 (or (funcall (argument-parser-of callback-box) args) t)
              (setf (slot-value *current-event* 'parsed-args) it)))))
