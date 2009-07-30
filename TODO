@@ -1,14 +1,7 @@
-Get rid of the "multiple-viewport --> single widget" thing
-==========================================================
+A Quasi-Quate thingy for JS that doesn't suck
+=============================================
 
-We'll use dataflow (SW-MVC) instead.
-
-The first step in doing this is to refactor some SW internals wrt. application/viewport bootup.
-
-The second step is to remember the change I did wrt. *CURRENT-EVENT-CB* which now will contain a CALLBACK-BOX
-instance for the current dom-event in progress.
-
-
+...is needed.
 
 
 
@@ -17,15 +10,6 @@ Consider sending response-data for AJAX-requests also; not only COMET-requests
 ==============================================================================
 
 Title speaks for itself.
-
-
-
-
-Repetition of code in RENDER methods for CONTAINER subclasses
-=============================================================
-
-The RENDER method for subclasses of CONTAINER has some code repetition.
-
 
 
 

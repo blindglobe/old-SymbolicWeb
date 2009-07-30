@@ -5,6 +5,7 @@
 (declaim #.(optimizations :widgets/css.lisp))
 
 
+(declaim (inline css))
 (defun css (property widget)
   (declare (string property)
            (widget widget))
@@ -12,6 +13,7 @@
 (export 'css)
 
 
+(declaim (inline (setf css)))
 (defun (setf css) (new-value property widget &rest args)
   (declare (string new-value property)
            (widget widget))
@@ -24,6 +26,7 @@
 (export 'css)
 
 
+(declaim (inline css-remove))
 (defun css-remove (property widget &key server-only-p)
   (declare (string property)
            (widget widget))
@@ -36,10 +39,13 @@
   `(progn
      (define-dom-property ',lisp-name
          :dom-client-writer (lambda (new-value widget &rest args)
+                              (declare (inline (setf css)))
                               (setf (apply #'css ,dom-name widget args) new-value))
          :dom-client-reader (lambda (widget)
+                              (declare (inline css))
                               (css ,dom-name widget))
          :dom-client-remover (lambda (widget &rest args)
+                               (declare (inline css-remove))
                                (apply #'css-remove ,dom-name widget args))
          ,@args)
      (export ',lisp-name)))

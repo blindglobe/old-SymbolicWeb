@@ -35,10 +35,7 @@ to URL type string; \"key=value&other-key=other-value\""
               ;; The values must really be JS expressions like "return 42;" because this allows us to also return
               ;; results of evaluating JS code on the client-side.
               (princ (catstr "\" + encodeURIComponent((function(){ "
-                             (let ((value (cdr name-value-pair)))
-                               (etypecase value
-                                 (string value)
-                                 (list (ps:ps* value))))
+                             (cdr name-value-pair)
                              " })()) + \"")
                      s)))
           1))
@@ -47,18 +44,22 @@ to URL type string; \"key=value&other-key=other-value\""
 
 (declaim (inline js-msg))
 (defun js-msg (widget-id callback-id &key
-               (js-before '(lambda () (return t)))
+               (js-before *js-before*)
                (callback-data nil)
-               (js-after '(lambda (data text-status)))
+               (js-after *js-after*)
                (browser-default-action-p t)
                (context-sym 'context))
   (declare (string widget-id callback-id))
-  (ps:ps* `(lambda (,context-sym)
-             (sw-msg ,widget-id ,callback-id
-                     ,js-before
-                     ,(js-callback-data callback-data)
-                     ,js-after)
-             (return ,browser-default-action-p))))
+  (catstr "(function(" (string-downcase context-sym) "){"
+          "swMsg(\"" widget-id "\""
+            ", \"" callback-id "\""
+            ", (function(){" js-before "})"
+            ", \"" (js-callback-data callback-data) "\""
+            ", (function(data, text_status){" js-after "}));"
+            (if browser-default-action-p
+                "return true;"
+                "return false;")
+          "})"))
 (export 'js-msg)
 
 
@@ -73,8 +74,14 @@ to URL type string; \"key=value&other-key=other-value\""
 (export 'js-focus)
 
 
+(defun js-blur (widget-id)
+  (declare (string widget-id))
+  (catstr "$(\"#" widget-id "\").blur();" +lf+))
+(export 'js-blur)
+
+
 (declaim (inline js-scroll-to-bottom))
 (defun js-scroll-to-bottom (selector)
   (declare (string selector))
-  (catstr "$(\"#" selector "\").get(0).scrollTop = $(\"" selector "\").get(0).scrollHeight + 1000;"))
+  (catstr "$(\"#" selector "\").get(0).scrollTop = $(\"" selector "\").get(0).scrollHeight + 1000;" +lf+))
 (export 'js-scroll-to-bottom)

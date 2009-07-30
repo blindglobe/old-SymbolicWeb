@@ -6,56 +6,56 @@
 
 
 (defun alert (msg &optional (viewport-or-widget *viewport*))
-  (let ((js-code (catstr "alert(decodeURIComponent(\"" (url-encode msg) "\"));")))
+  (let ((js-code (catstr "alert(decodeURIComponent(\"" (url-encode msg) "\"));" +lf+)))
     (if *js-code-only-p*
         js-code
         (run js-code viewport-or-widget))))
 (export 'alert)
 
 
-(defun window-location-href (&optional (viewport *viewport*))
+#|(defun window-location-href (&optional (viewport *viewport*))
   (declare (type viewport viewport))
   (let ((js-code "return window.location.href;"))
     (if *js-code-only-p*
         js-code
-        (run js-code viewport :async-p nil))))
-(export 'window-location-href)
+        (run js-code viewport :async-p nil))))|#
+#|(export 'window-location-href)|#
 
 
-(defun (setf window-location-href) (new-href &optional (viewport *viewport*))
+#|(defun (setf window-location-href) (new-href &optional (viewport *viewport*))
   (declare (type viewport viewport))
   (let ((js-code (catstr "window.location.href=\""
                          new-href ;;(cl-ppcre:regex-replace-all " " new-href "_")
                          "\";")))
     (if *js-code-only-p*
         js-code
-        (run js-code viewport))))
-(export 'window-location-href)
+        (run js-code viewport))))|#
+#|(export 'window-location-href)|#
 
 
-(defun get-title (&optional (viewport *viewport*))
+#|(defun get-title (&optional (viewport *viewport*))
   (declare (type viewport viewport))
   (let ((js-code "return document.title;"))
     (if *js-code-only-p*
         js-code
-        (run js-code viewport :async-p nil))))
-(export 'get-title)
+        (run js-code viewport :async-p nil))))|#
+#|(export 'get-title)|#
 
 
-(defun set-title (new-title &optional (viewport *viewport*))
+#|(defun set-title (new-title &optional (viewport *viewport*))
   (declare (type viewport viewport))
   (let ((js-code (catstr "document.title = decodeURIComponent(\""
                          (url-encode new-title)
                          "\");")))
     (if *js-code-only-p*
         js-code
-        (run js-code viewport))))
-(export 'set-title)
+        (run js-code viewport))))|#
+#|(export 'set-title)|#
 
 
 (defun reload (&optional (viewport *viewport*))
   "Do a page reload equal to the user pressing F5 or Ctrl-R in the browser."
-  (let ((js-code "window.location.reload();"))
+  (let ((js-code (catstr "window.location.reload();" +lf+)))
     (if *js-code-only-p*
         js-code
         (run js-code viewport))))
@@ -77,7 +77,7 @@
                    ".removeClass('sw-hide')"
                    ".fadeTo(" (princ-to-string speed)
                    ", 1" ;; Opacity goal.
-                   ");")))
+                   ");" +lf+)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
@@ -95,7 +95,7 @@
                    ".fadeTo(" (princ-to-string speed)
                    ", 0" ;; Opacity goal.
                    ", function(){ $(this).addClass('sw-hide'); }"
-                   ");")))
+                   ");" +lf+)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
@@ -136,7 +136,7 @@
                "expires=\" + (function(){ var date = new Date(); date.setFullYear(date.getFullYear()+1); return date.toUTCString(); })() + \";"
                "expires=Fri, 27 Jul 2001 02:47:11 UTC;")
            "path=\" + window.location.pathname + \";"
-           "\";")))
+           "\";" +lf+)))
     (if *js-code-only-p*
         js-code
         (progn

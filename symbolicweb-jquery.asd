@@ -14,8 +14,7 @@ their own wrappers which do type-checking.
   :author "See the file AUTHORS"
   :licence "See the file LICENCE"
 
-  :depends-on (:aromyxo
-               :parenscript)
+  :depends-on (:aromyxo)
 
   :serial t
   :components

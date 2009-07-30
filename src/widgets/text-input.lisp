@@ -60,26 +60,24 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
   (declare (string value-str)
            (text-input text-input))
   (declare (optimize speed (safety 2)))
-  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" value-str "\";")
+  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" value-str "\";" +lf+)
        text-input))
 
 
 (let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
-       '(if (= (slot-value (slot-value event 'current-target) 'sw_text_input_value)
-               (slot-value (slot-value event 'current-target) 'value))
-         (return false)
-         (progn
-           (setf (slot-value (slot-value event 'current-target) 'sw_text_input_value)
-                 (slot-value (slot-value event 'current-target) 'value))
-           (return t)))))
+       (catstr "if(event.currentTarget.sw_text_input_value == event.currentTarget.value){"
+               "return false;"
+               "}else{"
+               "event.currentTarget.sw_text_input_value = event.currentTarget.value;"
+               "return true;"
+               "}")))
   (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of)))
-    `(lambda () ,js))
+    js)
+
 
   (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of)))
-    `(lambda ()
-       (unless (= (slot-value event 'which) 13)
-         (return false))
-       ,js)))
+    (catstr "if(event.which != 13){ return false; }"
+            js)))
 
 
 (flet ((parse-client-args (args)

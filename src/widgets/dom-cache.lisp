@@ -28,6 +28,7 @@ Strong hash table; ID->CALLBACK-BOX.")))
                dom-mirror-data))))
 
 
+(declaim (inline dom-server-reader))
 (defun dom-server-reader (dom-mirror lisp-accessor-name)
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name))
@@ -36,6 +37,7 @@ Strong hash table; ID->CALLBACK-BOX.")))
       (gethash lisp-accessor-name dom-mirror-data))))
 
 
+(declaim (inline dom-server-writer))
 (defun dom-server-writer (dom-mirror lisp-accessor-name new-value)
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name))
@@ -45,6 +47,7 @@ Strong hash table; ID->CALLBACK-BOX.")))
             new-value))))
 
 
+(declaim (inline dom-server-remover))
 (defun dom-server-remover (dom-mirror lisp-accessor-name)
   (declare (dom-mirror dom-mirror)
            (symbol lisp-accessor-name))

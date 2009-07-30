@@ -5,6 +5,7 @@
 (declaim #.(optimizations :widgets/attributes.lisp))
 
 
+(declaim (inline attribute))
 (defun attribute (attribute widget)
   (declare (string attribute)
            (widget widget))
@@ -12,6 +13,7 @@
 (export 'attribute)
 
 
+(declaim (inline (setf attribute)))
 (defun (setf attribute) (new-value attribute widget &rest args)
   (declare (string new-value attribute)
            (widget widget))
@@ -24,25 +26,31 @@
 (export 'attribute)
 
 
+(declaim (inline attribute-remove))
 (defun attribute-remove (attribute widget &rest args)
   (declare (string attribute)
            (widget widget))
   (flet ((js-code ()
            (js-remove-attribute (id-of widget) attribute)))
+    (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
         (apply #'run (js-code) widget args))))
 (export 'attribute-remove)
 
 
+
 (defmacro define-attribute-property (lisp-name dom-name &body args)
   `(progn
      (define-dom-property ',lisp-name
          :dom-client-writer (lambda (new-value widget &rest args)
+                              (declare (inline (setf attribute)))
                               (setf (apply #'attribute ,dom-name widget args) new-value))
          :dom-client-reader (lambda (widget)
+                              (declare (inline attribute))
                               (attribute ,dom-name widget))
          :dom-client-remover (lambda (widget &rest args)
+                               (declare (inline attribute-remove))
                                (apply #'attribute-remove ,dom-name widget args))
          ,@args)
      (export ',lisp-name)))

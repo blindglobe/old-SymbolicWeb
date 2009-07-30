@@ -48,9 +48,4 @@
 (defvar *html-container-children* nil)
 
 
-;; Other stuff. ;; TODO: Not a special variable.
-(define-symbol-macro +newline+ #.(format nil "~C" #\Newline))
-(export '+newline+)
-
-
 (defvar *request-time* nil)

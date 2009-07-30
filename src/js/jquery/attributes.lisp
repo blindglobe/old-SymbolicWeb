@@ -8,7 +8,7 @@
 (declaim (inline js-get-attribute))
 (defun js-get-attribute (widget-id attribute)
   (declare (string widget-id attribute))
-  (catstr "return $(\"#" widget-id "\").attr(\"" attribute "\");"))
+  (catstr "return $(\"#" widget-id "\").attr(\"" attribute "\");" +lf+))
 (export 'js-get-attribute)
 
 
@@ -16,12 +16,12 @@
 (defun js-set-attribute (widget-id attribute new-value)
   (declare (string widget-id attribute new-value))
   (catstr "$(\"#" widget-id "\").attr(\"" attribute "\", "
-          "decodeURIComponent(\"" (url-encode new-value) "\"));"))
+          "decodeURIComponent(\"" (url-encode new-value) "\"));" +lf+))
 (export 'js-set-attribute)
 
 
 (declaim (inline js-remove-attribute))
 (defun js-remove-attribute (widget-id attribute)
   (declare (string widget-id attribute))
-  (catstr "$(\"#" widget-id "\").removeAttr(\"" attribute "\");"))
+  (catstr "$(\"#" widget-id "\").removeAttr(\"" attribute "\");" +lf+))
 (export 'js-remove-attribute)

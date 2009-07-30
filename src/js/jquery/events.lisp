@@ -18,37 +18,32 @@
 
 (declaim (inline js-unbind))
 (defun js-unbind (widget-id &optional event-type)
-  (declare (string widget-id))
+  (declare (string widget-id)
+           ((or null string) event-type))
   (catstr
    "$(\"#" widget-id "\").unbind("
    (if event-type
        (catstr "\"" event-type "\"")
        "")
-   ");"))
+   ");" +lf+))
 (export 'js-unbind)
 
 
 (defun js-bind (widget-id event-type callback-js)
   (declare (string widget-id event-type callback-js))
-  (catstr "$('#" widget-id "').bind('" event-type "', " callback-js ");"))
+  (catstr "$('#" widget-id "').bind('" event-type "', " callback-js ");" +lf+))
 (export 'js-bind)
 
 
 (declaim (inline js-trigger))
 (defun js-trigger (widget-id event-type)
   (declare (string widget-id event-type))
-  (catstr "$(\"#" widget-id "\").trigger(\"" event-type "\");"))
+  (catstr "$(\"#" widget-id "\").trigger(\"" event-type "\");" +lf+))
 (export 'js-trigger)
 
 
 (declaim (inline js-trigger-handler))
 (defun js-trigger-handler (widget-id event-type)
   (declare (string widget-id event-type))
-  (catstr "$(\"#" widget-id "\").triggerHandler(\"" event-type "\");"))
+  (catstr "$(\"#" widget-id "\").triggerHandler(\"" event-type "\");" +lf+))
 (export 'js-trigger-handler)
-
-
-(defun js-blur (widget-id)
-  (declare (string widget-id))
-  (catstr "$(\"#" widget-id "\").blur();"))
-(export 'js-blur)

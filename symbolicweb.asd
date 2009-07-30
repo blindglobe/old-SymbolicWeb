@@ -15,7 +15,6 @@
                :aromyxo
                :sw-stm
                :symbolicweb-jquery ;; Default JS generator backend.
-               :parenscript
                )
 
   :serial t

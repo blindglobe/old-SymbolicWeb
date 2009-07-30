@@ -91,7 +91,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
 
 (defmethod js-before-check ((widget widget) (lisp-accessor-name symbol))
-  '(lambda () (return t)))
+  "return true;")
 
 
 ;; (SETF EVENT)
@@ -155,7 +155,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
 (define-event-property (on-dblclick-of "dblclick"))
 (define-event-property (on-focus-of "focus"))
 
-(let ((js-which (ps:ps (return (slot-value event 'which)))))
+(let ((js-which "event.which"))
   (define-event-property (on-keyup-of "keydown" :callback-data (list (cons "which" js-which))))
   (define-event-property (on-keyup-of "keypress" :callback-data (list (cons "which" js-which))))
   (define-event-property (on-keyup-of "keyup" :callback-data (list (cons "which" js-which)))))
@@ -170,3 +170,36 @@ Instances of this is bound to *CURRENT-EVENT*."))
 (define-event-property (on-scroll-of "scroll"))
 (define-event-property (on-select-of "select"))
 (define-event-property (on-unload "unload"))
+
+#|
+$("#sw-root").append(decodeURIComponent("%3Cinput%20id%3D'TEXT-INPUT-9'%20type%3D'text'%3E%3C%2Finput%3E"));
+$('#TEXT-INPUT-9')[0].sw_text_input_value = "";
+$('#TEXT-INPUT-9').bind('blur', (function (event) {
+    swMsg("TEXT-INPUT-9", "A", (function () {
+        if (event.currentTarget.sw_text_input_value == event.currentTarget.value) {
+            return false
+        } else {
+            event.currentTarget.sw_text_input_value = event.currentTarget.value
+            return true
+        }
+    }), "value=" + encodeURIComponent((function(){ return $("#TEXT-INPUT-9").attr("value");\n })()) + "", (function (data, textStatus) {
+    }))
+    return true
+}));
+$('#TEXT-INPUT-9').bind('keyup', (function (event) {
+    swMsg("TEXT-INPUT-9", "B", (function () {
+        if (event.which != 13) {
+            return false
+        }
+        if (event.currentTarget.sw_text_input_value == event.currentTarget.value) {
+            return false
+        } else {
+            event.currentTarget.sw_text_input_value = event.currentTarget.value
+            return true
+        }
+    }), "value=" + encodeURIComponent((function(){ return $("#TEXT-INPUT-9").attr("value");\n })()) + "", (function (data, textStatus) {
+    }))
+    return true
+}));
+sw_comet_response = true;
+|#

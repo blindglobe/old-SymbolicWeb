@@ -8,14 +8,14 @@
 (declaim (inline (setf js-html-of)))
 (defun (setf js-html-of) (new-html widget-id)
   (declare (string new-html widget-id))
-  (catstr "$(\"#" widget-id "\").html(decodeURIComponent(\"" (the string (url-encode new-html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").html(decodeURIComponent(\"" (the string (url-encode new-html)) "\"));" +lf+))
 (export 'js-html-of)
 
 
 (declaim (inline js-html-of))
 (defun js-html-of (widget-id)
   (declare (string widget-id))
-  (catstr "return $(\"#" widget-id "\").html();"))
+  (catstr "return $(\"#" widget-id "\").html();" +lf+))
 (export 'js-html-of)
 
 
@@ -24,7 +24,7 @@
   (declare (string html widget-id))
   ;; append
   "inside append"
-  (catstr "$(\"#" widget-id "\").append(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").append(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
 (export 'js-iappend)
 
 
@@ -33,7 +33,7 @@
   (declare (string html widget-id))
   ;; after
   "outside append"
-  (catstr "$(\"#" widget-id "\").after(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").after(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
 (export 'js-oappend)
 
 
@@ -42,7 +42,7 @@
   (declare (string html widget-id))
   ;; prepend
   "inside prepend"
-  (catstr "$(\"#" widget-id "\").prepend(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").prepend(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
 (export 'js-iprepend)
 
 
@@ -51,28 +51,29 @@
   (declare (string html widget-id))
   ;; before
   "outside prepend"
-  (catstr "$(\"#" widget-id "\").before(decodeURIComponent(\"" (the string (url-encode html)) "\"));"))
+  (catstr "$(\"#" widget-id "\").before(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
 (export 'js-oprepend)
 
 
 (declaim (inline js-remove))
 (defun js-remove (widget-id)
   (declare (string widget-id))
-  (catstr "$(\"#" widget-id "\").remove();"))
+  (catstr "$(\"#" widget-id "\").remove();" +lf+))
 (export 'js-remove)
 
 
 (declaim (inline js-replace-with))
 (defun js-replace-with (widget-id new-content)
   (declare (string widget-id new-content))
-  (catstr "$(\"#" widget-id "\").replaceWith(decodeURIComponent(\"" (the string (url-encode new-content)) "\"));"))
+  (catstr "$(\"#" widget-id "\").replaceWith(decodeURIComponent(\""
+          (the string (url-encode new-content)) "\"));" +lf+))
 (export 'js-replace-with)
 
 
 (declaim (inline js-empty))
 (defun js-empty (widget-id)
   (declare (string widget-id))
-  (catstr "$(\"#" widget-id "\").empty();"))
+  (catstr "$(\"#" widget-id "\").empty();" +lf+))
 (export 'js-empty)
 
 
@@ -88,5 +89,5 @@
 
           "$(\"#js-exchange-first\").replaceWith(second);"
           "$(\"#js-exchange-second\").replaceWith(first);"
-          "})();"))
+          "})();" +lf+))
 (export 'js-exchange)

@@ -17,10 +17,6 @@
       (make-random-state t))
 
 
-;;(setf who:*attribute-quote-char* #\')
-(setf ps:*js-string-delimiter* #\") ;; CL-WHO defaults to #\' and Parenscript does too.
-
-
 
 ;;; Stuff for SERVER
 ;;;;;;;;;;;;;;;;;;;;
@@ -75,12 +71,6 @@ code root.")
 
 
 (eval-now (use-package :sw-jquery))
-
-
-(define-variable +add-newlines-to-js-code-p+
-    :value t
-    :kind :constant)
-(export '+add-newlines-to-js-code-p+)
 
 
 (define-variable -timeout-

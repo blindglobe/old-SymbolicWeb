@@ -117,7 +117,7 @@ refresh."
   (declare (ignore app))
   ;; TODO: This is pretty stupid; but it gets rid of the "always loading" thing in Firefox when using random
   ;; subdomains and the "page" is empty on initial load.
-  (run "2+2" viewport))
+  (run "2+2;" viewport))
 
 
 (defmethod render-viewport :after ((viewport viewport) (app application))
