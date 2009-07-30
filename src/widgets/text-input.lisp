@@ -34,9 +34,9 @@
       (when-let (value (on-enterpress-of text-input))
         (setf ~~text-input value)
         (when (clear-on-enterpress-p-of text-input)
-          (push (lambda () (setf ~~text-input ""))
-                (do-at-end-of *viewport*)))))))
-
+          (when-commit ()
+            ;; TODO: A :CLIENT-ONLY-P option would be useful for doing stuff like this.
+            (run (js-code-of (setf (value-of text-input) "")) text-input)))))))
 
 
 (let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
@@ -77,6 +77,7 @@
 
 
 (flet ((update-client-cache (new-value widget)
+         (declare (optimize speed (safety 2)))
          (run (catstr "$('#" (id-of widget) "')[0].sw_text_input_value = \"" new-value "\";")
               widget)))
   (declare (inline update-client-cache))
