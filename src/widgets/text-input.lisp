@@ -22,7 +22,7 @@
 
 
 (defmethod initialize-instance :after ((text-input text-input) &key
-                                       (sync-on-blur-p t)
+                                       (sync-on-blur-p (not (clear-on-enterpress-p-of text-input)))
                                        (sync-on-enterpress-p t))
   (when sync-on-blur-p
     (with-formula text-input
