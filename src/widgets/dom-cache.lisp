@@ -107,9 +107,11 @@ better. |#
 
   ;; Add DOM writer.
   (compile-and-execute
-    `(defun ,lisp-writer-name (property-value dom-mirror &rest args)
+    `(defun ,lisp-writer-name (property-value dom-mirror &rest args &key client-only-p)
        (declare #.(optimizations :dom-property)
-                (dom-mirror dom-mirror))
+                (dom-mirror dom-mirror)
+                ((member nil t) client-only-p))
+       (delete-from-plistf args :client-only-p)
        (let ((remove-entry-p
               (and ,value-removal-checker (funcall ,value-removal-checker property-value))))
          (flet ((client-writer ()
@@ -123,11 +125,12 @@ better. |#
                                   `property-value)
                              dom-mirror args)))
                 (server-writer ()
-                  (if remove-entry-p
-                      ;; Remove entry on server side.
-                      (funcall ,dom-server-remover dom-mirror ',lisp-accessor-name)
-                      ;; Add and/or set entry on server side.
-                      (funcall ,dom-server-writer dom-mirror ',lisp-accessor-name property-value))))
+                  (unless client-only-p
+                    (if remove-entry-p
+                        ;; Remove entry on server side.
+                        (funcall ,dom-server-remover dom-mirror ',lisp-accessor-name)
+                        ;; Add and/or set entry on server side.
+                        (funcall ,dom-server-writer dom-mirror ',lisp-accessor-name property-value)))))
            (declare (inline client-writer server-writer))
            (if *js-code-only-p*
                (client-writer)
