@@ -25,13 +25,11 @@
   (when sync-on-blur-p
     (with-formula text-input
       (when-let (value (on-text-input-blur-of text-input))
-        (setf (value-of text-input :server-only-p t) value)
         (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
     (with-formula text-input
       (when-let (value (on-enterpress-of text-input))
-        (setf (value-of text-input :server-only-p t) value)
         (setf ~~text-input value)))))
 
 
