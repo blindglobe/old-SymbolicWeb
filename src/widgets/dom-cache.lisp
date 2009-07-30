@@ -17,20 +17,15 @@
 Strong hash table; ID->CALLBACK-BOX.")))
 
 
-#| TOOD:
-Maybe storing "the real value" in the DOM-MIRROR-DATA hash is a bad idea in general. Maybe storing closures there is
-better. |#
 (defgeneric render-dom (dom-mirror property-name property-vaule))
-
-#|(defmethod render-dom (dom-mirror property-name (property-value callback-box))
-  (declare (ignore property-name))
-  (run (code-of property-value) dom-mirror))|#
 
 
 (defmethod render :after ((dom-mirror dom-mirror))
-  (maphash (lambda (name value)
-             (render-dom dom-mirror name value))
-           (dom-mirror-data-of dom-mirror)))
+  (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
+    (sb-ext:with-locked-hash-table (dom-mirror-data)
+      (maphash (lambda (name value)
+                 (render-dom dom-mirror name value))
+               dom-mirror-data))))
 
 
 (defun dom-server-reader (dom-mirror lisp-accessor-name)
