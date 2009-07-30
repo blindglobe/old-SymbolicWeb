@@ -8,7 +8,6 @@
 (defclass dom-mirror ()
   ((dom-mirror-data :reader dom-mirror-data-of
                     :type hash-table
-                    ;; SOME-ID??->JS-CODE
                     :initform (make-hash-table :test #'eq))
 
    (callbacks-of :reader callbacks-of

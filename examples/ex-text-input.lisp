@@ -17,10 +17,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 (defclass text-input-widget-view (html-container)
-  ((x :initform (mk-text-input ()))
+  ((x :initform (mk-text-input nil))
    (x-feedback :initform (mk-span () "X needs more cowbell!"))
 
-   (y :initform (mk-text-input ()))
+   (y :initform (mk-text-input nil))
    (y-feedback :initform (mk-span () "Y needs more cowbell!"))
 
    (square-of-x :initform (mk-span ()))
@@ -115,7 +115,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
          (:sw (make-instance 'text-input-widget-view :model ¤shared-model))
 
          :hr
-         (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/master/examples/ex-text-input.lisp"
+         (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/ex-text-input.lisp"
              "source code")
          :br
          "Hosted on a crummy ADSL line...")))))
