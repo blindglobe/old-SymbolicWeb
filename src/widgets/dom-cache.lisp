@@ -58,7 +58,6 @@ better. |#
 
 (defmethod define-dom-property ((lisp-accessor-name symbol)
                                 &key
-                                #|(dom-name "")|#
                                 (lisp-reader-name lisp-accessor-name)
                                 (lisp-writer-name (list 'setf lisp-accessor-name))
 
@@ -98,7 +97,7 @@ better. |#
        (declare #.(optimizations :dom-property)
                 (dom-mirror dom-mirror))
        (if *js-code-only-p*
-           (funcall ,dom-client-reader #|,dom-name|# dom-mirror)
+           (funcall ,dom-client-reader dom-mirror)
            (multiple-value-bind (value found-p)
                (funcall ,dom-server-reader dom-mirror ',lisp-accessor-name)
              (if found-p
@@ -116,13 +115,13 @@ better. |#
          (flet ((client-writer ()
                   (if remove-entry-p
                       ;; Remove entry on client side.
-                      (apply ,dom-client-remover #|,dom-name|# dom-mirror args)
+                      (apply ,dom-client-remover dom-mirror args)
                       ;; Add and/or set entry on client side.
                       (apply ,dom-client-writer
                              ,(if value-marshaller
                                   `(funcall ,value-marshaller property-value)
                                   `property-value)
-                             #|,dom-name|# dom-mirror args)))
+                             dom-mirror args)))
                 (server-writer ()
                   (if remove-entry-p
                       ;; Remove entry on server side.
@@ -145,13 +144,12 @@ better. |#
                                  ,(if value-marshaller
                                       `(funcall ,value-marshaller property-value)
                                       `property-value)
-                                 #|,dom-name|#
                                  dom-mirror))
             dom-mirror))))
 (export 'define-dom-property)
 
 
-(defmethod remove-dom-property ((lisp-accessor-name symbol) #|(dom-name string)|# (dom-client-remover function)
+(defmethod remove-dom-property ((lisp-accessor-name symbol) (dom-client-remover function)
                                 &key
                                 (lisp-reader-name lisp-accessor-name)
                                 (lisp-writer-name (list 'setf lisp-accessor-name))
@@ -162,6 +160,7 @@ better. |#
   (with-each-viewport-in-server ()
     (with-each-widget-in-tree (:root (root-widget-of *viewport*))
       (funcall dom-server-remover widget lisp-accessor-name)
+      ;; TODO: This thing needs a replacement.
       #|(funcall dom-client-remover dom-name widget)|#))
 
   ;; Remove DOM reader.
