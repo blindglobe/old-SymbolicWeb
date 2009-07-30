@@ -6,7 +6,9 @@
 
 
 (defclass text-input (widget focussable)
-  ()
+  ((clear-on-enterpress-p :accessor clear-on-enterpress-p-of :initarg :clear-on-enterpress-p
+                          :type (member t nil)
+                          :initform nil))
 
   (:default-initargs
    :element-type "input"
@@ -30,7 +32,11 @@
   (when sync-on-enterpress-p
     (with-formula text-input
       (when-let (value (on-enterpress-of text-input))
-        (setf ~~text-input value)))))
+        (setf ~~text-input value)
+        (when (clear-on-enterpress-p-of text-input)
+          (push (lambda () (setf ~~text-input ""))
+                (do-at-end-of *viewport*)))))))
+
 
 
 (let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
