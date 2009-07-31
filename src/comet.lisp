@@ -7,63 +7,46 @@
 
 (defmethod handle-comet-request ((server sw-http-server) (app application) (viewport viewport))
   (when-let (comet-callback (comet-callback-of viewport))
-    (warn "comet.lisp: Old Comet callback for session ~A (viewport ~A) is still around. I'll kill it." app viewport)
+    (warn "comet.lisp: Old Comet callback for session ~A (~A) is still around. I'll kill it." app viewport)
     (funcall (the function comet-callback) nil)
     (nilf (comet-callback-of viewport)))
 
   (when-let (do (sw-http:get-parameter "do"))
-    (with-lock-held ((response-data-mutex-of viewport))
+    (with-lock-held ((response-stream-mutex-of viewport))
       (cond
         ((string= do "refresh")
+         ;; TODO: WITH-SYNC
          (let ((*replace-address-bar-p* t))
-
-           (nilf (slot-value viewport 'response-data)
-                 (slot-value viewport 'prev-response-data))
-
            (unless (initialized-p-of app)
-             (tf (slot-value app 'initialized-p))
+             (tf (slot-value app 'initialized-p)) ;; TODO: Shouldn't this be done after the call to MAIN?
              (main app))
 
            (render-viewport viewport app)
            (sync-widgets (sw-http:get-parameter "hash") t)
            (on-refresh app viewport)))
 
-        ((string= do "ack")
-         (nilf (slot-value viewport 'prev-response-data))))))
-
-  ;; FIXME: This probably doesn't belong here, and it requires a lock of the viewport when it has been moved.
-  (handle-do-at-end-of viewport)
+        #|((string= do "ack")
+         (nilf (slot-value viewport 'prev-response-data)))|#)))
 
 
-  (flet ((do-comet-response (response-data-p)
-           (sw-http:response-add-chunk
-            (sw-http:mk-response-message-body
-             (catstr (if response-data-p
-                         (with-lock-held ((response-data-mutex-of viewport))
-                           (let ((response-data (slot-value viewport 'response-data)))
-                             (setf (slot-value viewport 'prev-response-data)
-                                   (prog1 response-data
-                                     (nilf (slot-value viewport 'response-data))))))
-                         "")
-                     "sw_comet_response = true;")))
+  (flet ((do-comet-response ()
+           (with-recursive-lock-held ((response-stream-mutex-of viewport))
+             (append-to-response-data-of viewport "sw_comet_response = true;")
+             (sw-http:response-add-chunk
+              (sw-http:mk-response-message-body
+               (get-output-stream-string (response-stream-of viewport))))
+             (tf (response-stream-emptyp-of viewport)))
            (handler-case (sw-http:done-generating-response)
              (t (c)
-               ;;(declare (ignore c))
                (warn "SW:HANDLE-COMET-REQUEST: ~A" c)))))
 
-    (when-let (prev-response-data (prev-response-data-of viewport))
-      (with-lock-held ((response-data-mutex-of viewport))
-        (append-to-response-data-of viewport prev-response-data)
-        (nilf (slot-value viewport 'prev-response-data))))
-
-    (if (response-data-of viewport)
-        (do-comet-response (response-data-of viewport))
+    (if (not (response-stream-emptyp-of viewport))
+        (do-comet-response)
         (setf (comet-callback-of viewport)
               (mk-delay-callback -sw-comet-timeout-
                                  (let ((connection sw-http::*connection*))
                                    (lambda ()
-                                     ;; TODO: Timeout should be dealt with somehow here.
-                                     (with-timeout (10)
+                                     (with-timeout (10) ;; TODO: Ho, hum. Output a warning, at least, on timeout?
                                        (let ((sw-http::*connection* connection))
                                          (nilf (comet-callback-of viewport))
-                                         (do-comet-response (response-data-of viewport)))))))))))
+                                         (do-comet-response))))))))))

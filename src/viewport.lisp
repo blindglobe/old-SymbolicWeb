@@ -16,43 +16,35 @@
 
    (address-bar :reader address-bar-of)
 
-   (dirty-p :reader dirty-p-of
-            :initform nil)
-
-   (do-at-end-mutex :reader do-at-end-mutex-of
-                    :initform (make-lock "do-at-end-mutex"))
-   (do-at-end :reader do-at-end-of
-              :type list
-              :initform nil
-              :documentation "
-List of closures to be executed at the end of _handling_ this round-trip.
-Note that these are sure to be executed even if we are in a \"comet-context\"
-which normally might have delayed the end (it might be sleeping).")
-
    (long-poll-frequency :accessor long-poll-frequency-of
                         :type fixnum
-                        :initform -default-long-poll-frequency-)
+                        :initform -default-long-poll-frequency-
+                        :documentation "
+Comet timeout or poll frequency in seconds.")
 
    (comet-callback :accessor comet-callback-of
+                   :type (or null function)
                    :initform nil)
+
+   (response-stream-mutex :reader response-stream-mutex-of
+                          :type mutex
+                          :initform (make-lock))
+
+   (response-stream :reader response-stream-of
+                    :type stream
+                    :initform (make-string-output-stream))
+
+   (response-stream-emptyp :accessor response-stream-emptyp-of
+                           :type (member nil t)
+                           :initform t)
 
    (last-ping-time :accessor last-ping-time-of
                    :type integer
                    :initform (get-universal-time))
 
    (last-user-activity-time :accessor last-user-activity-time-of
-                            :initform (get-universal-time))
-
-   (response-data :type (or null string) :initform nil)
-   (prev-response-data :reader prev-response-data-of
-                       :type (or null string)
-                       :initform nil)
-   (response-data-mutex :reader response-data-mutex-of
-                        :initform (make-lock "response-data-mutex"))
-
-   (code-id<->code :reader code-id<->code-of
-                   :type hash-table
-                   :initform (make-hash-table :test #'equal)))
+                            :type integer
+                            :initform (get-universal-time)))
 
   (:documentation "
 Each instance of VIEWPORT represents a browser window or tab."))
@@ -115,7 +107,7 @@ refresh."
 
 (defmethod render-viewport ((viewport viewport) (app application))
   (declare (ignore app))
-  ;; TODO: This is pretty stupid; but it gets rid of the "always loading" thing in Firefox when using random
+  ;; TODO: This is pretty stupid, but it gets rid of the "always loading" thing in Firefox when using random
   ;; subdomains and the "page" is empty on initial load.
   (run "2+2;" viewport))
 
@@ -127,7 +119,6 @@ refresh."
                               (widget it)
                               (null nil))
                        (visible-p-of it :viewport viewport)))))
-
     ;; Ensure that the widget that had focus before page refresh still has it.
     (focus widget)
     ;; No widget is assigned focus; we'll try to find a default candidate.
@@ -138,68 +129,30 @@ refresh."
           (return))))))
 
 
-(defun (setf do-at-end-of) (list-of-closures viewport)
-  (declare (type viewport viewport))
-  (with-recursive-lock-held ((do-at-end-mutex-of viewport))
-    (setf (slot-value viewport 'do-at-end) list-of-closures)))
-
-
-(defun handle-do-at-end-of (viewport)
-  (declare (type viewport viewport))
-  (with-recursive-lock-held ((do-at-end-mutex-of viewport))
-    (when (do-at-end-of viewport)
-      (dolist (to-do (do-at-end-of viewport))
-        (funcall to-do))
-      (nilf (slot-value viewport 'do-at-end))
-      (unless (eq *request-type* :comet)
-        ;; TODO: At least output a warning?
-        (handler-case
-            (funcall (comet-callback-of viewport))
-          (error (c)
-            (warn "HANDLE-DO-AT-END-OF: ~A" c)))))))
-
-
-(defmethod response-data-of ((viewport viewport))
-  (with-recursive-lock-held ((response-data-mutex-of viewport))
-    (slot-value viewport 'response-data)))
-
-
 (defun do-comet-response (viewport)
   (declare (viewport viewport))
-  (when-let ((comet-callback (comet-callback-of viewport)))
-    (funcall (the function comet-callback))))
+  (with-recursive-lock-held ((response-stream-mutex-of viewport))
+    (unless (response-stream-emptyp-of viewport)
+      (when-let ((comet-callback (comet-callback-of viewport)))
+        (funcall (the function comet-callback)))))
+  (values))
 
 
 #.(maybe-inline 'append-to-response-data-of)
 (defun append-to-response-data-of (viewport js-str)
-  (declare ;;(optimize (speed 3) (space 0) (safety 0) (debug 0) (compilation-speed 0))
-           (type viewport viewport)
-           (type string js-str))
-  (with-recursive-lock-held ((response-data-mutex-of viewport))
-    (setf (slot-value viewport 'response-data)
-          ;; TODO: I'm guessing using an array with a fill-pointer etc. would be faster...
-          (catstr (slot-value viewport 'response-data) js-str)))
+  (declare (optimize speed (safety 2))
+           (viewport viewport)
+           (string js-str))
+  (with-recursive-lock-held ((response-stream-mutex-of viewport))
+    (let ((*print-pretty* nil))
+      (princ js-str (response-stream-of viewport)))
+    (nilf (response-stream-emptyp-of viewport))
 
-  (if (and (equal viewport *viewport*)
-           (eq *request-type* :ajax))
-      (with-recursive-lock-held ((do-at-end-mutex-of viewport))
-        (if (dirty-p-of viewport)
-            (unless (do-at-end-of viewport)
-              ;; FIXME: This is a nasty thing that seems to happen once in a while; I got to figure this out proper
-              ;; later, but for now this works as a workaround.
-              ;;(warn "(SETF RESPONSE-DATA-OF): DIRTY-P is T and DO-AT-END slot in VIEWPORT (~A) in ~A is empty! Setting DIRTY-P to NIL and waking up comet thread."
-              ;;      (id-of viewport) (id-of (application-of viewport)))
-              (nilf (slot-value viewport 'dirty-p))
-              (do-comet-response viewport))
-            (progn
-              (tf (slot-value viewport 'dirty-p))
-              (push (iambda (with-recursive-lock-held ((do-at-end-mutex-of viewport)) (nilf (slot-value viewport 'dirty-p))))
-                    (do-at-end-of viewport)))))
-
-      ;; When sending to other viewports we send a direct wake up call to the comet channel.
-      ;; This is less than optimal, probably, but it's "safe". This will be called
-      ;; when working from the REPL too.
+    (when (or (eq *request-type* :unknown)    ;; From the REPL?
+              (not (eq *viewport* viewport))) ;; Cross-viewport?
+      ;; ..then send stuff right away.
       (do-comet-response viewport)))
+  (values))
 
 
 #.(maybe-inline 'root)
@@ -212,12 +165,3 @@ refresh."
   (reload viewport)
   (with-each-widget-in-tree (:root (root-widget-of viewport))
     (remove-widget-from-viewport widget viewport)))
-
-
-(defmethod reset (&optional (viewport *viewport*))
-  "Call this to do a hard reset of any pending JS-code about to be sent to VIEWPORT.
-This is useful while creating and debugging widgets or custom JS-code, as JS-code
-which causes an exception on the client might trigger a continious
-re-transmission of the same invalid JS-code to the client."
-  (setf (slot-value viewport 'prev-response-data) nil
-        (slot-value viewport 'response-data) nil))

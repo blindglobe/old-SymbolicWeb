@@ -179,7 +179,6 @@ fixing this.
                             (t (error "Unknown request-type: ~S" request-type))))))
       (case *request-type*
         (:comet
-         (handle-do-at-end-of viewport)
          (sw-http:response-add-chunk
           #.(sw-http::combine-buffers
              (sw-http::mk-response-status-code 200)
@@ -191,12 +190,12 @@ fixing this.
          (setf (last-user-activity-time-of viewport) *request-time*)
          (with-sync ()
            (handle-ajax-request server app viewport))
-         (handle-do-at-end-of viewport)
          (sw-http:response-add-chunk
           #.(sw-http::combine-buffers
              (sw-http::mk-response-status-code 200)
              (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
              (sw-http::mk-response-header-field "Connection: keep-alive")
              (sw-http::mk-response-message-body "")))
-         (sw-http:done-generating-response)))
+         (sw-http:done-generating-response)
+         (do-comet-response viewport)))
       t))
