@@ -49,7 +49,9 @@ to URL type string; \"key=value&other-key=other-value\""
                (js-after *js-after*)
                (browser-default-action-p t)
                (context-sym 'context))
-  (declare (string widget-id callback-id))
+  (declare (string widget-id callback-id js-before js-after)
+           ((member t nil) browser-default-action-p)
+           (symbol context-sym))
   (catstr "(function(" (string-downcase context-sym) "){"
           "swMsg(\"" widget-id "\""
             ", \"" callback-id "\""
@@ -70,7 +72,7 @@ to URL type string; \"key=value&other-key=other-value\""
   ;; https://bugzilla.mozilla.org/show_bug.cgi?id=53579
   ;; https://bugzilla.mozilla.org/show_bug.cgi?id=297134
   ;; TODO: Ok, seems Firefox-3.x has fixed this but, uh, IE6.x still requires this in some cases ...
-  (catstr "setTimeout(function(){ $(\"#" selector "\").focus(); }, 100);"))
+  (catstr "setTimeout(function(){ $(\"#" selector "\").focus(); }, 100);" +lf+))
 (export 'js-focus)
 
 

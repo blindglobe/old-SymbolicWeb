@@ -23,7 +23,6 @@ their own wrappers which do type-checking.
     :components
     ((:file "package")
      (:file "config")
-     ;;(:file "sw-jquery-mapping")
      (:file "jquery-util")
      (:file "selectors")
      (:file "manipulation")

@@ -5,10 +5,6 @@
 (declaim #.(optimizations))
 
 
-(defvar *js-before* "return true;") (export '*js-before*)
-(defvar *js-after* "") (export '*js-after*)
-
-
 (declaim (inline js-callback-id-of))
 (defun js-callback-id-of (widget-id event-type)
   (declare (string widget-id event-type))
