@@ -27,8 +27,10 @@
                         :type string)
 
    (initialized-p :reader initialized-p-of
-                  :documentation "Has the MAIN method been executed?"
-                  :initform nil)
+                  :type (member nil t)
+                  :initform nil
+                  :documentation "
+Has the MAIN method been executed?")
 
    (widgets :reader widgets-of
             :type hash-table
