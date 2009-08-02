@@ -89,8 +89,9 @@ in any session in any viewport."
   (when app-supplied-p
     (error "TODO: Not implemented yet."))
   (if viewport-supplied-p
-      (eq (viewport-of widget) viewport)
-      (viewport-of widget)))
+      (and (eq (viewport-of widget) viewport)
+           (visible-p-of viewport))
+      (withp (viewport-of widget) (visible-p-of it))))
 
 
 (defmethod render ((widget widget))
@@ -103,7 +104,7 @@ in any session in any viewport."
       (js-focus (id-of widget))
       (progn
         (setf (slot-value (application-of (viewport-of widget)) 'last-focus)
-              (id-of widget))
+              widget)
         (unless server-only-p
           (run (js-focus (id-of widget)) widget)))))
 

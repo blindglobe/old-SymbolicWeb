@@ -115,8 +115,8 @@ refresh."
 (defmethod render-viewport :after ((viewport viewport) (app application))
   (if-let ((widget (with (last-focus-of app)
                      (withp (etypecase it
-                              (string (gethash it (widgets-of app)))
                               (widget it)
+                              (string (gethash it (widgets-of app)))
                               (null nil))
                        (visible-p-of it :viewport viewport)))))
     ;; Ensure that the widget that had focus before page refresh still has it.
