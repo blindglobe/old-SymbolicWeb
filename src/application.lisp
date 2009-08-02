@@ -10,7 +10,7 @@
            :type server)
 
    (last-focus :reader last-focus-of
-               :type (or null string)
+               :type (or null string widget)
                :initform nil)
 
    (cookie-value :reader cookie-value-of :initarg :cookie-value
