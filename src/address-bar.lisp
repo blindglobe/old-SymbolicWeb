@@ -102,7 +102,7 @@ to server side objects.")
       (unless replace-p (nilf (slot-value address-bar 'replace-p)))
       (when (not (dirty-p-of address-bar)) ;; Make sure we don't send more JS to the client than needed.
         (tf (slot-value address-bar 'dirty-p))
-        (push (lambda ()
+        #|(push (lambda ()
                 (with-lock-held ((mutex-of address-bar))
                   ;; Using RUN-JS because we don't want to push stuff to the DO-AT-END slot (we're already handling this slot).
                   #|(run-js (catstr "updateHash(\"" (query-str-of-address-bar address-bar) "\", "
@@ -110,7 +110,7 @@ to server side objects.")
                           (viewport-of address-bar))|#
                   (nilf (slot-value address-bar 'dirty-p))
                   (tf (slot-value address-bar 'replace-p))))
-              (do-at-end-of (viewport-of address-bar)))))))
+              (do-at-end-of (viewport-of address-bar)))|#))))
 
 
 (defun add-history-entry (&optional (address-bar nil address-bar-supplied-p))

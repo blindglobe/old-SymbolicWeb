@@ -204,11 +204,13 @@ function swRun(code_id, async_p, func){
 /// address-bar.lisp ///
 ////////////////////////
 
+/*
 $.address.change(function(event){
     //alert(event.value);
     swAjax("&_sw_event=url-hash-changed",
            "&new-url-hash=" + encodeURIComponent(event.value));
   });
+*/
 
 
 
