@@ -4,7 +4,7 @@
           :static-data-fs-path (catstr (sb-posix:getcwd) "/data/"))
 
 
-(setf (debug-p-of *server*) nil)
+(nilf (debug-p-of *server*))
 ;;(setf *server-close-connection-p* t) ;; This must be T when running behind Lighttpd-1.4.x
 
 ;(set-uri 'sw-examples::mvc-container-app "/mvc-container-app")
