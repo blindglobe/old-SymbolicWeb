@@ -18,10 +18,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 (defclass text-input-widget-view (html-container)
   ((x :initform (mk-text-input nil))
-   (x-feedback :initform (mk-span () "X needs more cowbell!"))
+   (x-feedback :initform (mk-span ()))
 
    (y :initform (mk-text-input nil))
-   (y-feedback :initform (mk-span () "Y needs more cowbell!"))
+   (y-feedback :initform (mk-span ()))
 
    (square-of-x :initform (mk-span ()))
    (square-of-x-str :initform (mk-span ()))
@@ -66,11 +66,19 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   (with-object view
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
-          (set-show-on-feedback ¤x-feedback ~¤x)
+          (with-formula ¤x
+            (let ((widget ¤x-feedback))
+              (if-let (c ~(feedback-event-of ~¤x))
+                  (setf (html-content-of widget) c)
+                  (setf (html-content-of widget) ""))))
 
           (setf ~¤y (with-object model
                       (with1 #λ¤y (forward-cell (mk-number-parser it) (cell-of ¤y)))))
-          (set-show-on-feedback ¤y-feedback ~¤y)
+          (with-formula ¤y
+            (let ((widget ¤y-feedback))
+              (if-let (c ~(feedback-event-of ~¤y))
+                  (setf (html-content-of widget) c)
+                  (setf (html-content-of widget) ""))))
 
           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
           ;; A second View of the the SQUARE-OF-X Model.
