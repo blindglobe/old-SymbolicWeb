@@ -162,7 +162,7 @@ fixing this.
     (sw-http:response-add-chunk
      (sw-http:mk-response-header-field (catstr "Last-Modified: " (rfc-1123-date))))
     (sw-http:response-add-chunk
-     (sw-http:mk-response-message-body (with-sync () (render app))))
+     (sw-http:mk-response-message-body (with-sync (:name :render-app) (render app))))
     (sw-http:done-generating-response)
     t))
 
@@ -188,8 +188,9 @@ fixing this.
 
         (:ajax
          (setf (last-user-activity-time-of viewport) *request-time*)
-         (with-sync ()
+         (with-sync (:name :ajax)
            (handle-ajax-request server app viewport))
+
          (sw-http:response-add-chunk
           #.(sw-http::combine-buffers
              (sw-http::mk-response-status-code 200)

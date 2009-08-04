@@ -85,9 +85,11 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
   (if (debug-p-of server)
       (invoke-debugger condition)
       (progn
-        (warn "~A got condition: ~A~%Set DEBUG-P slot of ~A for to T to debug in Lisp/Slime."
+        (warn "~S got condition: ~S~%Set DEBUG-P slot of ~S for to T to debug in Lisp/Slime."
               server condition server)
-        (invoke-restart 'sw-http:continue-listening))))
+        (invoke-restart (or (find-restart 'sw-mvc:feedback-event)
+                            (find-restart 'sw-stm:abort-transaction)
+                            (find-restart 'sw-http:continue-listening))))))
 
 
 (defmethod cookie-expires-of ((server server))
