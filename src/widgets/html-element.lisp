@@ -6,13 +6,21 @@
 
 
 (defclass html-element (widget)
-  ((html-content :accessor html-content-of :initarg :html-content
-                 :initform "")))
+  ((html-content :reader html-content-of :initarg :html-content
+                 :initform "")
+
+   (escapep :accessor escapep-of :initarg :escapep
+            :initform t
+            :documentation "
+If this is T (default), HTML-CONTENT will be escaped as text and thus not rendered as HTML.
+If this is NIL, HTML-CONTENT will be renedered as HTML.")))
 
 
 (flet ((update-html (html-element new-html)
+         (declare (html-element html-element)
+                  (string new-html))
          (with-object html-element
-           (run (setf (js-html-of ¤id) (html<- new-html html-element))
+           (run (setf (js-html-of ¤id) new-html)
                 html-element))))
   (declare (inline update-html))
 
@@ -21,8 +29,11 @@
     (update-html html-element (html-content-of html-element)))
 
 
-  (defmethod (setf html-content-of) :after (new-html (html-element html-element))
-    (update-html html-element new-html)))
+  (defmethod (setf html-content-of) (new-html (html-element html-element))
+    (update-html html-element
+                 (if (escapep-of html-element)
+                     (escape-for-html (html<- new-html html-element))
+                     (html<- new-html html-element)))))
 
 
 (defmethod (setf model-of) ((model cell) (html-element html-element))
