@@ -60,15 +60,15 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
   (declare (string value-str)
            (text-input text-input))
   (declare (optimize speed (safety 2)))
-  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" value-str "\";" +lf+)
+  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" (url-encode value-str) "\";" +lf+)
        text-input))
 
 
 (let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
-       (catstr "if(event.currentTarget.sw_text_input_value == event.currentTarget.value){"
+       (catstr "if(event.currentTarget.sw_text_input_value == encodeURIComponent(event.currentTarget.value)){"
                "return false;"
                "}else{"
-               "event.currentTarget.sw_text_input_value = event.currentTarget.value;"
+               "event.currentTarget.sw_text_input_value = encodeURIComponent(event.currentTarget.value);"
                "return true;"
                "}")))
   (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of)))
