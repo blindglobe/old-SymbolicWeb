@@ -12,19 +12,19 @@ For this file to bootstrap correctly the following variables must be bound:
 /// swGetCurrentHash ///
 ////////////////////////
 
-
-
 if($.browser.mozilla)
-  swGetCurrentHash = function(){
+  swGetCurrentHash = 
+  function(){
     if((window.location.hash).length > 1)
       // https://bugzilla.mozilla.org/show_bug.cgi?id=378962 *sigh*
       return "#" + window.location.href.split("#")[1].replace(/%27/g, "'");
     else
       return "#";
-  }
+  };
 else
-  swGetCurrentHash = function(){
-    return location.hash
+  swGetCurrentHash = 
+  function(){
+    return location.hash;
   };
 
 
@@ -45,49 +45,51 @@ function swURL(){
 //////////////
 
 
-swAjax = (function(){
-    var queue = new Array();
-    var timer = false;
+swAjax = 
+  (function(){
+     var queue = new Array();
+     var timer = false;
 
-    function displaySpinner(){
-      $("#sw-loading-spinner").css("display", "block");
-    }
+     function displaySpinner(){
+       $("#sw-loading-spinner").css("display", "block");
+     }
 
-    function handleRestOfQueue(){
-      queue.shift();
-      if(queue.length != 0)
-        queue[0]();
-      else{
-        if(timer){
-          clearTimeout(timer);
-          timer = false;
-          $("#sw-loading-spinner").css("display", "none");
-        }
-      }
-    }
+     function handleRestOfQueue(){
+       queue.shift();
+       if(queue.length != 0)
+         queue[0]();
+       else{
+         if(timer){
+           clearTimeout(timer);
+           timer = false;
+           $("#sw-loading-spinner").css("display", "none");
+         }
+       }
+     }
 
-    return function(params, callback_data, after_fn){
-      if(queue.push(function(){
-            var options = {
-              type: "POST",
-              // NOTE: I think the reason I'm not using swURL here has to do with HTTP POST requests not working vs.
-              // "dynamic subdomains". // TODO: Confirm that this is the reason?
-              url: [window.location.pathname,
-                    "?_sw_request-type=ajax",
-                    "&_sw_viewport-id=", sw_viewport_id,
-                    params].join(''),
-              data: callback_data,
-              dataType: "script",
-              // TODO: 500 should be configurable.
-              beforeSend: function(){ if(!timer){ timer = setTimeout(displaySpinner, 500); }},
-              complete: handleRestOfQueue
-            };
-            if(after_fn) options.success = after_fn;
-            $.ajax(options);
-          }) == 1)
-        queue[0]();
-    }
-  })();
+     return function(params, callback_data, after_fn){
+       if(queue.push(function(){
+                       var options = {
+                         type: "POST",
+                         // NOTE: I think the reason I'm not using swURL here has to do with HTTP POST requests not
+                         // working vs. "dynamic subdomains". TODO: Confirm that this is the reason .. x)
+                         url: [window.location.pathname,
+                               "?_sw_request-type=ajax",
+                               "&_sw_viewport-id=", sw_viewport_id,
+                               params].join(''),
+                         data: callback_data,
+                         //dataType: "script", // NOTE: The server end always returns an empty result atm..
+                         dataType: "text",
+                         // TODO: 500 should be configurable.
+                         beforeSend: function(){ if(!timer){ timer = setTimeout(displaySpinner, 500); }},
+                         complete: handleRestOfQueue
+                       };
+                       if(after_fn) options.success = after_fn;
+                       $.ajax(options);
+                     }) == 1) // if()..
+         queue[0]();
+     };
+   })();
 
 
 
@@ -95,29 +97,31 @@ swAjax = (function(){
 ///////////////
 
 sw_comet_response = false;
-swComet = (function(){
-    function callback(){
-      if(sw_comet_response)
-        sw_comet_response = false, swComet('&do=ack');
-      else
-        // FIXME: This stuff never happen for Webkit.
-        setTimeout("swComet('');", 500);
-    }
 
-    function doIt(params){
-      $.ajax({
-          type: "GET",
-          url: [swURL(), "?_sw_request-type=comet", "&_sw_viewport-id=", sw_viewport_id, params].join(''),
-          dataType: "script",
-          complete: callback});
-    }
+swComet = 
+(function(){
+   function callback(){
+     if(sw_comet_response)
+       sw_comet_response = false, swComet('&do=ack');
+     else
+       // FIXME: This stuff never happen for Webkit.
+       setTimeout("swComet('');", 500);
+   }
 
-    if(!$.browser.mozilla)
-      return doIt;
-    else
-      // NOTE: This gets rid of the "always loading" thing in FF for the mouse pointer and the tab icon/favicon.
-      return function(params){ setTimeout(function(){ doIt(params); }, 0); };
-  })();
+   function doIt(params){
+     $.ajax({
+              type: "GET",
+              url: [swURL(), "?_sw_request-type=comet", "&_sw_viewport-id=", sw_viewport_id, params].join(''),
+              dataType: "script",
+              complete: callback});
+   }
+
+   if(!$.browser.mozilla)
+     return doIt;
+   else
+     // NOTE: This gets rid of the "always loading" thing in FF for the mouse pointer and the tab icon/favicon.
+     return function(params){ setTimeout(function(){ doIt(params); }, 0); };
+ })();
 
 
 
@@ -130,7 +134,6 @@ function swHandleEvent(callback_id, js_before, callback_data, js_after){
            callback_data,
            js_after());
 }
-
 
 
 
@@ -218,3 +221,5 @@ $.address.change(function(event){
 /////////////
 
 swComet("&do=refresh&hash=" + encodeURIComponent(encodeURIComponent(swGetCurrentHash().substr(1))));
+
+

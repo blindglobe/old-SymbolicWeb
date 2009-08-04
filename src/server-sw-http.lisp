@@ -158,7 +158,7 @@ fixing this.
         (sw-http:mk-response-header-field "Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
         (sw-http:mk-response-header-field "Pragma: no-cache")
         (sw-http:mk-response-header-field "Server: SBCL (Common Lisp), SW-HTTP, SymbolicWeb -- License: AGPL -- http://nostdal.org/")))
-    ;; NOTE: No `Set-Cookie' header; it is set by the RENDER method using JavaScript on the client
+    ;; NOTE: No `Set-Cookie' header; it is set by the RENDER method using JavaScript on the client.
     (sw-http:response-add-chunk
      (sw-http:mk-response-header-field (catstr "Last-Modified: " (rfc-1123-date))))
     (sw-http:response-add-chunk
@@ -177,26 +177,27 @@ fixing this.
                             ((string= request-type "comet") :comet)
                             ((string= request-type "ajax")  :ajax)
                             (t (error "Unknown request-type: ~S" request-type))))))
-      (case *request-type*
-        (:comet
-         (sw-http:response-add-chunk
-          #.(sw-http::combine-buffers
-             (sw-http::mk-response-status-code 200)
-             (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
-             (sw-http::mk-response-header-field "Connection: keep-alive")))
-         (handle-comet-request server app viewport))
+    (case *request-type*
+      (:comet
+       (sw-http:response-add-chunk
+        #.(sw-http::combine-buffers
+           (sw-http::mk-response-status-code 200)
+           (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
+           (sw-http::mk-response-header-field "Connection: keep-alive")))
+       (handle-comet-request server app viewport))
 
-        (:ajax
-         (setf (last-user-activity-time-of viewport) *request-time*)
-         (with-sync (:name :ajax)
-           (handle-ajax-request server app viewport))
+      (:ajax
+       (setf (last-user-activity-time-of viewport) *request-time*)
+       (with-sync (:name :ajax)
+         (handle-ajax-request server app viewport))
 
-         (sw-http:response-add-chunk
-          #.(sw-http::combine-buffers
-             (sw-http::mk-response-status-code 200)
-             (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
-             (sw-http::mk-response-header-field "Connection: keep-alive")
-             (sw-http::mk-response-message-body "")))
-         (sw-http:done-generating-response)
-         (do-comet-response viewport)))
-      t))
+       (sw-http:response-add-chunk
+        #.(sw-http::combine-buffers
+           (sw-http::mk-response-status-code 200)
+           #|(sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")|#
+           (sw-http::mk-response-header-field "Content-Type: text/plain; charset=utf-8")
+           (sw-http::mk-response-header-field "Connection: keep-alive")
+           (sw-http::mk-response-message-body "")))
+       (sw-http:done-generating-response)
+       (do-comet-response viewport)))
+    t))
