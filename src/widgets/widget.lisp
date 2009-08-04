@@ -57,12 +57,12 @@
 
 #.(maybe-inline 'currently-constructing-p)
 (defun currently-constructing-p (widget)
-  (declare (type widget widget))
+  (declare (widget widget))
   (eq widget *currently-constructing-widget*))
 
 
 (defun html<- (obj widget)
-  (declare (type widget widget))
+  (declare (widget widget))
   (the string
     (values
      (cond
