@@ -221,5 +221,3 @@ $.address.change(function(event){
 /////////////
 
 swComet("&do=refresh&hash=" + encodeURIComponent(encodeURIComponent(swGetCurrentHash().substr(1))));
-
-

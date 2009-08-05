@@ -66,13 +66,13 @@ to URL type string; \"key=value&other-key=other-value\""
 
 
 (declaim (inline js-focus))
-(defun js-focus (selector)
-  (declare (string selector))
+(defun js-focus (widget-id)
+  (declare (string widget-id))
   ;; TODO: Firefox has a bug that requires one to add a silly delay like this in some cases. I need to research this further.
   ;; https://bugzilla.mozilla.org/show_bug.cgi?id=53579
   ;; https://bugzilla.mozilla.org/show_bug.cgi?id=297134
   ;; TODO: Ok, seems Firefox-3.x has fixed this but, uh, IE6.x still requires this in some cases ...
-  (catstr "setTimeout(function(){ $(\"#" selector "\").focus(); }, 100);" +lf+))
+  (catstr "setTimeout(function(){ $(\"#" widget-id "\").focus(); }, 100);" +lf+))
 (export 'js-focus)
 
 
@@ -83,7 +83,7 @@ to URL type string; \"key=value&other-key=other-value\""
 
 
 (declaim (inline js-scroll-to-bottom))
-(defun js-scroll-to-bottom (selector)
-  (declare (string selector))
-  (catstr "$(\"#" selector "\").get(0).scrollTop = $(\"" selector "\").get(0).scrollHeight + 1000;" +lf+))
+(defun js-scroll-to-bottom (widget-id)
+  (declare (string widget-id))
+  (catstr "$(\"#" widget-id "\").get(0).scrollTop = $(\"" widget-id "\").get(0).scrollHeight + 1000;" +lf+))
 (export 'js-scroll-to-bottom)

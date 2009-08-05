@@ -19,9 +19,8 @@ If this is NIL, HTML-CONTENT will be renedered as HTML.")))
 (flet ((update-html (html-element new-html)
          (declare (html-element html-element)
                   (string new-html))
-         (with-object html-element
-           (run (setf (js-html-of ¤id) new-html)
-                html-element))))
+         (run (setf (js-html-of (id-of html-element)) new-html)
+              html-element)))
   (declare (inline update-html))
 
 

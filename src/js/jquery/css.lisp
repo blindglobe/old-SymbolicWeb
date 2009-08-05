@@ -4,6 +4,10 @@
 
 (declaim #.(optimizations))
 
+#| NOTE:
+I do not URL-escape stuff (writers) here because it is quite unlikely that user input will be sent directly to these
+functions. |#
+
 
 (declaim (inline js-get-css))
 (defun js-get-css (widget-id style-property)

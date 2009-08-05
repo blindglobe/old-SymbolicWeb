@@ -8,7 +8,7 @@
 (declaim (inline (setf js-html-of)))
 (defun (setf js-html-of) (new-html widget-id)
   (declare (string new-html widget-id))
-  (catstr "$(\"#" widget-id "\").html(decodeURIComponent(\"" (the string (url-encode new-html)) "\"));" +lf+))
+  (catstr "$(\"#" widget-id "\").html(decodeURIComponent(\"" (url-encode new-html) "\"));" +lf+))
 (export 'js-html-of)
 
 
@@ -24,7 +24,7 @@
   (declare (string html widget-id))
   ;; append
   "inside append"
-  (catstr "$(\"#" widget-id "\").append(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
+  (catstr "$(\"#" widget-id "\").append(decodeURIComponent(\"" (url-encode html) "\"));" +lf+))
 (export 'js-iappend)
 
 
@@ -33,7 +33,7 @@
   (declare (string html widget-id))
   ;; after
   "outside append"
-  (catstr "$(\"#" widget-id "\").after(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
+  (catstr "$(\"#" widget-id "\").after(decodeURIComponent(\"" (url-encode html) "\"));" +lf+))
 (export 'js-oappend)
 
 
@@ -42,7 +42,7 @@
   (declare (string html widget-id))
   ;; prepend
   "inside prepend"
-  (catstr "$(\"#" widget-id "\").prepend(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
+  (catstr "$(\"#" widget-id "\").prepend(decodeURIComponent(\"" (url-encode html) "\"));" +lf+))
 (export 'js-iprepend)
 
 
@@ -51,7 +51,7 @@
   (declare (string html widget-id))
   ;; before
   "outside prepend"
-  (catstr "$(\"#" widget-id "\").before(decodeURIComponent(\"" (the string (url-encode html)) "\"));" +lf+))
+  (catstr "$(\"#" widget-id "\").before(decodeURIComponent(\"" (url-encode html) "\"));" +lf+))
 (export 'js-oprepend)
 
 

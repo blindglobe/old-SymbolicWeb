@@ -67,18 +67,16 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
           (with-formula ¤x
-            (let ((widget ¤x-feedback))
-              (if-let (c ~(feedback-event-of ~¤x))
-                  (setf (html-content-of widget) c)
-                  (setf (html-content-of widget) ""))))
+            (if-let (c ~(feedback-event-of ~¤x))
+              (setf (html-content-of ¤x-feedback) c)
+              (setf (html-content-of ¤x-feedback) "")))
 
           (setf ~¤y (with-object model
                       (with1 #λ¤y (forward-cell (mk-number-parser it) (cell-of ¤y)))))
           (with-formula ¤y
-            (let ((widget ¤y-feedback))
-              (if-let (c ~(feedback-event-of ~¤y))
-                  (setf (html-content-of widget) c)
-                  (setf (html-content-of widget) ""))))
+            (if-let (c ~(feedback-event-of ~¤y))
+              (setf (html-content-of ¤y-feedback) c)
+              (setf (html-content-of ¤y-feedback) "")))
 
           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
           ;; A second View of the the SQUARE-OF-X Model.
