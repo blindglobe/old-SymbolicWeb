@@ -30,10 +30,11 @@ If this is NIL, HTML-CONTENT will be renedered as HTML.")))
 
 
   (defmethod (setf html-content-of) (new-html (html-element html-element))
-    (update-html html-element
-                 (if (escapep-of html-element)
-                     (escape-for-html (html<- new-html html-element))
-                     (html<- new-html html-element)))))
+    (let ((new-html (if (escapep-of html-element)
+                        (escape-for-html (html<- new-html html-element))
+                        (html<- new-html html-element))))
+      (setf (slot-value html-element 'html-content) new-html)
+      (update-html html-element new-html))))
 
 
 (defmethod (setf model-of) ((model cell) (html-element html-element))
