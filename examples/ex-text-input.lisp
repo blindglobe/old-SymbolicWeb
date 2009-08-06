@@ -35,7 +35,18 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   #| We connect MODEL and VIEW for automatic dataflow. At the same time, we make sure to return a list of the
   connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign).
 
-  A lot of stuff is going on here. The first SETF expression sets up something that looks like this (we use X-MODEL
+  A lot of stuff is going on here. Before the first SETF expression, things look like this:
+
+      X-MODEL -------> X-VIEW
+         |
+         v
+  SQUARE-OF-X-MODEL
+         |
+         V
+  SQUARE-OF-X-VIEW
+
+
+  The first SETF expression sets up something that looks like this (we use X-MODEL
   to denote the slot X in TEXT-INPUT-WIDGET-MODEL, X-VIEW to denote the slot X in TEXT-INPUT-WIDGET-VIEW etc. and
   IT denotes the CELL created at the first argument for the WITH1 macro):
 
