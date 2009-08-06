@@ -83,9 +83,11 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 (flet ((parse-client-args (args)
          (cdr (assoc "value" args :test #'string=))))
 
+
   (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of))
                                       (callback-box callback-box))
     (setf (argument-parser-of callback-box) #'parse-client-args))
+
 
   (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of))
                                       (callback-box callback-box))
@@ -94,9 +96,11 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
 
+
   (defmethod render ((text-input text-input))
     (declare (optimize speed (safety 2)))
     (text-input-update-client-cache (value-marshaller (value-of text-input)) text-input))
+
 
   (defmethod (setf model-of) ((model cell) (text-input text-input))
     (declare (optimize speed (safety 2)))
