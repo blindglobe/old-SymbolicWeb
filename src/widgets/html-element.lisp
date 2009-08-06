@@ -6,40 +6,36 @@
 
 
 (defclass html-element (widget)
-  ((html-content :reader html-content-of :initarg :html-content
-                 :initform "")
-
-   (escapep :accessor escapep-of :initarg :escapep
+  ((escapep :accessor escapep-of :initarg :escapep
             :initform t
             :documentation "
-If this is T (default), HTML-CONTENT will be escaped as text and thus not rendered as HTML.
-If this is NIL, HTML-CONTENT will be renedered as HTML.")))
+If this is T (default), the renedring of HTML-ELEMENT will be escaped as text instead of HTML.
+If this is NIL, HTML-ELEMENT will be renedered as HTML."))
+
+  (:default-initargs
+   :model #λ""))
 
 
 (flet ((update-html (html-element new-html)
-         (declare (html-element html-element)
-                  (string new-html))
-         (run (setf (js-html-of (id-of html-element)) new-html)
+         (declare (html-element html-element))
+         (run (setf (js-html-of (id-of html-element))
+                    (with (princ-to-string new-html)
+                      (if (escapep-of html-element)
+                          (escape-for-html it)
+                          it)))
               html-element)))
   (declare (inline update-html))
 
 
   (defmethod render ((html-element html-element))
-    (update-html html-element (html-content-of html-element)))
+    (update-html html-element ~~html-element))
 
 
-  (defmethod (setf html-content-of) (new-html (html-element html-element))
-    (let ((new-html (if (escapep-of html-element)
-                        (escape-for-html (html<- new-html html-element))
-                        (html<- new-html html-element))))
-      (setf (slot-value html-element 'html-content) new-html)
-      (update-html html-element new-html))))
+  (defmethod (setf model-of) ((model cell) (html-element html-element))
+    #λ(let ((model-value ~model))
+        (when-commit ()
+          (update-html html-element model-value)))))
 
-
-(defmethod (setf model-of) ((model cell) (html-element html-element))
-  #λ(let ((model-value ~model))
-      (when-commit ()
-        (setf (html-content-of html-element) model-value))))
 
 
 (defmacro mk-elt (args &body html-content)
@@ -54,10 +50,9 @@ If this is NIL, HTML-CONTENT will be renedered as HTML.")))
                                        (string-downcase element-type)
                                        `(string-downcase ,element-type))
                     ,@(rest args)
-                    ,@(when (and (not (member :html-content args))
-                                 (not (member :model args))
+                    ,@(when (and (not (member :model args))
                                  html-content)
-                       `(:html-content ,@html-content)))))
+                     `(:model #λ,@html-content)))))
 (export 'mk-elt)
 
 
