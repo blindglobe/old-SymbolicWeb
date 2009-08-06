@@ -66,17 +66,13 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   (with-object view
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
-          #λ(setf ~~¤x-feedback
-                  (if-let (c ~(feedback-event-of ~¤x))
-                    c
-                    ""))
+
+          #λ(setf ~~¤x-feedback ~(feedback-event-of ~¤x))
 
           (setf ~¤y (with-object model
                       (with1 #λ¤y (forward-cell (mk-number-parser it) (cell-of ¤y)))))
-          #λ(setf ~~¤y-feedback
-                  (if-let (c ~(feedback-event-of ~¤y))
-                    c
-                    ""))
+
+          #λ(setf ~~¤y-feedback ~(feedback-event-of ~¤y))
 
           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
           ;; A second View of the the SQUARE-OF-X Model.

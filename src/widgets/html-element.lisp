@@ -6,7 +6,10 @@
 
 
 (defclass html-element (widget)
-  ((escapep :accessor escapep-of :initarg :escapep
+  ((nil-denotes-empty-string-p :accessor nil-denotes-empty-string-p-of :initarg :nil-denotes-empty-string-p
+                               :initform t)
+
+   (escapep :accessor escapep-of :initarg :escapep
             :initform t
             :documentation "
 If this is T (default), the renedring of HTML-ELEMENT will be escaped as text instead of HTML.
@@ -19,10 +22,12 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 (flet ((update-html (html-element new-html)
          (declare (html-element html-element))
          (run (setf (js-html-of (id-of html-element))
-                    (with (string<- new-html)
-                      (if (escapep-of html-element)
-                          (escape-for-html it)
-                          it)))
+                    (if (or new-html (not (nil-denotes-empty-string-p-of html-element)))
+                        (with (string<- new-html)
+                          (if (escapep-of html-element)
+                              (escape-for-html it)
+                              it))
+                        ""))
               html-element)))
   (declare (inline update-html))
 
