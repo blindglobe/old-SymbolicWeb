@@ -17,15 +17,15 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 (defclass text-input-widget-view (html-container)
-  ((x :initform (mk-text-input nil))
-   (x-feedback :initform (mk-span ()))
+  ((x :initform (text-input ()))
+   (x-feedback :initform (span ()))
 
-   (y :initform (mk-text-input nil))
-   (y-feedback :initform (mk-span ()))
+   (y :initform (text-input ()))
+   (y-feedback :initform (span ()))
 
-   (square-of-x :initform (mk-span ()))
-   (square-of-x-str :initform (mk-span ()))
-   (sum :initform (mk-span ())))
+   (square-of-x :initform (span ()))
+   (square-of-x-str :initform (span ()))
+   (sum :initform (span ())))
 
   (:default-initargs
    :model (make-instance 'text-input-widget-model)))

@@ -117,9 +117,8 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 
 
-(defmacro mk-text-input ((&rest args) &optional (value nil value-supplied-p))
+(defmacro text-input (args &optional (value nil value-supplied-p))
   (with-gensyms (text-input)
     `(letp1 ((,text-input (make-instance 'text-input ,@args)))
        ,(when value-supplied-p
          `(setf (deref (model-of ,text-input)) ,value)))))
-(export 'mk-text-input)

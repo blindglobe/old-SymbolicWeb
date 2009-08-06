@@ -61,13 +61,17 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 (export 'mk-elt)
 
 
-(defmacro mk-div (args &body html-content)
-  `(mk-elt (:div ,@args)
-     ,@html-content))
-(export 'mk-div)
+(defmacro def-elt (element-type &key (xml-p t))
+  (declare (ignore xml-p))
+  `(defmacro ,element-type (args &body html-content)
+     `(mk-elt (,(make-keyword ',element-type) ,@(when (listp args) args))
+        ,@(if (listp args)
+              html-content
+              (list args)))))
 
-
-(defmacro mk-span (args &body html-content)
-  `(mk-elt (:span ,@args)
-     ,@html-content))
-(export 'mk-span)
+(def-elt div)
+(def-elt span)
+(def-elt b)
+(def-elt em)
+(def-elt h1) (def-elt h2) (def-elt h3)
+(def-elt h4) (def-elt h5) (def-elt h6)
