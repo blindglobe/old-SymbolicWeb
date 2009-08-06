@@ -5,13 +5,6 @@
 (declaim #.(optimizations :widgets/html-container.lisp))
 
 
-(defclass test (html-container)
-  ())
-
-(defmethod generate-html ((test test))
-  (who (:h1 "Hello World")))
-
-
 (defclass html-container (container)
   ((html-content :accessor html-content-of
                  :type string)
