@@ -179,3 +179,10 @@ and :NEW-VALUE while in the lex scope of BODY.
            (declare (ignore app))
            (unless found-p
              (return-from generate-random-cookie-value cookie-value)))))))
+
+
+(defun get-widget (id &key (app *app*))
+  (declare (string id)
+           (application app))
+  (gethash id (widgets-of app)))
+(export 'get-widget)

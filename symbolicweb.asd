@@ -30,7 +30,6 @@
      (:file "config")
      (:file "util")
      (:file "code")
-     (:file "id-mixin")
      (:file "server")
      (:file "object")
      (:file "base-classes")
