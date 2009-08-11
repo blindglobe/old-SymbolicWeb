@@ -8,7 +8,9 @@
 (defclass dom-mirror ()
   ((dom-mirror-data :reader dom-mirror-data-of
                     :type hash-table
-                    :initform (make-hash-table :test #'eq))
+                    :initform (make-hash-table :test #'eq)
+                    :documentation "
+DOM attributes, CSS properties etc.")
 
    (callbacks-of :reader callbacks-of
                  :type hash-table

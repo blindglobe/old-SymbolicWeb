@@ -78,6 +78,8 @@
 
 
 
+;; TODO: This stuff is probably no good. "MK-HTML" is a poor name. etc...
+
 (defmacro mk-html (args &body html)
   (setf args (mklst args))
   (assert (sequence-of-length-p html 1) nil

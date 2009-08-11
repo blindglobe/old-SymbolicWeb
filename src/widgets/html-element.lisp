@@ -43,6 +43,8 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 
 
 
+;; TODO: Finish and improve all this stuff:
+
 (defmacro mk-elt (args &body html-content)
   "First element of ARGS should be ELEMENT-TYPE. If it is not supplied
 :DIV is silently assumed."
@@ -75,3 +77,5 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 (def-elt em)
 (def-elt h1) (def-elt h2) (def-elt h3)
 (def-elt h4) (def-elt h5) (def-elt h6)
+
+;; NOTE: The A element should probably have its own widget-type (LINK).
