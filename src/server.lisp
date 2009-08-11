@@ -85,9 +85,10 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
   (if (debug-p-of server)
       (invoke-debugger condition)
       (progn
-        (warn "~S got condition: ~S~%Set DEBUG-P slot of ~S for to T to debug in Lisp/Slime."
-              server condition server)
-        (invoke-restart (or (find-restart 'sw-mvc:feedback-event)
+        (warn "~S got condition: ~S~%Set DEBUG-P slot to T to debug in Lisp/Slime."
+              server condition)
+        (invoke-restart (or (find-restart 'sw-mvc:assign-condition)
+                            #|(find-restart 'sw-mvc:user-feedback)|# ;; Try letting the user deal with the problem.
                             (find-restart 'sw-stm:abort-transaction)
                             (find-restart 'sw-http:continue-listening))))))
 

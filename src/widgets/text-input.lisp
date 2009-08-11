@@ -50,6 +50,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
     (with-formula text-input
       (when-let (value (on-enterpress-of text-input))
         (setf ~~text-input value)
+
         (when (clear-on-enterpress-p-of text-input)
           (when-commit ()
             (setf (value-of text-input :client-only-p t) "")
