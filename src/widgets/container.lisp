@@ -5,6 +5,9 @@
 (declaim #.(optimizations :widgets/container.lisp))
 
 
+#| TODO: Get rid of the CHILDREN slot in CONTAINER-BASE. This is basically the same change done wrt. HTML-ELEMENT. |#
+
+
 (defclass container (widget container-base)
   ()
 

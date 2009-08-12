@@ -23,7 +23,7 @@ possible and be able to optimize type-checking code based on this. |#
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defclass container-base ()
-  ((children :reader children-of
+  ((children :reader children-of ;; TODO: Get rid of this slot. This is something the Model end should deal with.
              :type list
              :initform nil
              :documentation "
