@@ -31,7 +31,7 @@
      (:file "util")
      (:file "code")
      (:file "server")
-     (:file "object")
+     #|(:file "object")|#
      (:file "base-classes")
      (:file "viewport")
 

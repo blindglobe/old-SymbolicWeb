@@ -5,6 +5,9 @@
 (declaim #.(optimizations :object.lisp))
 
 
+#| TODO: This stuff should probably be dealing with Model stuff; not widgets. |#
+
+
 (defclass object ()
   ((urlized-p :reader urlized-p-of
               :initform nil

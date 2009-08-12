@@ -31,14 +31,10 @@ Contains View instances.")))
 (export '(container-base children children-of))
 
 
-(defmethod initialize-instance :after ((container-base container-base) &key
-                                       (children nil children-supplied-p)
-                                       (child nil child-supplied-p))
+(defmethod initialize-instance :after ((container-base container-base) &key children child)
   (with-object container-base
     (setf ¤children
-          (loop :for child :in (mklst (cond
-                                        (children-supplied-p children)
-                                        (child-supplied-p child)))
+          (loop :for child :in (mklst (or children child))
              :collect (if (typep child 'view-base)
                           child
                           (view-in-context-of container-base child))))))
