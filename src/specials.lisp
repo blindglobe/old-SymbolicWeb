@@ -3,12 +3,6 @@
 (in-package #:sw)
 
 
-;; TODO: Not a special.
-(define-variable -id-generator-
-    :kind :global
-    :value (mk-id-generator))
-
-
 (defvar *server* nil)
 (export '*server*)
 

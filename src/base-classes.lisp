@@ -13,19 +13,9 @@ possible and be able to optimize type-checking code based on this. |#
 ;;; widget-base.lisp
 ;;;;;;;;;;;;;;;;;;;;
 
-(defclass widget-base (#|object|# self-ref view-base dom-mirror)
-  ((id :reader id-of
-       :type string)))
+(defclass widget-base (#|object|# id-mixin self-ref view-base dom-mirror)
+  ())
 (export '(widget-base id id-of))
-
-
-(defmethod initialize-instance :before ((widget widget-base) &key (id nil id-supplied-p))
-  (declare (optimize speed))
-  (setf (slot-value widget 'id)
-        (if id-supplied-p
-            id
-            (catstr (string (type-of widget)) "-" (id-generator-next-str -id-generator-)))))
-
 
 
 
