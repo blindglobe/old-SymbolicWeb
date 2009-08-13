@@ -15,7 +15,7 @@ possible and be able to optimize type-checking code based on this. |#
 
 (defclass widget-base (#|object|# id-mixin self-ref view-base dom-mirror)
   ())
-(export '(widget-base id id-of))
+(export 'widget-base)
 
 
 
