@@ -209,13 +209,14 @@ Returns WIDGET."
   "Prepends each widget in WIDGETS to CONTAINER in sequence.
 Returns WIDGETS."
   (prog1 widgets
-    (setf (cdr (last widgets)) (slot-value container 'children)
-          (slot-value container 'children) widgets)
     (when (visible-p-of container)
       (dolist (widget widgets)
         (run (js-iprepend (shtml-of widget) (id-of container)) container)
         (propagate-for-add widget container)
-        (render widget)))))
+        (render widget)))
+    ;; This mutates WIDGETS.
+    (setf (slot-value container 'children)
+          (nconc widgets (slot-value container 'children)))))
 
 
 #|(defmethod replace ((container container) (old-widget widget) (new-widget widget))
