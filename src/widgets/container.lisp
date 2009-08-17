@@ -20,7 +20,10 @@
 
 
 (defmethod view-constructor ((container container) (model single-value-model))
-  (make-instance 'html-element :model model))
+  (let ((value ~model))
+    (typecase value
+      (multiple-value-model (make-instance 'container :model value))
+      (t (make-instance 'html-element :model model)))))
 
 
 (defmethod view-constructor ((container container) (model multiple-value-model))
