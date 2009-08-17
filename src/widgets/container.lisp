@@ -39,7 +39,7 @@
       (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
           ((null dlist-node))
         (when-commit ()
-          (add (view-in-context-of container ~dlist-node) container)))))
+          (add (view-in-context-of container dlist-node) container)))))
 
 
 (defun mvc-container-insert (container event)
