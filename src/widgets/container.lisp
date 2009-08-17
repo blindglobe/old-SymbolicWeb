@@ -23,7 +23,7 @@
   (make-instance 'html-element :model model))
 
 
-(defmethod view-constructor ((container container) (model dlist))
+(defmethod view-constructor ((container container) (model multiple-value-model))
   (make-instance 'container :model model))
 
 
@@ -46,7 +46,7 @@
   (let ((relative-position (relative-position-of event))
         (relative-object (relative-object-of event)))
     (if relative-object
-        (let ((relative-widget (view-in-context-of container ~relative-object)))
+        (let ((relative-widget (view-in-context-of container relative-object)))
           (dolist (object (objects-of event))
             (let ((new-widget (view-in-context-of container object)))
               (case relative-position
@@ -65,14 +65,14 @@
 
 
 (defun mvc-container-remove (container event)
-  (dolist (dlist-node (objects-of event))
-    (remove (view-in-context-of container ~dlist-node) container)))
+  (dolist (object (objects-of event))
+    (remove (view-in-context-of container object) container)))
 
 
 (defun mvc-container-exchange (container event)
   (exchange container
-            (view-in-context-of container ~(object-of event))
-            (view-in-context-of container ~(target-position-of event))))
+            (view-in-context-of container (object-of event))
+            (view-in-context-of container (target-position-of event))))
 
 
 (defmethod render ((container container))
