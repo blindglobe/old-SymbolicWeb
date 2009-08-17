@@ -77,9 +77,11 @@
 
 (defmethod render ((container container))
   (let ((container-id (id-of container)))
-    (dolist (child (children-of container))
-      (run (js-iappend (shtml-of child) container-id) container)
-      (render child))))
+    ;; TODO: Consider adding a VIEWS-IN-CONTEXT-OF (plural) method in SW-MVC.
+    (dolist (child-model ~~container)
+      (let ((child-view (view-in-context-of container child-model)))
+        (run (js-iappend (shtml-of child-view) container-id) container)
+        (render child-view)))))
 
 
 #.(maybe-inline 'propagate-for-add)

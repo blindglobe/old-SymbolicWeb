@@ -36,7 +36,7 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
     (update-html html-element ~~html-element))
 
 
-  (defmethod (setf model-of) ((model cell) (html-element html-element))
+  (defmethod (setf model-of) ((model single-value-model) (html-element html-element))
     #λ(let ((model-value ~model))
         (when-commit ()
           (update-html html-element model-value)))))
