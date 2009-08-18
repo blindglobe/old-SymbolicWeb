@@ -4,6 +4,11 @@
 
 (declaim #.(optimizations :widgets/container.lisp))
 
+#| NOTE:
+This should be thread safe because all changes of CONTAINER (View) should come from the Model end.
+This is true even though the CHILDREN slot (from CONTAINER-BASE) isn't handled by SW-STM.
+|#
+
 
 (defclass container (widget container-base)
   ()
