@@ -73,8 +73,12 @@
 
 (defmethod generate-html ((html-container html-container))
   (with-object html-container
-    (funcall ¤closure)))
+    (funcall (truly-the function ¤closure))))
 (export 'generate-html)
+
+
+(defmethod (setf model-of) (model (html-container html-container))
+  (error "HTML-CONTAINER is not meant to have a back end Model."))
 
 
 

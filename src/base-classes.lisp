@@ -13,7 +13,7 @@ possible and be able to optimize type-checking code based on this. |#
 ;;; widget-base.lisp
 ;;;;;;;;;;;;;;;;;;;;
 
-(defclass widget-base (#|object|# id-mixin self-ref view-base dom-mirror)
+(defclass widget-base (id-mixin self-ref view-base dom-mirror)
   ())
 (export 'widget-base)
 
@@ -23,11 +23,12 @@ possible and be able to optimize type-checking code based on this. |#
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defclass container-base ()
-  ((children :reader children-of ;; TODO: Get rid of this slot. This is something the Model end should deal with.
+  ((children :reader children-of
              :type list
              :initform nil
              :documentation "
-Contains View instances.")))
+Contains View instances. Note that this is also the only hard link to the View part of
+a Model <-> View relationship.")))
 (export '(container-base children children-of))
 
 
