@@ -7,6 +7,7 @@
 #| NOTE:
 This should be thread safe because all changes of CONTAINER (View) should come from the Model end.
 This is true even though the CHILDREN slot (from CONTAINER-BASE) isn't handled by SW-STM.
+It also holds while CONTAINER is currently being rendered.
 |#
 
 
@@ -82,11 +83,10 @@ This is true even though the CHILDREN slot (from CONTAINER-BASE) isn't handled b
 
 (defmethod render ((container container))
   (let ((container-id (id-of container)))
-    ;; TODO: Consider adding a VIEWS-IN-CONTEXT-OF (plural) method in SW-MVC.
-    (dolist (child-model ~~container)
-      (let ((child-view (view-in-context-of container child-model)))
-        (run (js-iappend (shtml-of child-view) container-id) container)
-        (render child-view)))))
+    ~~container ;; "Locks" the Model.
+    (dolist (child (children-of container))
+      (run (js-iappend (shtml-of child) container-id) container)
+      (render child))))
 
 
 #.(maybe-inline 'propagate-for-add)
