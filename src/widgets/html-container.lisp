@@ -4,6 +4,10 @@
 
 (declaim #.(optimizations :widgets/html-container.lisp))
 
+#| NOTE:
+This does not use a Model. It is meant to generate static "HTML skeletons" for other widgets to be placed in, and
+it should not have any thread safety issues. |#
+
 
 (defclass html-container (container)
   ((html-content :accessor html-content-of

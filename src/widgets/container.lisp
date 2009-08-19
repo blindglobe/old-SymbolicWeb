@@ -7,8 +7,7 @@
 #| NOTE:
 This should be thread safe because all changes of CONTAINER (View) should come from the Model end.
 This is true even though the CHILDREN slot (from CONTAINER-BASE) isn't handled by SW-STM.
-It also holds while CONTAINER is currently being rendered.
-|#
+It also holds while CONTAINER is currently being rendered. |#
 
 
 (defclass container (widget container-base)
@@ -37,7 +36,7 @@ It also holds while CONTAINER is currently being rendered.
   (prog1
       #λ(when-let (event (event-of model))
           ;; TODO: Why am I not using a method here?
-          (typecase event
+          (etypecase event
             (container-insert   (when-commit () (mvc-container-insert   container event)))
             (container-remove   (when-commit () (mvc-container-remove   container event)))
             (container-exchange (when-commit () (mvc-container-exchange container event)))))

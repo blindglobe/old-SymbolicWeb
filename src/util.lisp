@@ -75,6 +75,7 @@
                        (t (error "CL-WHO syntax for :SW doesn't know what to do with: ~S" maybe-widget))))))))
 
 
+;; NOTE/TODO: Placed here because of bootstrapping issues..
 #.(maybe-inline 'for-each-widget-in-tree)
 (defun for-each-widget-in-tree (widget func)
   (declare ((function (widget-base)) func)
@@ -114,40 +115,12 @@
 (export 'sw-heading)
 
 
-(defun js-str (str)
+(declaim (inline js-str))
+(defn js-str (string ((str string)))
   (format nil "\"~A\"" str))
 
 
-(defmacro maybe-value-change ((&key (object nil object-supplied-p)
-                                    (old-value (error ":OLD-VALUE needed."))
-                                    (new-value (error ":NEW-VALUE needed."))
-                                    (test '#'equal)
-                                    (on-no-change '(return :not-changed)))
-                              &body body)
-  "Supply NIL for :OBJECT if you want to control when and how DO-ON-STATE-CHANGE is called.
-*OLD-VALUE* and *NEW-VALUE* will be bound to what was supplied to :OLD-VALUE
-and :NEW-VALUE while in the lex scope of BODY.
-:ON-NO-CHANGE signifies what to do when *OLD-VALUE* and *NEW-VALUE* are determined to be equal."
-  (once-only (object)
-    `(block nil
-       (let ((*new-value* ,new-value)
-             (*old-value* ,old-value))
-         (if (funcall ,test *old-value* *new-value*)
-             ,on-no-change
-             (progn
-               ,@body
-               ,(when object-supplied-p
-                 `(do-on-state-change  ,object))))))))
-(export 'maybe-value-change)
-
-
-(defun htmlize (obj)
-  (if (stringp obj)
-      (escape-for-html obj)
-      (escape-for-html (princ-to-string obj))))
-(export 'htmlize)
-
-
+;; TODO: This belongs in SW-MVC.
 (defun remove-and-return-closest (item sequence &key
                                   (test #'eql)
                                   (return-if-none-left nil))
