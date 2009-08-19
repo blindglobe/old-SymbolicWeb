@@ -56,8 +56,7 @@ fixing this.
   (sw-http:start-listening server))
 
 
-(defun sw-http-server-request-handler (server connection)
-  (declare (sw-http-server server))
+(defn sw-http-server-request-handler (((server sw-http-server) (connection sw-http:connection)))
   (with-thread ((cons server (sw-http::cn-socket connection)))
     (with-timeout (10 (warn "SW-HTTP-SERVER-REQUEST-HANDLER: Timeout!")
                       (invoke-restart 'skip-body))

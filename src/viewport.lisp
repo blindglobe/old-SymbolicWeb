@@ -66,13 +66,11 @@ Each instance of VIEWPORT represents a browser window or tab."))
 
 
 #.(maybe-inline 'find-or-create-viewport)
-(defun find-or-create-viewport (viewport-id app)
+(defn find-or-create-viewport (((viewport-id string) (app application)))
   "Find an existing or create a new viewport based on the VIEWPORT-ID parameter
  sent from the client.
 Returns two values; a VIEWPORT instance and whether a new one was created or not."
-  (declare (string viewport-id)
-           (application app)
-           (optimize speed))
+  (declare (optimize speed))
   (with-locked-object app
     (if-let (viewport (gethash viewport-id (viewports-of app)))
       (values viewport nil)
