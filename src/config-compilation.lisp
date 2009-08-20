@@ -55,6 +55,14 @@
   '(optimize (speed 3) (safety 2)))
 
 
+(defmethod optimizations ((context (eql :widgets/css.lisp)) &key)
+  '(optimize (speed 3) (safety 2)))
+
+
+(defmethod optimizations ((context (eql :widgets/attributes.lisp)) &key)
+  '(optimize (speed 3) (safety 2)))
+
+
 (defmethod optimizations ((context (eql :server-sw-http.lisp)) &key)
   '(optimize (speed 3) (safety 2)))
 

@@ -88,7 +88,7 @@ Returns two values; a VIEWPORT instance and whether a new one was created or not
 Also see FOR-EACH-VIEWPORT-OF-WIDGET."
   (declare (application app)
            ((function (viewport)) fn)
-           (optimize speed))
+           (optimize speed (safety 2)))
   (maphash (lambda (%not-used viewport)
              (declare (ignore %not-used)
                       (viewport viewport))
@@ -151,7 +151,7 @@ refresh."
   (values))
 
 
-#.(maybe-inline 'root)
+(declaim (inline root))
 (defun root ()
   (root-widget-of *viewport*))
 
