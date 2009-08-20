@@ -26,8 +26,11 @@ single viewport for execution there."
      (warn "SW:RUN: Returning from RUN with no effect; no code in CODE-STR."))
 
     (t
-     (if (typep target 'viewport)
-         (append-to-response-data-of target code-str)
-         (when-let (viewport (viewport-of target))
-           (append-to-response-data-of viewport code-str)))))
+     (etypecase target
+       (viewport
+        (append-to-response-data-of target code-str))
+
+       (widget
+        (when-let (viewport (viewport-of target))
+          (append-to-response-data-of viewport code-str))))))
   (values))
