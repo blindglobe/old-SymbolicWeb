@@ -1,4 +1,5 @@
 (eval-when (:execute :load-toplevel :compile-toplevel)
+  (require :swank)
   (require :symbolicweb)
   (require :symbolicweb-examples))
 
