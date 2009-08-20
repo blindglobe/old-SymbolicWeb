@@ -36,7 +36,7 @@
           (:b "SQUARE: ") (:sw square)
 
           :hr
-          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/comet-test-app.lisp"
+          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/comet-test.lisp"
               "source code")
           :br
           "PS: Hosted on a crummy home ADSL line...")))))
