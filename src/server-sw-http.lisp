@@ -106,12 +106,12 @@ fixing this.
       ((or (string= "ajax" request-type)
            (string= "comet" request-type))
        (sw-http:response-add-chunk
-        #.(sw-http::combine-buffers
-           (sw-http::mk-response-status-code 200)
-           (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
-           (sw-http::mk-response-header-field "Connection: keep-alive")))
+        #.(sw-http:combine-buffers
+           (sw-http:mk-response-status-code 200)
+           (sw-http:mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
+           (sw-http:mk-response-header-field "Connection: keep-alive")))
        (sw-http:response-add-chunk
-        (sw-http::mk-response-message-body
+        (sw-http:mk-response-message-body
          (catstr
            (js-code-of (set-document-cookie :name (cookie-name-of *server*)
                                             :value nil))
@@ -179,10 +179,10 @@ fixing this.
     (case *request-type*
       (:comet
        (sw-http:response-add-chunk
-        #.(sw-http::combine-buffers
-           (sw-http::mk-response-status-code 200)
-           (sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
-           (sw-http::mk-response-header-field "Connection: keep-alive")))
+        #.(sw-http:combine-buffers
+           (sw-http:mk-response-status-code 200)
+           (sw-http:mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
+           (sw-http:mk-response-header-field "Connection: keep-alive")))
        (handle-comet-request server app viewport))
 
       (:ajax
@@ -191,12 +191,12 @@ fixing this.
          (handle-ajax-request server app viewport))
 
        (sw-http:response-add-chunk
-        #.(sw-http::combine-buffers
-           (sw-http::mk-response-status-code 200)
-           #|(sw-http::mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")|#
-           (sw-http::mk-response-header-field "Content-Type: text/plain; charset=utf-8")
-           (sw-http::mk-response-header-field "Connection: keep-alive")
-           (sw-http::mk-response-message-body "")))
+        #.(sw-http:combine-buffers
+           (sw-http:mk-response-status-code 200)
+           #|(sw-http:mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")|#
+           (sw-http:mk-response-header-field "Content-Type: text/plain; charset=utf-8")
+           (sw-http:mk-response-header-field "Connection: keep-alive")
+           (sw-http:mk-response-message-body "")))
        (sw-http:done-generating-response)
        (do-comet-response viewport)))
     t))
