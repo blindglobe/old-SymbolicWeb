@@ -22,7 +22,8 @@
                  "This'll be very slow or even down at random.")
             (:ul
              (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious") ": collection of source code repositories")
-             (:li (:a :href "text-input" "text-input-app") ": silly test application"))
+             (:li (:a :href "text-input" "text-input-app") ": silly dataflow test application")
+             (:li (:a :href "comet-test-app" "comet-test-app") ": silly comet test application"))
 
 
             (:h2 "Chat")

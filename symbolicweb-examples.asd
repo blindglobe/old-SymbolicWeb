@@ -25,4 +25,5 @@
      (:file "nostdal.org")
      ;;(:file "simple-event-flow")
      (:file "ex-text-input")
+     (:file "comet-test")
      ))))
