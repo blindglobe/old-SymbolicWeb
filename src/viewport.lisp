@@ -127,23 +127,20 @@ refresh."
           (return))))))
 
 
-(defun do-comet-response (viewport)
-  (declare (viewport viewport))
+(defn do-comet-response (null ((viewport viewport)))
+  (declare (optimize speed (safety 2)))
   (with-recursive-lock-held ((response-stream-mutex-of viewport))
     (unless (response-stream-emptyp-of viewport)
       (when-let ((comet-callback (comet-callback-of viewport)))
-        (funcall (the function comet-callback)))))
+        (funcall (truly-the function comet-callback)))))
   (values))
 
 
 #.(maybe-inline 'append-to-response-data-of)
-(defun append-to-response-data-of (viewport js-str)
-  (declare (optimize speed (safety 2))
-           (viewport viewport)
-           (string js-str))
+(defn append-to-response-data-of (null ((viewport viewport) (js-str string)))
+  (declare (optimize speed (safety 2)))
   (with-recursive-lock-held ((response-stream-mutex-of viewport))
-    (let ((*print-pretty* nil))
-      (princ js-str (response-stream-of viewport)))
+    (write-string js-str (response-stream-of viewport))
     (nilf (response-stream-emptyp-of viewport))
 
     (when (or (eq *request-type* :unknown)    ;; From the REPL?
