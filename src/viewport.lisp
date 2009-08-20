@@ -143,11 +143,12 @@ refresh."
     (write-string js-str (response-stream-of viewport))
     (nilf (response-stream-emptyp-of viewport))
 
-    (when (and (not *bulk-update-p*)
-               (or (eq *request-type* :unknown)     ;; From the REPL?
-                   (not (eq *viewport* viewport)))) ;; Cross-viewport?
-      ;; ..then send stuff right away.
-      (do-comet-response viewport)))
+    (if *bulk-update-p*
+        (pushnew viewport *bulk-update-p* :test #'eq)
+        (when (or (eq *request-type* :unknown)     ;; From the REPL?
+                  (not (eq *viewport* viewport))) ;; Cross-viewport?
+          ;; ..then send stuff right away.
+          (do-comet-response viewport))))
   (values))
 
 
