@@ -64,10 +64,9 @@ executing it there."
 
 
 (defmacro with-bulk-update (&body body)
-  ;; TODO: Using BUTLAST etc. here is sub-optimal.
   `(let ((*bulk-update-p* (list t)))
      (unwind-protect
           (progn ,@body)
-       (dolist (viewport (butlast *bulk-update-p*))
+       (dolist (viewport (cdr *bulk-update-p*))
          (do-comet-response viewport)))))
 (export 'with-bulk-update)
