@@ -143,8 +143,9 @@ refresh."
     (write-string js-str (response-stream-of viewport))
     (nilf (response-stream-emptyp-of viewport))
 
-    (when (or (eq *request-type* :unknown)    ;; From the REPL?
-              (not (eq *viewport* viewport))) ;; Cross-viewport?
+    (when (and (not *bulk-update-p*)
+               (or (eq *request-type* :unknown)     ;; From the REPL?
+                   (not (eq *viewport* viewport)))) ;; Cross-viewport?
       ;; ..then send stuff right away.
       (do-comet-response viewport)))
   (values))

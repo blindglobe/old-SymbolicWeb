@@ -28,6 +28,9 @@
   "Used by the macros JS-CODE-OF and WITH-JS-CODE-FROM (src/js/util.lisp).")
 
 
+(defvar *bulk-update-p* nil)
+
+
 ;; :AROUND INITIALIZE-INSTANCE ((.. widget) ..)
 (defvar *currently-constructing-widget* nil)
 

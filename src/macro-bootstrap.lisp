@@ -61,3 +61,12 @@ executing it there."
   `(let ((*js-code-only-p* t))
      ,@body))
 (export 'with-js-code-only)
+
+
+(defmacro with-bulk-update (&body body)
+  `(unwind-protect
+        (let ((*bulk-update-p* t))
+          ,@body)
+     (when-let (viewport *viewport*)
+       (do-comet-response viewport))))
+(export 'with-bulk-update)
