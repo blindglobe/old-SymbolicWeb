@@ -135,7 +135,7 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
     (with-html-output (ss ss :prologue t)
       (:html :xmlns "http://www.w3.org/1999/xhtml" :|xml:lang| "en" :lang "en"
        (:head
-        (:title)
+        (:title (str (string-capitalize (type-of app))))
         (:meta :name "Author" :content (http-meta-author-of app))
         (:meta :http-equiv "X-UA-Compatible" :content "IE=edge") ;; For IE8 and up.
         (:meta :http-equiv "Content-Type" :content "text/html;charset=UTF-8")
