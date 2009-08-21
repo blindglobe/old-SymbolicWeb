@@ -135,12 +135,14 @@ fixing this.
        ;; NOTE: I think this is the only way to do this proper; HTTP headers will not include the URL hashes.
        (sw-http:response-add-chunk
         (sw-http:mk-response-message-body
-         (who (:html (:body (:script
-                             (str (catstr
-                                    (js-code-of (set-document-cookie :name (cookie-name-of *server*)
-                                                                     :value nil))
-                                    (js-code-of (reload))))))))))
-
+         (who (:html
+               (:body
+                (:script
+                 (str (catstr
+                        (js-code-of (set-document-cookie :name (cookie-name-of *server*)
+                                                         :value nil))
+                        (js-code-of (reload)))))
+                (:noscript (:p "JavaScript needs to be enabled.")))))))
        (sw-http:done-generating-response)))))
 
 
