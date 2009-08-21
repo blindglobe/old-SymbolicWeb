@@ -129,10 +129,13 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
     ;; :PROLOGUE set to T generates this (needed to trigger "standards mode" in IE7!):
     ;; <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
     (with-html-output (ss ss :prologue t)
-      (:html
+      (:html :xmlns "http://www.w3.org/1999/xhtml" :|xml:lang| "en" :lang "en"
        (:head
+        (:title)
         (:meta :name "Author" :content (http-meta-author-of app))
         (:meta :http-equiv "X-UA-Compatible" :content "IE=edge") ;; For IE8 and up.
+        (:meta :http-equiv "Content-Type" :content "text/html;charset=UTF-8")
+
         ;; TODO: Move this to a slot in APPLICATION.
         (:style :type "text/css"
           "html, body, #sw-root {"
@@ -149,16 +152,16 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
         probably be set to "hidden" later for that reason; it'll force the user to be more explicit in what he
         wants instead. |#
         (:div :id "sw-root" :style "overflow: auto;")
+        (:div
+            (:img :id "sw-loading-spinner" :alt ""
+                  :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"
+                  :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
 
-        (:img :id "sw-loading-spinner"
-              :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"
-              :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
+          (:a :accesskey 1 :href "javascript:swTerminateSession();")
+          (:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")
 
-        (:a :accesskey 1 :href "javascript:swTerminateSession();")
-        (:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")
-
-        (:noscript "JavaScript needs to be enabled.")
-        (str (js-sw-headers app)))))))
+          (:noscript (:p "JavaScript needs to be enabled."))
+          (str (js-sw-headers app))))))))
 
 
 (defmethod remove-application ((app application) &optional (server *server*))
