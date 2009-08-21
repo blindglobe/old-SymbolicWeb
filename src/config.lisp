@@ -17,6 +17,11 @@
       (make-random-state t))
 
 
+(define-variable -break-http-connection-limit-p-
+    :value t
+    :kind :global)
+
+
 
 ;;; Stuff for SERVER
 ;;;;;;;;;;;;;;;;;;;;
