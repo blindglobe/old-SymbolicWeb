@@ -220,4 +220,7 @@ $.address.change(function(event){
 /// Boot! ///
 /////////////
 
-swComet("&do=refresh&hash=" + encodeURIComponent(encodeURIComponent(swGetCurrentHash().substr(1))));
+$(document).ready(
+function(){
+  swComet("&do=refresh&hash=" + encodeURIComponent(encodeURIComponent(swGetCurrentHash().substr(1))));          
+});
