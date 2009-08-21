@@ -9,6 +9,11 @@
   ((server :reader server-of
            :type server)
 
+   (break-http-connection-limit-p :accessor break-http-connection-limit-p-of
+                                  :initarg :break-http-connection-limit-p
+                                  :type (member nil t)
+                                  :initform t) ;; TODO: Get this from a global variable in config.lisp.
+
    (last-focus :reader last-focus-of
                :type (or null string widget)
                :initform nil)
@@ -83,10 +88,9 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 
 
 (defmethod generate-dynamic-subdomain ((app application))
-  ;; To break the 2 connection limit of HTTP do something like
-  ;;   (catstr "sw.dyn-" (generate-id))
-  ;; ..here (in your application subclass).
-  nil)
+  (if (break-http-connection-limit-p-of app)
+      (catstr "sw.dyn-" (id-generator-next-str -id-generator-))
+      nil))
 
 
 (defmethod visible-p-of ((app application) &key)

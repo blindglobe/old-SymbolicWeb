@@ -129,7 +129,7 @@
   (let ((js-code
          (catstr
            "document.cookie = \"" name "=" (if value value "") ";"
-           (if (and app (generate-dynamic-subdomain app))
+           (if (and app (break-http-connection-limit-p-of app))
                "domain=.\" + window.location.hostname + \";"
                "")
            (if value
