@@ -127,16 +127,23 @@
   (declare (string name)
            (optimize speed))
   (let ((js-code
-         (catstr
-           "document.cookie = \"" name "=" (if value value "") ";"
-           (if (and app (break-http-connection-limit-p-of app))
-               "domain=.\" + window.location.hostname + \";"
-               "")
+         (flet ((inner (domain-p)
+                  (catstr
+                    "document.cookie = \""
+                    name "=" (if value value "") ";"
+                    (if domain-p
+                        "domain=.\" + window.location.hostname + \";"
+                        "")
+                    (if value
+                        "expires=\" + (function(){ var date = new Date(); date.setFullYear(date.getFullYear()+1); return date.toUTCString(); })() + \";"
+                        "expires=Fri, 27 Jul 2001 02:47:11 UTC;")
+                    "path=\" + window.location.pathname + \";"
+                    "\";" +lf+)))
            (if value
-               "expires=\" + (function(){ var date = new Date(); date.setFullYear(date.getFullYear()+1); return date.toUTCString(); })() + \";"
-               "expires=Fri, 27 Jul 2001 02:47:11 UTC;")
-           "path=\" + window.location.pathname + \";"
-           "\";" +lf+)))
+               (inner t)
+               #| NOTE: Firefox seems to have trouble deleting cookies when domain is included, but, uh, sometimes
+               not -- so we do both! x) |#
+               (catstr (inner t) (inner nil))))))
     (if *js-code-only-p*
         js-code
         (progn

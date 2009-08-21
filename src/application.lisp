@@ -12,11 +12,7 @@
    (break-http-connection-limit-p :accessor break-http-connection-limit-p-of
                                   :initarg :break-http-connection-limit-p
                                   :type (member nil t)
-                                  ;; TODO/NOTE: Opera does not handle random subdomains well.
-                                  ;; TODO: Control this from a centralized location (nyzer needs this).
-                                  :initform (if (eq :presto (sw-http:browser-type))
-                                                nil
-                                                t))
+                                  :initform t) ;; TODO: Get this from a global variable in config.lisp.
 
    (last-focus :reader last-focus-of
                :type (or null string widget)
