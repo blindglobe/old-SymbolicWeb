@@ -145,10 +145,13 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
           "}"))
 
        (:body
-        ;; NOTE/TODO: Browsers tend to add scrollbars for sub-pixel errors in their own rendering; this will probably be set to "hidden" later for that reason; it'll force the user to be more explicit in what he wants instead.
+        #| NOTE/TODO: Browsers tend to add scrollbars for sub-pixel errors in their own rendering; this will
+        probably be set to "hidden" later for that reason; it'll force the user to be more explicit in what he
+        wants instead. |#
         (:div :id "sw-root" :style "overflow: auto;")
 
-        (:img :id "sw-loading-spinner" :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"
+        (:img :id "sw-loading-spinner"
+              :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"
               :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
 
         (:a :accesskey 1 :href "javascript:swTerminateSession();")
