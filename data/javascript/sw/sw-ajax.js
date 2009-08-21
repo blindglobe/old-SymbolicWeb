@@ -103,8 +103,9 @@ swComet =
    function callback(){
      if(sw_comet_response)
        sw_comet_response = false, swComet('&do=ack');
-     else
-       // FIXME: This stuff never happen for Webkit.
+     else 
+       // FIXME: This stuff never happen for Webkit (it doesn't seem to be a big problem atm. though), 
+       // or Opera (when random subdomains are used).
        setTimeout("swComet('');", 500);
    }
 
