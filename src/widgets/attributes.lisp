@@ -5,7 +5,7 @@
 (declaim #.(optimizations :widgets/attributes.lisp))
 
 
-(declaim (inline attribute))
+#.(maybe-inline 'attribute)
 (defun attribute (attribute widget)
   (declare (string attribute)
            (widget widget))
@@ -13,7 +13,7 @@
 (export 'attribute)
 
 
-(declaim (inline (setf attribute)))
+#.(maybe-inline '(setf attribute))
 (defun (setf attribute) (new-value attribute widget &rest args)
   (declare (string new-value attribute)
            (widget widget)

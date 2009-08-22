@@ -6,9 +6,10 @@
 
 
 #.(maybe-inline 'run)
-(declaim (ftype (function (string (or viewport widget) &key (:server-only-p (member t nil)))
-                          (values &optional))
-                run))
+(eval-now
+  (proclaim '(ftype (function (string (or viewport widget) &key (:server-only-p (member t nil)))
+                              (values &optional))
+                    run)))
 (defun run (code-str target &key server-only-p)
   "Send JavaScript code to client(s) for execution.
 

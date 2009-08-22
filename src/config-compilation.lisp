@@ -28,15 +28,23 @@
 
 ;;; INLINE declarations.
 
-(defmethod maybe-inline ((function-name (eql 'run-js)) &key)
-  t)
-
-
 (defmethod maybe-inline ((function-name (eql 'run)) &key)
   t)
 
 
 (defmethod maybe-inline ((function-name (eql 'append-to-response-data-of)) &key)
+  t)
+
+(defmethod maybe-inline ((function-name (eql 'css)) &key)
+  t)
+
+(defmethod maybe-inline ((function-name (eql '(setf css))) &key)
+  t)
+
+(defmethod maybe-inline ((function-name (eql 'attribute)) &key)
+  t)
+
+(defmethod maybe-inline ((function-name (eql '(setf attribute))) &key)
   t)
 
 

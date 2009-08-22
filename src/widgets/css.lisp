@@ -5,7 +5,7 @@
 (declaim #.(optimizations :widgets/css.lisp))
 
 
-(declaim (inline css))
+#.(maybe-inline 'css)
 (defun css (property widget)
   (declare (string property)
            (widget widget))
@@ -13,7 +13,7 @@
 (export 'css)
 
 
-(declaim (inline (setf css)))
+#.(maybe-inline '(setf css))
 (defun (setf css) (new-value property widget &rest args)
   (declare (string new-value property)
            (widget widget)

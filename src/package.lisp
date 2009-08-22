@@ -157,10 +157,8 @@
   ;;;;;;;;
 
   (:export
-   #:run-js
    #:run
    #:with-visible-contexts-of
-   #:with-code-block
    )
 
 
