@@ -27,7 +27,7 @@
 
 (defmethod render-viewport ((viewport viewport) (app comet-test-app))
   (with-object app
-    (add-to (root)
+    (sw-mvc:insert
       (mk-html ()
         (:div
          (:h1 "COMET-TEST-APP")
@@ -39,4 +39,5 @@
           (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/comet-test.lisp"
               "source code")
           :br
-          "PS: Hosted on a crummy home ADSL line...")))))
+          "PS: Hosted on a crummy home ADSL line..."))
+      :in (root))))

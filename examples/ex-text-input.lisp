@@ -105,9 +105,9 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
   (with-object app
-    (add-to (root)
-      (mk-html ()
-        (:div
+    (sw-mvc:insert
+     (mk-html ()
+       (:div
          (:h1 "TEXT-INPUT-APP")
 
          (:h2 "VIEW-1")
@@ -120,4 +120,5 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/ex-text-input.lisp"
              "source code")
          :br
-         "Hosted on a crummy ADSL line...")))))
+         "Hosted on a crummy ADSL line..."))
+     :in (root))))
