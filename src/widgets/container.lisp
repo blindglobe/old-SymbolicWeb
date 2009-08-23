@@ -35,20 +35,15 @@ It also holds while CONTAINER is currently being rendered. |#
 (defmethod (setf model-of) ((model dlist) (container container))
   (prog1
       #λ(when-let (event (event-of model))
-          ;; TODO: Why am I not using a method here?
-          (etypecase event
-            (sw-mvc:container-insert   (when-commit () (mvc-container-insert   container event)))
-            (sw-mvc:container-remove   (when-commit () (mvc-container-remove   container event)))
-            (sw-mvc:container-exchange (when-commit () (mvc-container-exchange container event)))))
-
+          (when-commit ()
+            (handle-model-event container event)))
 
       (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
           ((null dlist-node))
         (when-commit ()
           (container-add container (view-in-context-of container dlist-node))))))
 
-
-(defun mvc-container-insert (container event)
+(defmethod handle-model-event ((container container) (event sw-mvc:container-insert))
   (let ((relative-position (relative-position-of event))
         (relative-object (relative-object-of event)))
     (if relative-object
@@ -68,12 +63,12 @@ It also holds while CONTAINER is currently being rendered. |#
             (container-add container new-widget))))))
 
 
-(defun mvc-container-remove (container event)
+(defmethod handle-model-event ((container container) (event sw-mvc:container-remove))
   (dolist (object (objects-of event))
     (container-remove container (view-in-context-of container object))))
 
 
-(defun mvc-container-exchange (container event)
+(defmethod handle-model-event ((container container) (event sw-mvc:container-exchange))
   (container-exchange container
                       (view-in-context-of container (object-of event))
                       (view-in-context-of container (target-position-of event))))
