@@ -17,24 +17,24 @@
 
 
   ;; Fix conflicts between Alexandria and cl-utilities.
-  (:shadowing-import-from #:alexandria
-    #:with-gensyms
-    #:compose
-    #:with-unique-names
-    #:copy-array
-    #:once-only)
+  (:shadowing-import-from
+   #:alexandria
+   #:with-gensyms
+   #:compose
+   #:with-unique-names
+   #:copy-array
+   #:once-only)
 
   ;; SW-MVC vs. CL and Aromyxo.
-    (:shadowing-import-from #:sw-mvc
-     #:remove
-     #:insert)
+  (:shadowing-import-from
+   #:sw-mvc
+   #:remove
+   #:insert)
 
 
   (:shadow
-
    ;; From AROMYXO.
    #:exchange
-
    ;; From SW-MVC.
    #:value-of
    #:right-of #:left-of

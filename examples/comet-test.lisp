@@ -27,7 +27,7 @@
 
 (defmethod render-viewport ((viewport viewport) (app comet-test-app))
   (with-object app
-    (sw-mvc:insert
+    (insert
       (mk-html ()
         (:div
          (:h1 "COMET-TEST-APP")
