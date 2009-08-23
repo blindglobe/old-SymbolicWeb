@@ -43,6 +43,7 @@ It also holds while CONTAINER is currently being rendered. |#
         (when-commit ()
           (container-add container (view-in-context-of container dlist-node))))))
 
+
 (defmethod handle-model-event ((container container) (event sw-mvc:container-insert))
   (let ((relative-position (relative-position-of event))
         (relative-object (relative-object-of event)))
