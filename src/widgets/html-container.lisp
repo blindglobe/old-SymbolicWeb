@@ -4,19 +4,15 @@
 
 (declaim #.(optimizations :widgets/html-container.lisp))
 
-#| NOTE:
-This does not use a Model. It is meant to generate static "HTML skeletons" for other widgets to be placed in, and
-it should not have any thread safety issues. |#
 
-
-(defclass html-container (container)
+(defclass html-container (widget container-base)
   ((html-content :accessor html-content-of
                  :type string)
 
    (closure :type function))
 
   (:default-initargs
-   :model nil))
+   :model #λ"")) ;; TODO: This is just a dummy ... hm.
 (export 'html-container)
 
 
@@ -45,17 +41,26 @@ it should not have any thread safety issues. |#
 
 (flet ((generate-html-wrapper (html-container fn)
          (declare (html-container html-container)
-                  (function fn))
+                  (function fn)
+                  (optimize (safety 2)))
          (let ((*creating-html-container-p* html-container)
                (*html-container-children* nil))
            (prog1 (setf (slot-value html-container 'html-content) (funcall fn))
              (when-let ((additional-children (set-difference *html-container-children* (children-of html-container)
                                                              :test #'eq)))
-               (add-to* html-container (reverse additional-children)))
+               (appendf (slot-value html-container 'children)
+                        (reverse additional-children))
+               (when (visible-p-of html-container)
+                 (dolist (child additional-children)
+                   (propagate-for-add child html-container))))
+
              (when-let ((removed-children (set-difference (children-of html-container) *html-container-children*
                                                           :test #'eq)))
                (dolist (child removed-children)
-                 (remove child html-container)))))))
+                 (deletef (slot-value html-container 'children) child))
+               (when (visible-p-of html-container)
+                 (dolist (child removed-children)
+                   (propagate-for-remove child html-container))))))))
   (declare (inline generate-html-wrapper))
 
 
@@ -82,7 +87,7 @@ it should not have any thread safety issues. |#
 
 
 (defmethod (setf model-of) (model (html-container html-container))
-  (error "HTML-CONTAINER is not meant to have a back end Model."))
+  )
 
 
 
