@@ -38,6 +38,9 @@
     #:container
     #:add
     #:remove #:remove-all
+    #:container-insert
+    #:container-remove
+    #:container-exchange
     )
 
 

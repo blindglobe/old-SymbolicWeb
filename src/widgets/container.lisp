@@ -18,7 +18,7 @@ It also holds while CONTAINER is currently being rendered. |#
 
 
 (defmethod view-constructor ((container container) model)
-  (error "~S doesn't know how to make a View of ~S." container model))
+  (error "~S doesn't know how to make a View of~% ~S." container model))
 
 
 (defmethod view-constructor ((container container) (model single-value-model))
@@ -37,14 +37,15 @@ It also holds while CONTAINER is currently being rendered. |#
       #λ(when-let (event (event-of model))
           ;; TODO: Why am I not using a method here?
           (etypecase event
-            (container-insert   (when-commit () (mvc-container-insert   container event)))
-            (container-remove   (when-commit () (mvc-container-remove   container event)))
-            (container-exchange (when-commit () (mvc-container-exchange container event)))))
+            (sw-mvc:container-insert   (when-commit () (mvc-container-insert   container event)))
+            (sw-mvc:container-remove   (when-commit () (mvc-container-remove   container event)))
+            (sw-mvc:container-exchange (when-commit () (mvc-container-exchange container event)))))
+
 
       (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
           ((null dlist-node))
         (when-commit ()
-          (add (view-in-context-of container dlist-node) container)))))
+          (container-add container (view-in-context-of container dlist-node))))))
 
 
 (defun mvc-container-insert (container event)
@@ -53,31 +54,29 @@ It also holds while CONTAINER is currently being rendered. |#
     (if relative-object
         (let ((relative-widget (view-in-context-of container relative-object)))
           (dolist (object (objects-of event))
-            (let ((new-widget (view-in-context-of container object)))
-              (case relative-position
+            (let ((new-widget (view-in-context-of container object t)))
+              (ecase relative-position
                 (:before
-                 (insert container new-widget :before relative-widget)
+                 (container-insert container new-widget :before relative-widget)
                  (setf relative-widget new-widget
                        relative-position :after))
                 (:after
-                 (insert container new-widget :after relative-widget)
-                 (setf relative-widget new-widget))
-                (otherwise
-                 (error "Unknown relative-position: ~A" relative-position))))))
+                 (container-insert container new-widget :after relative-widget)
+                 (setf relative-widget new-widget))))))
         (dolist (object (objects-of event))
-          (let ((new-widget (view-in-context-of container object)))
-            (add new-widget container))))))
+          (let ((new-widget (view-in-context-of container object t)))
+            (container-add container new-widget))))))
 
 
 (defun mvc-container-remove (container event)
   (dolist (object (objects-of event))
-    (remove (view-in-context-of container object) container)))
+    (container-remove container (view-in-context-of container object))))
 
 
 (defun mvc-container-exchange (container event)
-  (exchange container
-            (view-in-context-of container (object-of event))
-            (view-in-context-of container (target-position-of event))))
+  (container-exchange container
+                      (view-in-context-of container (object-of event))
+                      (view-in-context-of container (target-position-of event))))
 
 
 (defmethod render ((container container))
@@ -111,7 +110,8 @@ It also holds while CONTAINER is currently being rendered. |#
       (nilf (viewport-of widget)))))
 
 
-(defmethod add ((widget widget) (container container))
+;; TODO: Get rid of this and add a :IN keyarg to CONTAINER-INSERT instead.
+(defmethod container-add ((container container) (widget widget))
   "Add or append WIDGET to CONTAINER.
 Returns WIDGET."
   (prog1 widget
@@ -122,17 +122,51 @@ Returns WIDGET."
       (render widget))))
 
 
-;; TODO: I don't think shadowing CL:REMOVE is such a great idea.
-(muffle-compiler-note
-(defmethod remove ((widget widget) &optional (container (error "CONTAINER needed.")))
+(defmethod container-insert ((container container) (widget widget) &key before after)
+  "Inserts NEW-WIDGET \"left\" or \"right\" of an already existing widget
+depending on whether :BEFORE or :AFTER is supplied."
+  #|(declare (inline oadd oprepend))|#
+  (prog1 widget
+    (cond
+      (after
+       (amx:insert widget ↺(slot-value container 'children) :after after)
+       (when (visible-p-of container)
+         (run (js-oappend (shtml-of widget) (id-of widget))
+              container)
+         (propagate-for-add widget container)
+         (render widget)))
+
+      (before
+       (amx:insert widget ↺(slot-value container 'children) :before before)
+       (when (visible-p-of container)
+         (run (js-oprepend (shtml-of widget) (id-of widget)) container)
+         (propagate-for-add widget container)
+         (render widget)))
+
+      (t
+       (error ":AFTER or :BEFORE must be supplied.")))))
+
+
+(defmethod container-exchange ((container container) (widget-a widget) (widget-b widget))
+  (with-object container
+    (setf ¤children (amx:exchange widget-a widget-b ¤children)))
+  (when (visible-p-of container)
+    (run (js-exchange (id-of widget-a) (id-of widget-b)) container)))
+
+
+(defmethod container-remove ((container container) (widget widget))
   "Remove WIDGET.
 Returns WIDGET."
-  (declare (container container))
   (prog1 widget
     (deletef (slot-value container 'children) widget)
     (when (visible-p-of container)
       (propagate-for-remove widget container)
-      (run (js-remove (id-of widget)) container)))))
+      (run (js-remove (id-of widget)) container))))
+
+
+
+
+
 
 
 (defmethod add-to* ((container container) widgets)
@@ -148,29 +182,6 @@ Returns WIDGETS."
         (render widget)))))
 
 
-(defmethod oadd ((container container) (widget widget) (left-widget widget))
-  "Inserts WIDGET as a sibling right of LEFT-WIDGET. Does the \"same as\"
-jQuery's 'after' function.
-Returns WIDGET."
-  (prog1 widget
-    (amx:insert widget ↺(slot-value container 'children) :after left-widget)
-    (when (visible-p-of container)
-      (run (js-oappend (the string (shtml-of widget))
-                       (the string (id-of left-widget)))
-           container)
-      (propagate-for-add widget container)
-      (render widget))))
-
-
-(defmethod insert ((container container) (new-widget widget) &key before after)
-  "Inserts NEW-WIDGET \"left\" or \"right\" of an already existing widget
-depending on whether :BEFORE or :AFTER is supplied."
-  (declare (inline oadd oprepend))
-  (cond
-    (after  (oadd container new-widget after))
-    (before (oprepend container new-widget before))
-    (t (error ":AFTER or :BEFORE must be supplied."))))
-
 
 #|(defmethod add ((container container) (widget widget) (left-widget widget))
   "Inserts WIDGET as a sibling right of LEFT-WIDGET. Does the \"same as\"
@@ -180,7 +191,7 @@ Returns WIDGET."
   (oadd container widget left-widget))|#
 
 
-(defmethod prepend ((container container) (widget widget))
+#|(defmethod prepend ((container container) (widget widget))
   "Prepend WIDGET to CONTAINER.
 Returns WIDGET."
   (prog1 widget
@@ -189,19 +200,7 @@ Returns WIDGET."
     (when (visible-p-of container)
       (run (js-iprepend (shtml-of widget) (id-of container)) container)
       (propagate-for-add widget container)
-      (render widget))))
-
-
-(defmethod oprepend ((container container) (widget widget) (right-widget widget))
-  "Inserts WIDGET as a sibling left of RIGHT-WIDGET. Does the \"same as\"
-jQuery's 'before' function.
-Returns WIDGET."
-  (prog1 widget
-    (amx:insert widget ↺(slot-value container 'children) :before right-widget)
-    (when (visible-p-of container)
-      (run (js-oprepend (shtml-of widget) (id-of right-widget)) container)
-      (propagate-for-add widget container)
-      (render widget))))
+      (render widget))))|#
 
 
 #|(defmethod prepend ((container container) (widget widget) (right-widget widget))
@@ -211,7 +210,7 @@ Returns WIDGET."
   (oprepend container widget right-widget))|#
 
 
-(defmethod prepend-to ((container container) &rest widgets)
+#|(defmethod prepend-to ((container container) &rest widgets)
   "Prepends each widget in WIDGETS to CONTAINER in sequence.
 Returns WIDGETS."
   (prog1 widgets
@@ -222,7 +221,7 @@ Returns WIDGETS."
         (render widget)))
     ;; This mutates WIDGETS.
     (setf (slot-value container 'children)
-          (nconc widgets (slot-value container 'children)))))
+          (nconc widgets (slot-value container 'children)))))|#
 
 
 #|(defmethod replace ((container container) (old-widget widget) (new-widget widget))
@@ -238,7 +237,7 @@ returns new-widget."
   new-widget)|#
 
 
-(defmethod remove-all ((container container)
+#|(defmethod remove-all ((container container)
                        &aux (old-children (slot-value container 'children)))
   "Remove all widgets (directly contained) in CONTAINER.
 Returns the number of widgets removed."
@@ -247,7 +246,7 @@ Returns the number of widgets removed."
     (when (visible-p-of container)
       (dolist (child old-children)
         (propagate-for-remove child container))
-      (run (js-empty (id-of container)) container))))
+      (run (js-empty (id-of container)) container))))|#
 
 
 #|(defmethod (setf children-of) ((new-child-widgets list) (container container)
@@ -263,13 +262,6 @@ already be in."
       (run (js-iappend (shtml-of child) (id-of container)) container)
       (propagate-for-add child container)
       (render child))))|#
-
-
-(defmethod exchange ((container container) (widget-a widget) (widget-b widget))
-  (with-object container
-    (setf ¤children (amx:exchange widget-a widget-b ¤children)))
-  (when (visible-p-of container)
-    (run (js-exchange (id-of widget-a) (id-of widget-b)) container)))
 
 
 (defmethod child-of ((container container))
