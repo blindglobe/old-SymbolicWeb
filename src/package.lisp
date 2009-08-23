@@ -24,24 +24,27 @@
     #:copy-array
     #:once-only)
 
+  ;; SW-MVC vs. CL and Aromyxo.
+    (:shadowing-import-from #:sw-mvc
+     #:remove
+     #:insert)
+
 
   (:shadow
-    ;; From CL.
-    #:remove #:replace
 
-    ;; From AROMYXO.
-    #:insert #:exchange #:get-obj
+   ;; From AROMYXO.
+   #:exchange
 
-    ;; From SW-MVC.
-    #:value-of
-    #:right-of #:left-of
-    #:container
-    #:add
-    #:remove #:remove-all
-    #:container-insert
-    #:container-remove
-    #:container-exchange
-    )
+   ;; From SW-MVC.
+   #:value-of
+   #:right-of #:left-of
+   #:container
+   #:add
+   #:remove #:remove-all
+   #:container-insert
+   #:container-remove
+   #:container-exchange
+   )
 
 
 
@@ -195,51 +198,51 @@
    ;;; CONTAINER
    ;;;;;;;;;;;;;
 
-   (:export
-    #:container
-    #:num-children-of
-    #:add
-    #:remove
-    #:add-to
-    #:oadd
-    #:insert
-    #:prepend
-    #:oprepend
-    #:prepend-to
-    #:replace
-    #:remove-all
-    #:children-of
-    #:child-of
-    #:html-of
-    #:mk-container
-    #:exchange
-    )
+  (:export
+   #:container
+   #:num-children-of
+   #:add
+   #:remove
+   #:add-to
+   #:oadd
+   #:insert
+   #:prepend
+   #:oprepend
+   #:prepend-to
+   #:replace
+   #:remove-all
+   #:children-of
+   #:child-of
+   #:html-of
+   #:mk-container
+   #:exchange
+   )
 
 
 
    ;;; MODEL stuff
    ;;;;;;;;;;;;;;;
 
-   (:export
-    #:model #:view
-    #:model-of #:views-of
-    #:view-in-context-of
-    #:model-add #:model-remove
-    #:mk-view
-    #:container-list-model #:content-of
-    #:single-value-model #:mk-single-value #:value-of
-    #:with-bulk-update-of
-    #:view-constructor-fn-of)
+  (:export
+   #:model #:view
+   #:model-of #:views-of
+   #:view-in-context-of
+   #:model-add #:model-remove
+   #:mk-view
+   #:container-list-model #:content-of
+   #:single-value-model #:mk-single-value #:value-of
+   #:with-bulk-update-of
+   #:view-constructor-fn-of)
 
-   (:export
-    #:filtered-model #:proxied-model #:proxied-model-of)
+  (:export
+   #:filtered-model #:proxied-model #:proxied-model-of)
 
-   (:export
-    #:filtered-container-model #:filter-fn #:filter-fn-of
-    #:hidden-p-of
-    #:shown-p-of
-    #:hide-all
-    #:show-all
-    #:hide
-    #:show
-    #:set-show-on-feedback))
+  (:export
+   #:filtered-container-model #:filter-fn #:filter-fn-of
+   #:hidden-p-of
+   #:shown-p-of
+   #:hide-all
+   #:show-all
+   #:hide
+   #:show
+   #:set-show-on-feedback))

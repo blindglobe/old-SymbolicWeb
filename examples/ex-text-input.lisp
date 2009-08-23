@@ -105,10 +105,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
   (with-object app
-    (sw-mvc:insert
+    (insert
      (mk-html ()
        (:div
-         (:h1 "TEXT-INPUT-APP")
+           (:h1 "TEXT-INPUT-APP")
 
          (:h2 "VIEW-1")
          (:sw (make-instance 'text-input-widget-view :model ¤shared-model))
