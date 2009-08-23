@@ -83,7 +83,7 @@
            (optimize speed)
            (notinline for-each-widget-in-tree))
   (funcall func widget)
-  (when (typep widget 'container)
+  (when (typep widget 'container-base)
     (dolist (child (children-of widget))
       (for-each-widget-in-tree child func)))
   (values))
