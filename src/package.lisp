@@ -35,12 +35,11 @@
   (:shadow
    ;; From AROMYXO.
    #:exchange
+
    ;; From SW-MVC.
    #:value-of
    #:right-of #:left-of
    #:container
-   #:add
-   #:remove #:remove-all
    #:container-insert
    #:container-remove
    #:container-exchange
