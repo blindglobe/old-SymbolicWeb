@@ -92,6 +92,7 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 
 
 (defmethod generate-dynamic-subdomain ((app application))
+  (declare (optimize speed (safety 1)))
   (if (break-http-connection-limit-p-of app)
       (catstr "sw.dyn-" (id-generator-next-str -id-generator-))
       nil))
@@ -129,6 +130,10 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 
 
 (defmethod render ((app application))
+  "Defines the static skeleton HTML for an application. If you define your own
+RENDER method you most likely want to include a 'sw-root' DIV element, and also
+include the JS libraries required for SW in general."
+  (declare (optimize speed))
   (with-output-to-string (ss)
     ;; :PROLOGUE set to T generates this (needed to trigger "standards mode" in IE7!):
     ;; <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
@@ -162,7 +167,7 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
                   :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
 
           (:a :accesskey 1 :href "javascript:swTerminateSession();")
-          (:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")
+          #|(:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")|#
 
           (:noscript (:p "JavaScript needs to be enabled."))
           (str (js-sw-headers app))))))))
