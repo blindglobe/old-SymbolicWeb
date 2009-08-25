@@ -26,3 +26,4 @@
 (set-uri 'sw::simple-event-flow-app "/simple-event-flow")
 (set-uri 'sw::text-input-app "/text-input")
 (set-uri 'sw::comet-test-app  "/comet-test-app")
+(set-uri 'sw::blink-app  "/blink-app")

@@ -26,4 +26,5 @@
      ;;(:file "simple-event-flow")
      (:file "ex-text-input")
      (:file "comet-test")
+     (:file "blink-app")
      ))))
