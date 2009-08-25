@@ -17,15 +17,8 @@ It also holds while CONTAINER is currently being rendered. |#
    :model (dlist)))
 
 
-(defmethod view-constructor ((container container) model)
-  (error "~S doesn't know how to make a View of~% ~S." container model))
-
-
-(defmethod view-constructor ((container container) (model single-value-model))
-  (let ((value ~model))
-    (typecase value
-      (multiple-value-model (make-instance 'container :model value))
-      (t (make-instance 'html-element :model model)))))
+(defmethod view-constructor ((container container) (model cell))
+  (make-instance 'html-element :model model))
 
 
 (defmethod view-constructor ((container container) (model multiple-value-model))
@@ -45,28 +38,48 @@ It also holds while CONTAINER is currently being rendered. |#
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-insert))
-  (let ((relative-position (relative-position-of event))
-        (relative-object (relative-object-of event)))
-    (if relative-object
-        (let ((relative-widget (view-in-context-of container relative-object)))
-          (dolist (object (objects-of event))
-            (let ((new-widget (view-in-context-of container object t)))
-              (ecase relative-position
-                (:before
-                 (container-insert container new-widget :before relative-widget)
-                 (setf relative-widget new-widget
-                       relative-position :after))
-                (:after
-                 (container-insert container new-widget :after relative-widget)
-                 (setf relative-widget new-widget))))))
+  (flet ((mk-view (object)
+           (etypecase object
+             (view-base
+              object)
+
+             (dlist-node
+              (view-in-context-of container ~object t))
+
+             (model
+              (view-in-context-of container object t)))))
+
+    (let ((relative-position (relative-position-of event))
+          (relative-object (relative-object-of event)))
+      (if relative-object
+          (let ((relative-widget (view-in-context-of container relative-object)))
+            (dolist (object (objects-of event))
+              (let ((new-widget (mk-view object)))
+                (ecase relative-position
+                  (:before
+                   (container-insert container new-widget :before relative-widget)
+                   (setf relative-widget new-widget
+                         relative-position :after))
+                  (:after
+                   (container-insert container new-widget :after relative-widget)
+                   (setf relative-widget new-widget))))))
+
         (dolist (object (objects-of event))
-          (let ((new-widget (view-in-context-of container object t)))
-            (container-add container new-widget))))))
+          (container-add container (mk-view object)))))))
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-remove))
   (dolist (object (objects-of event))
-    (container-remove container (view-in-context-of container object))))
+    (container-remove container
+                      (etypecase object
+                        (view-base
+                         object)
+
+                        (dlist-node
+                         (view-in-context-of container ~object))
+
+                        (model
+                         (view-in-context-of container object))))))
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-exchange))
@@ -75,9 +88,14 @@ It also holds while CONTAINER is currently being rendered. |#
                       (view-in-context-of container (target-position-of event))))
 
 
+(defmethod render :around ((container container))
+  ;; We'd like to render a snapshot of the entire container Model; so we "lock" it (STM).
+  ~~container
+  (call-next-method))
+
+
 (defmethod render ((container container))
   (let ((container-id (id-of container)))
-    ~~container ;; "Locks" the Model.
     (dolist (child (children-of container))
       (run (js-iappend (shtml-of child) container-id) container)
       (render child))))
