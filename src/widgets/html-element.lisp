@@ -47,7 +47,7 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 (defmacro mk-elt (args &body html-content)
   "First element of ARGS should be ELEMENT-TYPE. If it is not supplied
 :DIV is silently assumed."
-  (setf args (mklst args))
+  (setf args (ensure-list args))
   (let ((element-type (first args)))
     (unless element-type
       (setf element-type :div))
@@ -70,6 +70,7 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
               html-content
               (list args)))))
 
+;; *GRR* the syntax is (DIV (:MODEL #λ42))
 (def-elt div)
 (def-elt span)
 (def-elt b)

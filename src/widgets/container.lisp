@@ -64,8 +64,8 @@ It also holds while CONTAINER is currently being rendered. |#
                    (container-insert container new-widget :after relative-widget)
                    (setf relative-widget new-widget))))))
 
-        (dolist (object (objects-of event))
-          (container-add container (mk-view object)))))))
+          (dolist (object (objects-of event))
+            (container-add container (mk-view object)))))))
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-remove))
