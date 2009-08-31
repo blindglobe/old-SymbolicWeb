@@ -74,7 +74,9 @@ Returns two values; a VIEWPORT instance and whether a new one was created or not
   (with-locked-object app
     (if-let (viewport (gethash viewport-id (viewports-of app)))
       (values viewport nil)
-      (values (make-instance 'viewport :id viewport-id :application app) t))))
+      (values (with-sync (:name 'find-or-create-viewport)
+                (make-instance 'viewport :id viewport-id :application app))
+              t))))
 
 
 (defmethod visible-p-of ((viewport viewport) &key)
