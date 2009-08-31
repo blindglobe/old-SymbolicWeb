@@ -16,7 +16,6 @@
          (mk-html ()
            (:div
 
-
             (:h1 "nostdal.org")
             (:em "NOTE: This is being served from an ADSL connection. "
                  "This'll be very slow or even down at random.")
@@ -38,7 +37,6 @@
              (:li "Firebug")
              (:li "Firecookie")
              (:li "Flashblock")
-             (:li "Google Gears")
              (:li "Page Speed (maybe..)")
              (:li "Tabs Open Relative")
              (:li "Tiny Menu"))

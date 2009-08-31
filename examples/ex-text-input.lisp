@@ -64,6 +64,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   'sync-back' connection does not cause things to get stuck propagating in circles, this applies for two-way
   connections as well. |#
   (with-object view
+    ;; TODO: Consider moving some of the piping here to widgets/text-input.lisp ..?
     (list (setf ~¤x (with-object model
                       (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
 

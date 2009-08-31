@@ -189,8 +189,7 @@ fixing this.
 
       (:ajax
        (setf (last-user-activity-time-of viewport) *request-time*)
-       (with-sync (:name :ajax)
-         (handle-ajax-request server app viewport))
+       (with-sync (:name :ajax) (handle-ajax-request server app viewport))
 
        (sw-http:response-add-chunk
         #.(sw-http:combine-buffers

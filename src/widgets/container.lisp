@@ -180,7 +180,7 @@ depending on whether :BEFORE or :AFTER is supplied."
 
 
 
-(defmethod add-to* ((container container) widgets)
+#|(defmethod add-to* ((container container) widgets)
   "Adds or appends each widget in WIDGETS to CONTAINER in sequence.
 Returns WIDGETS."
   (declare (list widgets))
@@ -190,8 +190,7 @@ Returns WIDGETS."
       (dolist (widget widgets)
         (run (js-iappend (shtml-of widget) (id-of container)) container)
         (propagate-for-add widget container)
-        (render widget)))))
-
+        (render widget)))))|#
 
 
 #|(defmethod add ((container container) (widget widget) (left-widget widget))
