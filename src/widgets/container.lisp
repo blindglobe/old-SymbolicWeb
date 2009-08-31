@@ -100,26 +100,23 @@ It also holds while CONTAINER is currently being rendered. |#
 
 
 #.(maybe-inline 'propagate-for-add)
-(defun propagate-for-add (widget container)
-  (declare (widget widget)
-           (container container))
+(defn propagate-for-add (null ((widget widget) (container container-base)))
   (let* ((viewport (viewport-of container))
          (widgets (widgets-of (application-of viewport))))
     (with-each-widget-in-tree (:root widget)
       (setf (gethash (id-of widget) widgets) widget
-            (viewport-of widget) viewport))))
+            (viewport-of widget) viewport)))
+  (values))
 
 
 #.(maybe-inline 'propagate-for-remove)
-(defun propagate-for-remove (widget container)
-  (declare (widget widget)
-           (container container)
-           (ignore container))
+(defn propagate-for-remove (null ((widget widget)))
   (let* ((viewport (viewport-of widget))
          (widgets (widgets-of (application-of viewport))))
     (with-each-widget-in-tree (:root widget)
       (remhash (id-of widget) widgets)
-      (nilf (viewport-of widget)))))
+      (nilf (viewport-of widget))))
+  (values))
 
 
 ;; TODO: Get rid of this and add a :IN keyarg to CONTAINER-INSERT instead.
@@ -173,7 +170,7 @@ depending on whether :BEFORE or :AFTER is supplied."
   (when-commit ()
     (deletef (slot-value container 'children) widget)
     (when (visible-p-of container)
-      (propagate-for-remove widget container)
+      (propagate-for-remove widget)
       (run (js-remove (id-of widget)) container)))
   (values))
 
