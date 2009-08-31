@@ -52,16 +52,16 @@ It also holds while CONTAINER is currently being rendered. |#
       (if relative-object
           (let ((relative-widget (view-in-context-of container relative-object)))
             (dolist (object (objects-of event))
-              (let ((new-widget (mk-view object)))
-                (ecase relative-position
+              (ecase relative-position
                   (:before
-                   (container-insert container new-widget :before relative-widget)
-                   (setf relative-widget new-widget
-                         relative-position :after))
+                   (let ((new-widget (mk-view object)))
+                     (container-insert container new-widget :before relative-widget)
+                     (setf relative-widget new-widget
+                           relative-position :after)))
                   (:after
-                   (container-insert container new-widget :after relative-widget)
-                   (setf relative-widget new-widget))))))
-
+                   (let ((new-widget (mk-view object)))
+                     (container-insert container new-widget :after relative-widget)
+                     (setf relative-widget new-widget))))))
           (dolist (object (objects-of event))
             (container-add container (mk-view object)))))))
 
