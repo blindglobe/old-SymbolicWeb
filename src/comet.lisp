@@ -15,15 +15,16 @@
     (when-let (do (sw-http:get-parameter "do"))
       (cond
         ((string= do "refresh")
-         ;; TODO: WITH-SYNC
-         (let ((*replace-address-bar-p* t))
-           (unless (initialized-p-of app)
-             (tf (slot-value app 'initialized-p)) ;; TODO: Shouldn't this be done after the call to MAIN?
-             (main app))
+         (with-sync ()
+           (let ((*replace-address-bar-p* t))
+             (unless (initialized-p-of app)
+               (when-commit () ;; TODO: Using a REF for INITIALIZED-P would make sense.
+                 (tf (slot-value app 'initialized-p)))
+               (main app))
 
-           (render-viewport viewport app)
-           (sync-widgets (sw-http:get-parameter "hash") t)
-           (on-refresh app viewport)))
+             (render-viewport viewport app)
+             (sync-widgets (sw-http:get-parameter "hash") t)
+             (on-refresh app viewport))))
 
         #|((string= do "ack")
         (nilf (slot-value viewport 'prev-response-data)))|#))

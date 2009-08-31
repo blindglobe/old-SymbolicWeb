@@ -179,9 +179,10 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
 (defmethod create-new-session ((server server))
   (when-let (app-class (gethash (sw-http:path) (path->app-class-of server)))
     (let* ((cookie-value (generate-random-cookie-value server))
-           (app (make-instance app-class
-                               :cookie-value cookie-value
-                               :server server)))
+           (app (with-sync (:name 'create-new-session)
+                  (make-instance app-class
+                                 :cookie-value cookie-value
+                                 :server server))))
       (setf (gethash (id-of app) (id->app-of server)) app
             (gethash cookie-value (cookie-value->app-of server)) app)
       app)))
