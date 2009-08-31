@@ -8,7 +8,7 @@
 
 
 #| TODO: Think about this; this is only used by code below in this file. |#
-(eval-now (defvar *sw-debug* t))
+(define-variable *sw-debug* :value t)
 (export '*sw-debug*)
 
 
@@ -19,7 +19,7 @@
 
 (define-variable -break-http-connection-limit-p-
     :value t
-    :kind :global)
+    :type (member t nil))
 
 
 
@@ -29,7 +29,7 @@
 
 (define-variable -server-close-connection-p-
     :value nil
-    :kind :global
+    :type (member t nil)
     :doc "
 * Lighttpd-1.4.x: this must be T.
 * Lighttpd-1.5.x: this can be NIL.")
@@ -37,42 +37,42 @@
 
 (define-variable -sw-comet-timeout-
     :value 30
-    :kind :global)
+    :type fixnum)
 
 
 (define-variable -server-default-type-
     :value 'sw-http-server
-    :kind :global)
+    :type symbol)
 
 
 (define-variable -server-default-port-
     :value 6001
-    :kind :global)
+    :type fixnum)
 
 
 (define-variable -server-default-static-data-subdomain-
     :value nil
-    :kind :global
+    :type (or null string)
     :doc "A string like `sw-static' (no slash prefix) or NIL.")
 
 
 (define-variable -server-default-static-path-
     :value "sw-static"
-    :kind :global
+    :type string
     :doc "A string like `sw-static' (no dot) or NIL.")
 
 
 (define-variable -server-default-static-data-fs-path-
     :value (catstr (namestring (user-homedir-pathname))
                    "symbolicweb-data/")
-    :kind :global
+    :type string
     :doc "This should probably point to the data/ directory of the SymbolicWeb source
 code root.")
 
 
 (define-variable -server-default-gc-frequency-
     :value (* 60 #|seconds|# 1000)
-    :kind :global)
+    :type fixnum)
 
 
 (eval-now (use-package :sw-jquery))
@@ -80,23 +80,31 @@ code root.")
 
 (define-variable -timeout-
     :value 10
-    :kind :global
+    :type fixnum
     :doc "Time before a non-async call to RUN times out.")
 
 
 (define-variable +global-object-access-p+
     :value t
-    :kind :constant
+    :type (member nil t)
     :doc "The GET-OBJ function can be used to access any object in SW when this is T.")
 
 
-(define-variable +auto-set-viewport-support-p+ :value *sw-debug* :kind :constant)
-(define-variable -auto-set-viewport-p- :value t :kind :global)
-(export '-auto-set-viewport-)
+(define-variable +auto-set-viewport-support-p+
+    :value *sw-debug*
+    :type (member t nil))
+(define-variable -auto-set-viewport-p-
+    :value t
+    :type (member t nil))
+(export '-auto-set-viewport-p-)
 
-(define-variable +auto-set-app-support-p+ :value *sw-debug* :kind :constant)
-(define-variable -auto-set-app-p- :value t :kind :global)
-(export '-auto-set-app-)
+(define-variable +auto-set-app-support-p+
+    :value *sw-debug*
+    :type (member t nil))
+(define-variable -auto-set-app-p-
+    :value t
+    :type (member t nil))
+(export '-auto-set-app-p-)
 
 
 
@@ -107,17 +115,17 @@ code root.")
 (define-variable -default-long-poll-frequency-
     :value (/ -server-default-gc-frequency- 1000
               2)
-    :kind :global)
+    :type fixnum)
 (export '-default-long-poll-frequency-)
 
 ;; This must be larger than *DEFAULT-LONG-POLL-FREQUENCY*
 (define-variable -app-visible-p-timeout-
     :value (+ 10 -default-long-poll-frequency-)
-    :kind :global)
+    :type fixnum)
 (export '-app-visible-p-timeout-)
 
 
 (define-variable -viewport-visible-p-timeout-
     :value -app-visible-p-timeout-
-    :kind :global)
+    :type fixnum)
 (export '-viewport-visible-p-timeout-)

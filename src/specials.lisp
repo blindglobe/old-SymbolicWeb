@@ -3,13 +3,30 @@
 (in-package #:sw)
 
 
-(defvar *server* nil)
+(define-variable *request-time*
+    :value nil
+    :type (or null unsigned-byte))
+
+;; TODO: Is this really useful? It seems be bound in server-sw-http.lisp then only used in viewport.lisp.
+(define-variable *request-type*
+    :value :unknown
+    :type (member :ajax :comet :regular :unknown)
+    :doc ":AJAX, :COMET, :REGULAR or :UNKNOWN.")
+
+
+(define-variable *server*
+    :value nil
+    :type (or null server))
 (export '*server*)
 
-(defvar *app* nil)
+(define-variable *app*
+    :value nil
+    :type (or null application))
 (export '*app*)
 
-(defvar *viewport* nil)
+(define-variable *viewport*
+    :value nil
+    :type (or null viewport))
 (export '*viewport*)
 
 
@@ -18,31 +35,35 @@
 (export '*root*)
 
 
-;; TODO: Is this really useful? It seems be bound in server-sw-http.lisp then only used in viewport.lisp.
-(defvar *request-type* :unknown
-  ":AJAX, :COMET, :REGULAR or :UNKNOWN.")
-(export '*request-type*)
+(define-variable *js-code-only-p*
+    :value nil
+    :type (member t nil)
+    :doc "Used by the macros JS-CODE-OF and WITH-JS-CODE-FROM (src/js/util.lisp).")
 
 
-(defvar *js-code-only-p* nil
-  "Used by the macros JS-CODE-OF and WITH-JS-CODE-FROM (src/js/util.lisp).")
-
-
-(defvar *bulk-update-p* nil)
+(define-variable *bulk-update-p*
+    :value nil
+    :type (or null cons))
 
 
 ;; :AROUND INITIALIZE-INSTANCE ((.. widget) ..)
-(defvar *currently-constructing-widget* nil)
+(define-variable *currently-constructing-widget*
+    :value nil
+    :type (or null widget))
 
 
 ;; (ajax.lisp)
-(defvar *current-event* nil
-  "This will contain an instance of EVENT (widgets/events.lisp).")
+(define-variable *current-event*
+    :value nil
+    :type (or null callback-box)
+    :doc "This will contain an instance of EVENT (widgets/events.lisp).")
 
 
 ;;; Stuff for HTML-CONTAINER (widgets/html-container.lisp).
-(defvar *creating-html-container-p* nil)
-(defvar *html-container-children* nil)
+(define-variable *creating-html-container-p*
+    :value nil
+    :type (or null html-container))
 
-
-(defvar *request-time* nil)
+(define-variable *html-container-children*
+    :value nil
+    :type list)
