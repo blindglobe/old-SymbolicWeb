@@ -52,10 +52,10 @@
     :type (or null widget))
 
 
-;; (ajax.lisp)
+;; (ajax.lisp widgets/events.lisp)
 (define-variable *current-event*
     :value nil
-    :type (or null callback-box)
+    :type (or null event)
     :doc "This will contain an instance of EVENT (widgets/events.lisp).")
 
 
