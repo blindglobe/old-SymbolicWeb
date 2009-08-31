@@ -28,13 +28,11 @@ It also holds while CONTAINER is currently being rendered. |#
 (defmethod (setf model-of) ((model dlist) (container container))
   (prog1
       #λ(when-let (event (event-of model))
-          (when-commit ()
-            (handle-model-event container event)))
+          (handle-model-event container event))
 
       (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
           ((null dlist-node))
-        (when-commit ()
-          (container-add container (view-in-context-of container dlist-node))))))
+        (container-add container (view-in-context-of container ~dlist-node t)))))
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-insert))
@@ -126,21 +124,20 @@ It also holds while CONTAINER is currently being rendered. |#
 
 ;; TODO: Get rid of this and add a :IN keyarg to CONTAINER-INSERT instead.
 (defmethod container-add ((container container) (widget widget))
-  "Add or append WIDGET to CONTAINER.
-Returns WIDGET."
-  (prog1 widget
+  "Add or append WIDGET to CONTAINER."
+  (when-commit ()
     (amx:insert widget ↺(slot-value container 'children) :last-p t)
     (when (visible-p-of container)
       (run (js-iappend (shtml-of widget) (id-of container)) container)
       (propagate-for-add widget container)
-      (render widget))))
+      (render widget)))
+  (values))
 
 
 (defmethod container-insert ((container container) (widget widget) &key before after)
   "Inserts NEW-WIDGET \"left\" or \"right\" of an already existing widget
 depending on whether :BEFORE or :AFTER is supplied."
-  #|(declare (inline oadd oprepend))|#
-  (prog1 widget
+  (when-commit ()
     (cond
       (after
        (amx:insert widget ↺(slot-value container 'children) :after after)
@@ -158,24 +155,27 @@ depending on whether :BEFORE or :AFTER is supplied."
          (render widget)))
 
       (t
-       (error ":AFTER or :BEFORE must be supplied.")))))
+       (error ":AFTER or :BEFORE must be supplied."))))
+  (values))
 
 
 (defmethod container-exchange ((container container) (widget-a widget) (widget-b widget))
-  (with-object container
-    (setf ¤children (amx:exchange widget-a widget-b ¤children)))
-  (when (visible-p-of container)
-    (run (js-exchange (id-of widget-a) (id-of widget-b)) container)))
+  (when-commit ()
+    (with-object container
+      (setf ¤children (amx:exchange widget-a widget-b ¤children)))
+    (when (visible-p-of container)
+      (run (js-exchange (id-of widget-a) (id-of widget-b)) container)))
+  (values))
 
 
 (defmethod container-remove ((container container) (widget widget))
-  "Remove WIDGET.
-Returns WIDGET."
-  (prog1 widget
+  "Remove WIDGET."
+  (when-commit ()
     (deletef (slot-value container 'children) widget)
     (when (visible-p-of container)
       (propagate-for-remove widget container)
-      (run (js-remove (id-of widget)) container))))
+      (run (js-remove (id-of widget)) container)))
+  (values))
 
 
 
