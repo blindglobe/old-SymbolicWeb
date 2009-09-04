@@ -15,7 +15,8 @@
     (when-let (do (sw-http:get-parameter "do"))
       (cond
         ((string= do "refresh")
-         (with-sync ()
+         ;; TODO: Think about the WITH-SYNC here a bit.
+         (with-sync (:name 'handle-comet-response-refresh)
            (let ((*replace-address-bar-p* t))
              (unless (initialized-p-of app)
                (when-commit () ;; TODO: Using a REF for INITIALIZED-P would make sense.

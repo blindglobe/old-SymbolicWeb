@@ -7,10 +7,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 (defclass text-input-widget-model (self-ref)
-  ((x :initform #λ(random 100))
-   (y :initform #λ(random 100))
-   (square-of-x :initform ↑#λ(* ¤x ¤x))
-   (sum :initform ↑#λ(+ ¤square-of-x ¤y)))
+  ((x :initform (random 100))
+   (y :initform (random 100))
+   (square-of-x :initform ↑λf(* ¤x ¤x))
+   (sum :initform ↑λf(+ ¤square-of-x ¤y)))
 
   (:metaclass mvc-class))
 
@@ -97,9 +97,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 (defclass text-input-app (application)
-  ((shared-model :initform (make-instance 'text-input-widget-model)))
-
-  (:metaclass mvc-class))
+  ((shared-model :initform (make-instance 'text-input-widget-model))))
 
 (set-uri 'text-input-app "/text-input")
 
@@ -109,7 +107,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
     (insert
      (mk-html ()
        (:div
-           (:h1 "TEXT-INPUT-APP")
+         (:h1 "TEXT-INPUT-APP")
 
          (:h2 "VIEW-1")
          (:sw (make-instance 'text-input-widget-view :model ¤shared-model))
