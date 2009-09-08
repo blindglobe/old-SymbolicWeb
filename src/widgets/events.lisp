@@ -30,7 +30,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
        :initform (id-generator-next-str -id-generator-))
 
    (widget :reader widget-of :initarg :widget
-           :type widget
+           :type dom-mirror
            :initform (error ":WIDGET needed"))
 
    (event-cell :reader event-cell-of :initarg :event-cell
@@ -58,15 +58,16 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
 (defun remove-callback-box (callback-box widget)
   (declare (callback-box callback-box)
-           (widget widget))
+           (dom-mirror widget))
   (remhash (id-of callback-box) (callbacks-of widget)))
 
 
 (defun find-callback-box (widget-id callback-id app)
   (declare (string widget-id callback-id)
            (application app))
-  (when-let (widget (gethash widget-id (widgets-of app)))
-    (gethash callback-id (callbacks-of widget))))
+  (or (when-let (widget (gethash widget-id (widgets-of app)))
+        (gethash callback-id (callbacks-of widget)))
+      (gethash callback-id (callbacks-of *viewport*))))
 
 
 (defun execute-callback (callback-box args)
@@ -90,7 +91,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
 #|(export 'event-remove)|#
 
 
-(defmethod js-before-check ((widget widget) (lisp-accessor-name symbol))
+(defmethod js-before-check ((widget dom-mirror) (lisp-accessor-name symbol))
   "return true;")
 
 
@@ -132,7 +133,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
        :dom-client-writer
        (lambda (cb widget &rest args)
          (declare (callback-box cb)
-                  (widget widget))
+                  (dom-mirror widget))
          (apply #'event-dom-client-writer widget cb
                 (lambda ()
                   (js-bind (id-of widget) ,event-type
