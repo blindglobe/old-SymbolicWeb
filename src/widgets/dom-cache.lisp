@@ -12,10 +12,10 @@
                     :documentation "
 DOM attributes, CSS properties etc.")
 
-   (callbacks-of :reader callbacks-of
-                 :type hash-table
-                 :initform (make-hash-table :test #'equal)
-                 :documentation "
+   (callbacks :reader callbacks-of
+              :type hash-table
+              :initform (make-hash-table :test #'equal)
+              :documentation "
 Strong hash table; ID->CALLBACK-BOX.")))
 
 
