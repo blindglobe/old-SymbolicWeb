@@ -36,3 +36,4 @@
 (set-uri 'sw::text-input-app "/text-input")
 (set-uri 'sw::comet-test-app  "/comet-test-app")
 (set-uri 'sw::blink-app  "/blink-app")
+(set-uri 'sw::resize-event-app "/resize-event-app")

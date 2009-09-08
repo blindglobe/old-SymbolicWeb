@@ -27,4 +27,5 @@
      (:file "ex-text-input")
      (:file "comet-test")
      (:file "blink-app")
+     (:file "resize-event")
      ))))
