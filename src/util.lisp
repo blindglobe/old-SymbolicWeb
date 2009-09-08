@@ -18,6 +18,10 @@
     ;;(mk-static-data-url *server* "javascript/jquery.address-1.0.min.js")
     ;;"'></script>"
 
+    "<script type='text/javascript' src='"
+    (mk-static-data-url *server* "javascript/jquery-debounce/jquery.debounce.js")
+    "'></script>"
+
     ;; It is important that this is done before sw-ajax.js (below) is loaded+evaled.
     "<script type='text/javascript'>"
     "sw_viewport_id = \"" (id-generator-next-str -id-generator-) "\";"

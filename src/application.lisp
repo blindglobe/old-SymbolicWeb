@@ -157,10 +157,7 @@ include the JS libraries required for SW in general."
           "}"))
 
        (:body
-        #| NOTE/TODO: Browsers tend to add scrollbars for sub-pixel errors in their own rendering; this will
-        probably be set to "hidden" later for that reason; it'll force the user to be more explicit in what he
-        wants instead. |#
-        (:div :id "sw-root" :style "overflow: auto;")
+        (:div :id "sw-root" :style "overflow: visible;")
         (:div
             (:img :id "sw-loading-spinner" :alt ""
                   :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"

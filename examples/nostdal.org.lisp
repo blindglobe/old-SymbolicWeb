@@ -15,34 +15,23 @@
   (with
       (mk-html ()
         (:div
+          (:h1 "nostdal.org")
+          (:em "PS: This is being served from an ADSL connection."
+               "This'll be very slow or down at random.")
 
-            (:h1 "nostdal.org")
-          (:em "NOTE: This is being served from an ADSL connection. "
-            "This'll be very slow or even down at random.")
           (:ul
            (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious") ": collection of source code repositories")
-           (:li (:a :href "text-input" "text-input-app") ": silly dataflow test application")
-           (:li (:a :href "comet-test-app" "comet-test-app") ": silly comet test application"))
+           (:li (:a :href "text-input" "text-input-app") ": dataflow test thing")
+           (:li (:a :href "comet-test-app" "comet-test-app") ": comet test thing")
+           (:li (:a :href "resize-event-app" "resize-event-app")
+             ": scalable vector graphics, fonts, text and labels")
+           (:li (:a :href "http://nostdal.org/lnostdal/always-here/sw/vector/" "scalable vector fonts and text")
+             ": videos of vector based graphics, fonts and text that scale to any screen size in all browsers"))
 
-
-          (:h2 "Chat")
-          (:iframe :src "http://webchat.freenode.net/?randomnick=1&channels=nostdal.org&prompt=1"
-                   :width 647 :height 400)
-
-
-          (:h2 "Firefox addons")
-          (:p "I keep forgetting the names of these, so as a note-to-self (and maybe others) here is "
-              "some of the must-have stuff:")
-          (:ul
-           (:li "Firebug")
-           (:li "Firecookie")
-           (:li "Flashblock")
-           (:li "Page Speed (maybe..)")
-           (:li "Tabs Open Relative")
-           (:li "Tiny Menu"))
-
+          (:p "..and yes, I despise people.")
 
           (:hr :width "100%")
           (:pre "λ(:linux :lighttpd :sbcl :sw-http :sw-mvc :sw-stm :sw-db :symbolicweb)λ")))
+
     (setf (margin-of it) "1%")
     (insert it :in (root))))
