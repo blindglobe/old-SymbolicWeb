@@ -15,6 +15,7 @@
                :aromyxo
                :sw-stm
                :symbolicweb-jquery ;; Default JS generator backend.
+               :vecto
                )
 
   :serial t
@@ -57,6 +58,7 @@
         (:file "button")
         (:file "html-container")
         (:file "text-input")
+        (:file "image")
         #|
         (:file "container-with-1-active-item")
         (:file "html-elements")
@@ -69,7 +71,6 @@
         (:file "radio-button")
         (:file "checkbox")
         (:file "link")
-        (:file "image")
         (:file "slider")
         (:file "cursor")
         (:file "combo-box")
