@@ -109,10 +109,12 @@ refresh."
   (declare (ignore app))
   ;; TODO: This is pretty stupid, but it gets rid of the "always loading" thing in Firefox when using random
   ;; subdomains and the "page" is empty on initial load.
-  (run "2+2;" viewport))
+  ;; NOTE: This isn't needed anymore since we call SET-LOADING-P in the :AFTER method.
+  #|(run "2+2;" viewport)|#)
 
 
 (defmethod render-viewport :after ((viewport viewport) (app application))
+  (set-loading-p nil)
   (if-let ((widget (with (last-focus-of app)
                      (withp (etypecase it
                               (widget it)

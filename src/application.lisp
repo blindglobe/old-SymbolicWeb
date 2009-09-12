@@ -159,15 +159,15 @@ include the JS libraries required for SW in general."
        (:body
         (:div :id "sw-root" :style "overflow: visible;")
         (:div
-            (:img :id "sw-loading-spinner" :alt ""
-                  :style "display: none; position: absolute; z-index: 1000; right: 0px; top: 0;"
-                  :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
+         (:img :id "sw-loading-spinner" :alt ""
+               :style "position: absolute; z-index: 1000; right: 0px; top: 0px;"
+               :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
 
-          (:a :accesskey 1 :href "javascript:swTerminateSession();")
-          #|(:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")|#
+         (:a :accesskey 1 :href "javascript:swTerminateSession();")
+         #|(:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")|#
 
-          (:noscript (:p "JavaScript needs to be enabled."))
-          (str (js-sw-headers app))))))))
+         (:noscript (:p "JavaScript needs to be enabled."))
+         (str (js-sw-headers app))))))))
 
 
 (defmethod remove-application ((app application) &optional (server *server*))
