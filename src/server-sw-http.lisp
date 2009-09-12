@@ -108,7 +108,7 @@ fixing this.
        (sw-http:response-add-chunk
         #.(sw-http:combine-buffers
            (sw-http:mk-response-status-code 200)
-           (sw-http:mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
+           (sw-http:mk-response-header-field "Content-Type: text/javascript; charset=utf-8")
            (sw-http:mk-response-header-field "Connection: keep-alive")))
        (sw-http:response-add-chunk
         (sw-http:mk-response-message-body
@@ -183,7 +183,7 @@ fixing this.
        (sw-http:response-add-chunk
         #.(sw-http:combine-buffers
            (sw-http:mk-response-status-code 200)
-           (sw-http:mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")
+           (sw-http:mk-response-header-field "Content-Type: text/javascript; charset=utf-8")
            (sw-http:mk-response-header-field "Connection: keep-alive")))
        (handle-comet-request server app viewport))
 
@@ -194,7 +194,7 @@ fixing this.
        (sw-http:response-add-chunk
         #.(sw-http:combine-buffers
            (sw-http:mk-response-status-code 200)
-           #|(sw-http:mk-response-header-field "Content-Type: application/x-javascript; charset=utf-8")|#
+           #|(sw-http:mk-response-header-field "Content-Type: text/javascript; charset=utf-8")|#
            (sw-http:mk-response-header-field "Content-Type: text/plain; charset=utf-8")
            (sw-http:mk-response-header-field "Connection: keep-alive")
            (sw-http:mk-response-message-body "")))

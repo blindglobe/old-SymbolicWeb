@@ -143,7 +143,7 @@ include the JS libraries required for SW in general."
         (:title (str (string-capitalize (type-of app))))
         (:meta :name "Author" :content (http-meta-author-of app))
         (:meta :http-equiv "X-UA-Compatible" :content "IE=edge") ;; For IE8 and up.
-        (:meta :http-equiv "Content-Type" :content "text/html;charset=UTF-8")
+        (:meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
 
         ;; TODO: Move this to a slot in APPLICATION.
         (:style :type "text/css"
