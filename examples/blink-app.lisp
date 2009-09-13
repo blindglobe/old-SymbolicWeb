@@ -5,7 +5,9 @@
 
 (defclass blink-app (application)
   ((state :allocation :class
-          :initform #λnil)))
+          :initform nil))
+
+  (:metaclass mvc-class))
 
 (set-uri 'blink-app "/blink-app")
 
@@ -17,7 +19,7 @@
         (loop
            (with-bulk-update
              (with-sync ()
-               (setf ~¤state (not ~¤state))))
+               (setf ¤state (not ¤state))))
            (sleep 1))))))
 
 
@@ -31,7 +33,7 @@
 
          (:sw (with1 (h2 "WEB 2.0 is here! ♥")
                 (with-formula it
-                  (if ~¤state
+                  (if ¤state
                       (show it)
                       (hide it)))))
 
