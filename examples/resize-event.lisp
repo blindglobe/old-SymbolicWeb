@@ -31,6 +31,8 @@
             (when (zerop width) (incf width))
             (when (zerop height) (incf height))
             #|(format t "~%(width ~A) (height ~A)~%" width height)|#
+            ;; TODO: Cache (hash-table) the result here.
+            ;; TODO: Use optipng (queue+background-thread?) to compress the result further.
             (unless (probe-file filename)
               (vecto:with-canvas (:width width :height height)
                 (vecto:with-graphics-state
@@ -87,11 +89,12 @@
                 (vecto:stroke)
                 (vecto:save-png filename)))
             (setf (src-of (child-of (root)))
-                  (catstr "http://nostdal.org/sw-static/vecto-test-" width-str "x" height-str ".png")))))))
+                  (mk-static-data-url app (catstr "vecto-test-" width-str "x" height-str ".png"))))))))
 
   ;; TODO: Move this to the DOM API.
   (run (catstr "$(window).resize("
                ;; You see; this is why JavaScript is nice.
+               ;; TODO: Don't debounce on initial load (pass 'true' to the ASAP arg. of debounce, I think).
                "$.debounce("
                (js-msg (id-of viewport) "resize"
                        :callback-data `(("width"  . "return $('#sw-root').innerWidth();")
@@ -110,4 +113,4 @@
   (insert (mk-image "") :in (root))
 
   ;; Boot things up. TODO: Move this.
-  (run "$(window).resize();" viewport))
+  (run (catstr "$(window).resize();" +lf+) viewport))

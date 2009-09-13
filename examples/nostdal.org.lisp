@@ -24,11 +24,10 @@
            (:li (:a :href "text-input" "text-input-app") ": dataflow test thing")
            (:li (:a :href "comet-test-app" "comet-test-app") ": comet test thing")
            (:li (:a :href "resize-event-app" "resize-event-app")
-             ": scalable vector graphics, fonts, text and labels")
+             ": scalable vector graphics, fonts, text and labels (try resizing your browser window)")
            (:li (:a :href "http://nostdal.org/lnostdal/always-here/sw/vector/" "scalable vector fonts and text")
              ": videos of vector based graphics, fonts and text that scale to any screen size in all browsers"))
 
-          (:p "..and yes, I despise people.")
 
           (:hr :width "100%")
           (:pre "λ(:linux :lighttpd :sbcl :sw-http :sw-mvc :sw-stm :sw-db :symbolicweb)λ")))

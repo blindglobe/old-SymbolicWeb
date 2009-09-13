@@ -28,7 +28,6 @@
     (insert
       (mk-html ()
         (:div
-
          (:h1 "BLINK-APP")
 
          (:sw (with1 (h2 "WEB 2.0 is here! ♥")
