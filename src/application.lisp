@@ -148,8 +148,9 @@ include the JS libraries required for SW in general."
         ;; TODO: Move this to a slot in APPLICATION.
         (:style :type "text/css"
           "html, body, #sw-root {"
-          "  position: absolute; overflow: hidden;"
-          "  height: 100%; width: 100%;"
+          "  position: absolute;"
+          "  width: 100%; height: 100%;"
+          "  overflow: hidden;"
           "  margin: 0; padding: 0; border: 0;"
           "}"
           ".sw-hide {"
@@ -157,7 +158,7 @@ include the JS libraries required for SW in general."
           "}"))
 
        (:body
-        (:div :id "sw-root" :style "overflow: visible;")
+        (:div :id "sw-root")
         (:div
          (:img :id "sw-loading-spinner" :alt ""
                :style "position: absolute; z-index: 1000; right: 0px; top: 0px;"
