@@ -27,8 +27,7 @@
 
 
 (defmethod update-client ((html-container html-container))
-  (run (setf (js-html-of (id-of html-container))
-             (html-content-of html-container))
+  (run (setf (js-html-of (id-of html-container)) (html-content-of html-container))
        html-container)
   (dolist (child (children-of html-container))
     (render child)))
