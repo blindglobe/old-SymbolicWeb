@@ -95,6 +95,9 @@ in any session in any viewport."
 
 
 (defmethod render ((widget widget))
+  "These methods must never 'pull' from their MODEL ends; the MODEL should 'push'.
+These methods might be called from within the dynamic scope of a WHEN-COMMIT
+body (widgets/container.lisp)."
   )
 (export 'render)
 

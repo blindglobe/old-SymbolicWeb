@@ -6,7 +6,11 @@
 
 
 (defclass html-element (widget)
-  ((nil-denotes-empty-string-p :accessor nil-denotes-empty-string-p-of :initarg :nil-denotes-empty-string-p
+  ((html-content :accessor html-content-of
+                 :documentation "
+Not meant to be manipulated directly; use the MODEL instead.")
+
+   (nil-denotes-empty-string-p :accessor nil-denotes-empty-string-p-of :initarg :nil-denotes-empty-string-p
                                :initform t)
 
    (escapep :accessor escapep-of :initarg :escapep
@@ -32,13 +36,18 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 
 
   (defmethod render ((html-element html-element))
-    (update-html html-element ~~html-element))
+    (update-html html-element (html-content-of html-element)))
+
+
+  (defmethod (setf html-content-of) :after (new-html (html-element html-element))
+    (update-html html-element new-html))
 
 
   (defmethod (setf model-of) ((model cell) (html-element html-element))
-    #λ(let ((model-value ~model))
+    #λ(with ~model
         (when-commit ()
-          (update-html html-element model-value)))))
+          (setf (html-content-of html-element) it)))))
+
 
 
 
