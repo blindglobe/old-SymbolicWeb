@@ -52,17 +52,8 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
         (setf ~~text-input value)
 
         (when (clear-on-enterpress-p-of text-input)
-          (when-commit ()
-            (setf (value-of text-input :client-only-p t) "")
-            (text-input-update-client-cache "" text-input)))))))
-
-
-(defun text-input-update-client-cache (value-str text-input)
-  (declare (string value-str)
-           (text-input text-input))
-  (declare (optimize speed (safety 2)))
-  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" (url-encode value-str) "\";" +lf+)
-       text-input))
+          (setf (value-of text-input :client-only-p t) "")
+          (text-input-update-client-cache "" text-input))))))
 
 
 (let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
@@ -93,6 +84,14 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
   (defmethod initialize-callback-box ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of))
                                       (callback-box callback-box))
     (setf (argument-parser-of callback-box) #'parse-client-args)))
+
+
+(defun text-input-update-client-cache (value-str text-input)
+  (declare (string value-str)
+           (text-input text-input))
+  (declare (optimize speed (safety 2)))
+  (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" (url-encode value-str) "\";" +lf+)
+       text-input))
 
 
 (fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
