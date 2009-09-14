@@ -5,7 +5,7 @@
 
 (defclass blink-app (application)
   ((state :allocation :class
-          :initform nil))
+          :initform #λnil))
 
   (:metaclass mvc-class))
 

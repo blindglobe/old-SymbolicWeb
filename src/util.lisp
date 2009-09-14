@@ -79,7 +79,7 @@
                        (t (error "CL-WHO syntax for :SW doesn't know what to do with: ~S" maybe-widget))))))))
 
 
-;; NOTE/TODO: Placed here because of bootstrapping issues..
+;; NOTE/TODO: Placed here because of bootstrapping issues.. move to some bootstrap*.lisp file?
 #.(maybe-inline 'for-each-widget-in-tree)
 (defun for-each-widget-in-tree (widget func)
   (declare ((function (widget-base)) func)
