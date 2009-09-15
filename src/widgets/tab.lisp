@@ -24,10 +24,10 @@
 
 (defclass tab (container-base widget)
   ((pane :reader pane-of
-         :initform (make-instance 'tab-pane :id "pane" :tab (self)))
+         :initform (make-instance 'tab-pane :tab (self)))
 
    (content :reader content-of
-            :initform (make-instance 'container :id "content")))
+            :initform (make-instance 'container)))
 
   (:default-initargs
    :model (make-instance 'sw-mvc:container-with-1-active-item)))
@@ -82,5 +82,5 @@
   (insert it :in (root))
   (insert (mk-pair #λ"label-1" (dlist #λ"content-1" #λ"more-content-1"))
           :in it)
-  (insert (mk-pair (b "label-2") (dlist #λ"content-2" #λ"more-content-2"))
+  (insert (mk-pair (b "label-2") #λ"content-2")
           :in it))
