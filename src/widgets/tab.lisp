@@ -43,11 +43,9 @@
 
 (defmethod render ((tab tab))
   (let ((tab-id (id-of tab)))
-    (when-commit ()
-      (run (js-iappend (shtml-of (pane-of tab)) tab-id) tab))
+    (run (js-iappend (shtml-of (pane-of tab)) tab-id) tab)
     (render (pane-of tab))
-    (when-commit ()
-      (run (js-iappend (shtml-of (content-of tab)) tab-id) tab))
+    (run (js-iappend (shtml-of (content-of tab)) tab-id) tab)
     (render (content-of tab))))
 
 
@@ -58,7 +56,6 @@
            (handle-model-event tab it))
 
        #λ(withp (active-item-of model)
-           #|(format t "~%TAB: Update View based on new active item: ~S~%" it)|#
            (let ((view (view-in-context-of (content-of tab) (sw-mvc:right-of ~it) t)))
              (remove-all (content-of tab))
              (insert view :in (content-of tab)))))
@@ -73,7 +70,8 @@
 
 
 (defmethod handle-model-event ((tab tab) (event sw-mvc:container-remove))
-  (write-line "TODO: TAB, remove..."))
+  (handle-model-event (pane-of tab) event))
+
 
 
 
