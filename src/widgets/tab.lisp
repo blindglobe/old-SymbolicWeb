@@ -22,7 +22,7 @@
 
 
 
-(defclass tab (container-base widget)
+(defclass tab (container)
   ((pane :reader pane-of
          :initform (make-instance 'tab-pane :tab (self)))
 
@@ -34,19 +34,8 @@
 
 
 (defmethod initialize-instance :after ((tab tab) &key)
-  (setf (border-of tab) "1px solid red"))
-
-
-(defmethod children-of ((tab tab))
-  (list (pane-of tab) (content-of tab)))
-
-
-(defmethod render ((tab tab))
-  (let ((tab-id (id-of tab)))
-    (run (js-iappend (shtml-of (pane-of tab)) tab-id) tab)
-    (render (pane-of tab))
-    (run (js-iappend (shtml-of (content-of tab)) tab-id) tab)
-    (render (content-of tab))))
+  (setf (slot-value tab 'children) (list (pane-of tab) (content-of tab))
+        (border-of tab) "1px solid red"))
 
 
 (defmethod (setf model-of) ((model container-with-1-active-item) (tab tab))
@@ -56,6 +45,7 @@
            (handle-model-event tab it))
 
        #λ(withp (active-item-of model)
+           ;; TODO: Perhaps the context here should be the TAB and not the CONTENT pane of it?
            (let ((view (view-in-context-of (content-of tab) (sw-mvc:right-of ~it) t)))
              (remove-all (content-of tab))
              (insert view :in (content-of tab)))))
