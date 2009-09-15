@@ -19,7 +19,21 @@
 
    (focussable-p :reader focussable-p-of :initarg :focussable-p
                  :type (member t nil)
-                 :initform nil)))
+                 :initform nil))
+
+  (:documentation "
+Some notes about creating widgets
+=================================
+
+  * You do not want to 'pull' from the Model end in your RENDER method; let the
+    Model end 'push' to the View end instead.
+
+  * This also means that you do not want to use the WHEN-COMMIT facility in your
+    RENDER methods or in code called by it as it is not unlikely that you're
+    already within the dynamic scope of a WHEN-COMMIT form by the time RENDER
+    is called. E.g., the CONTAINER-* methods in widgets/container.lisp wrap
+    calls to RENDER in WHEN-COMMIT forms.
+"))
 
 
 (defmethod initialize-instance :around ((widget widget) &key)

@@ -101,8 +101,7 @@ It also holds while CONTAINER is currently being rendered. |#
          (widgets (widgets-of (application-of viewport))))
     (with-each-widget-in-tree (:root widget)
       (setf (gethash (id-of widget) widgets) widget
-            (viewport-of widget) viewport)))
-  (values))
+            (viewport-of widget) viewport))))
 
 
 #.(maybe-inline 'propagate-for-remove)
@@ -111,40 +110,35 @@ It also holds while CONTAINER is currently being rendered. |#
          (widgets (widgets-of (application-of viewport))))
     (with-each-widget-in-tree (:root widget)
       (remhash (id-of widget) widgets)
-      (nilf (viewport-of widget))))
-  (values))
+      (nilf (viewport-of widget)))))
 
 
 (defmethod container-insert ((container container) (widget widget) &key before after)
   "Implements SW-MVC:INSERT for SW:CONTAINER widget."
   (when-let (it (or before after))
     (check-type it widget))
-  (cond
-   (after
-    (when-commit ()
+  (when-commit ()
+    (cond
+     (after
       (amx:insert widget ↺(slot-value container 'children) :after after)
       (when (visible-p-of container)
         (propagate-for-add widget container)
         (run (js-oappend (shtml-of widget) (id-of widget)) container)
-        (render widget))))
+        (render widget)))
 
-   (before
-    (when-commit ()
+     (before
       (amx:insert widget ↺(slot-value container 'children) :before before)
       (when (visible-p-of container)
         (propagate-for-add widget container)
         (run (js-oprepend (shtml-of widget) (id-of widget)) container)
-        (render widget))))
+        (render widget)))
 
-   (t
-    (when-commit ()
+     (t
       (amx:insert widget ↺(slot-value container 'children) :last-p t)
       (when (visible-p-of container)
         (propagate-for-add widget container)
         (run (js-iappend (shtml-of widget) (id-of container)) container)
-        (render widget)))))
-
-  (values))
+        (render widget))))))
 
 
 (defmethod container-remove ((container container) (widget widget))
@@ -153,8 +147,7 @@ It also holds while CONTAINER is currently being rendered. |#
     (deletef (slot-value container 'children) widget)
     (when (visible-p-of container)
       (run (js-remove (id-of widget)) container)
-      (propagate-for-remove widget)))
-  (values))
+      (propagate-for-remove widget))))
 
 
 (defmethod container-exchange ((container container) (widget-a widget) (widget-b widget))
@@ -162,8 +155,7 @@ It also holds while CONTAINER is currently being rendered. |#
     (with-object container
       (setf ¤children (amx:exchange widget-a widget-b ¤children)))
     (when (visible-p-of container)
-      (run (js-exchange (id-of widget-a) (id-of widget-b)) container)))
-  (values))
+      (run (js-exchange (id-of widget-a) (id-of widget-b)) container))))
 
 
 (defmethod child-of ((container container))
