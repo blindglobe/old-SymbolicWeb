@@ -124,11 +124,12 @@ refresh."
     ;; Ensure that the widget that had focus before page refresh still has it.
     (focus widget)
     ;; No widget is assigned focus; we'll try to find a default candidate.
-    (block nil
-      (with-each-widget-in-tree (:root (root-widget-of viewport))
-        (when (focussable-p-of widget)
-          (focus widget)
-          (return))))))
+    (when-commit ()
+      (block nil
+        (with-each-widget-in-tree (:root (root-widget-of viewport))
+          (when (focussable-p-of widget)
+            (focus widget)
+            (return)))))))
 
 
 (defn do-comet-response (null ((viewport viewport)))
