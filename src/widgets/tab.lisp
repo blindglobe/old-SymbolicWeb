@@ -45,10 +45,9 @@
            (handle-model-event tab it))
 
        #λ(withp (active-item-of model)
-           ;; TODO: Perhaps the context here should be the TAB and not the CONTENT pane of it?
-           (let ((view (view-in-context-of (content-of tab) (sw-mvc:right-of ~it) t)))
-             (remove-all (content-of tab))
-             (insert view :in (content-of tab)))))
+           (remove-all (content-of tab))
+           (insert (view-in-context-of tab (sw-mvc:right-of ~it) t)
+                   :in (content-of tab))))
 
     (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
         ((null dlist-node))
