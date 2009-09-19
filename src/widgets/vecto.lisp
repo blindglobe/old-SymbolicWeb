@@ -95,18 +95,22 @@ Possible ways to specify how to draw:
   (funcall (redraw-fn-of vc) vc))
 
 
+#| TODO: This could be optimized a great deal; defaulting to 0.1 wrt. the INCF and DECF calls is not ideal. |#
 (defun calc-font-size (font string width height)
   "Returns three values:
   * font-size: something that'll fit inside the bounds requested by WIDTH and HEIGHT.
   * x-adjust and y-adjust: meant to be passed to VECTO:TRANSLATE."
   (declare (string string)
-           (real width height))
+           (fixnum width height)
+           (optimize speed))
   (let* ((string-vector (coerce string 'simple-vector))
-         (font-size height)
+         (font-size (coerce height 'double-float))
          (last-good-size font-size)
-         (xmin) (ymin) (xmax) (ymax)
+         (xmin 0d0) (ymin 0d0) (xmax 0d0) (ymax 0d0)
          (direction nil))
-    (declare ((member nil :up :down) direction))
+    (declare ((member nil :up :down) direction)
+             (double-float font-size last-good-size xmin ymin xmax ymax))
+
     (flet ((calc-bounds ()
              (let ((bounds (vecto:string-bounding-box string-vector font-size font)))
                (setf xmin (svref bounds 0)
