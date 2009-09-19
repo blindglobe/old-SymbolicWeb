@@ -12,7 +12,8 @@
    (inner-height :reader inner-height-of
                  :initform nil)
 
-   (filename :initarg :filename
+   (filename :accessor filename-of
+             :initarg :filename
              :initform nil)
 
    (redraw-fn :accessor redraw-fn-of :initarg :redraw-fn
@@ -92,3 +93,59 @@ Possible ways to specify how to draw:
 
 (defmethod redraw ((vc vecto))
   (funcall (redraw-fn-of vc) vc))
+
+
+(defun calc-font-size (font string width height)
+  "Returns three values:
+  * font-size: something that'll fit inside the bounds requested by WIDTH and HEIGHT.
+  * x-adjust and y-adjust: meant to be passed to VECTO:TRANSLATE."
+  (declare (string string)
+           (real width height))
+  (let* ((string-vector (coerce string 'simple-vector))
+         (font-size height)
+         (last-good-size font-size)
+         (xmin) (ymin) (xmax) (ymax)
+         (direction nil))
+    (declare ((member nil :up :down) direction))
+    (flet ((calc-bounds ()
+             (let ((bounds (vecto:string-bounding-box string-vector font-size font)))
+               (setf xmin (svref bounds 0)
+                     ymin (svref bounds 1)
+                     xmax (svref bounds 2)
+                     ymax (svref bounds 3)))))
+      (loop
+         (calc-bounds)
+         #|(format t "~A ~A ~A ~A~%" xmin ymin xmax ymax)|#
+         (let ((too-big-p (or (> (+ xmax (- xmin)) #|(ceiling (+ xmax (- xmin)))|#
+                                 width)
+                              (> (+ ymax (- ymin)) #|(ceiling (+ ymax (- ymin)))|#
+                                 height))))
+           (unless direction
+             ;; TODO: Third state needed for when initial state is ok.
+             (if too-big-p
+                 (setf direction :down)
+                 (setf direction :up)))
+           (ecase direction
+             (:up (if too-big-p
+                      (progn
+                        (setf font-size last-good-size)
+                        (calc-bounds)
+                        (return))
+                      (setf last-good-size (incf font-size 0.1))))
+             (:down (if too-big-p
+                        (setf last-good-size (decf font-size 0.1))
+                        (progn
+                          (setf font-size last-good-size)
+                          (calc-bounds)
+                          (return))))))))
+    (values font-size (- xmin) (- ymin))))
+
+
+(defun vecto-simple-draw-string (string font max-width max-height)
+  (declare (string string))
+  (vecto:with-graphics-state
+    (multiple-value-bind (font-size x-adjust y-adjust)
+        (calc-font-size font string max-width max-height)
+      (vecto:translate x-adjust y-adjust)
+      (vecto:set-font font font-size)
+      (vecto:draw-string 0 0 string))))
