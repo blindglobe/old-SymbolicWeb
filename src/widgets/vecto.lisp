@@ -46,7 +46,8 @@ Possible ways to specify how to draw:
                causing the server to update things proper. |#
             (setf (position-of it) "absolute"
                   (width-of it) "100%"
-                  (height-of it) "100%"))
+                  (height-of it) "100%"
+                  (z-index-of it) "-1"))
           :in vc)
   (with (make-instance 'callback-box :widget vc :id "resize")
     (with-formula vc
