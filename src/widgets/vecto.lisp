@@ -7,9 +7,11 @@
 
 (defclass vecto (image)
   ((inner-width :reader inner-width-of
+                :type (or fixnum null)
                 :initform nil)
 
    (inner-height :reader inner-height-of
+                 :type (or fixnum null)
                  :initform nil)
 
    (filename :accessor filename-of
@@ -35,6 +37,7 @@ Possible ways to specify how to draw:
 
 
 (defmethod initialize-instance :after ((vc vecto) &key)
+  (declare (optimize speed))
   (with (make-instance 'callback-box :widget vc :id "resize")
     (with-formula vc
       (when-let (event ~(event-cell-of it))
@@ -42,10 +45,7 @@ Possible ways to specify how to draw:
         (let* ((width-str (cdr (find "width" event :key #'car :test #'string=)))
                (width (parse-integer width-str))
                (height-str (cdr (find "height" event :key #'car :test #'string=)))
-               (height (parse-integer height-str))
-               (filename (catstr (static-data-fs-path-of *app*)
-                                 (string-downcase (filename-of vc)) "-"
-                                 width-str "x" height-str ".png")))
+               (height (parse-integer height-str)))
           ;; TODO: 3k is probably too big, and it should be configurable anyways.
           (when (< 3000 width) (setf width 3000))
           (when (< 3000 height) (setf height 3000))
@@ -57,10 +57,13 @@ Possible ways to specify how to draw:
                   (slot-value vc 'inner-height) height)
             ;; TODO: Cache (hash-table?) the result here.
             ;; TODO: Use optipng (queue+background-thread?) to compress the result further.
-            (unless (probe-file filename)
-              (vecto:with-canvas (:width (inner-width-of vc) :height (inner-height-of vc))
-                (redraw vc)
-                (vecto:save-png filename)))
+            (let ((filename (catstr (static-data-fs-path-of *app*)
+                                    (string-downcase (filename-of vc)) "-"
+                                    width-str "x" height-str ".png")))
+              (unless (probe-file filename)
+                (vecto:with-canvas (:width (inner-width-of vc) :height (inner-height-of vc))
+                  (redraw vc)
+                  (vecto:save-png filename))))
             (setf (src-of vc)
                   (mk-static-data-url *app* (catstr (string-downcase (filename-of vc)) "-"
                                                     width-str "x" height-str ".png")))))))))
