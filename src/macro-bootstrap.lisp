@@ -63,10 +63,13 @@ executing it there."
 (export 'with-js-code-only)
 
 
+;; The "other end" of this is implemented in APPEND-TO-RESPONSE-DATA-OF in viewport.lisp.
 (defmacro with-bulk-update (&body body)
+  "This is useful for \"outside\" threads manipulating state.
+See examples/comet-test.lisp for usage."
   `(let ((*bulk-update-p* (list t)))
      (unwind-protect
-          (progn ,@body)
+         (progn ,@body)
        (dolist (viewport (cdr *bulk-update-p*))
          (do-comet-response viewport)))))
 (export 'with-bulk-update)

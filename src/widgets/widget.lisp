@@ -7,7 +7,7 @@
 
 (defclass widget (widget-base)
   ((element-type :reader element-type-of :initarg :element-type
-                 ;;:type string ;; TODO: Think about this.
+                 :type string
                  :initform "div")
 
    (static-attributes :reader static-attributes-of
