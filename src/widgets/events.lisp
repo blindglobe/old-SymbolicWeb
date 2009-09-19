@@ -35,7 +35,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
    (event-cell :reader event-cell-of :initarg :event-cell
                :type cell
-               :initform #~nil)
+               :initform λvnil)
 
    (argument-parser :accessor argument-parser-of :initarg :argument-parser
                     :type function
