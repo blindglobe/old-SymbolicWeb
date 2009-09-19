@@ -62,6 +62,17 @@
 (export 'reload)
 
 
+(defun window-location-href (url &optional (viewport *viewport*))
+  (declare (string url))
+  (let ((js-code (catstr "window.location.href(decodeURIComponent(\"~A\"));"
+                         (url-encode url)
+                         +lf+)))
+    (if *js-code-only-p*
+        js-code
+        (run js-code viewport))))
+(export 'window-location-href)
+
+
 (defmethod redraw ((p (eql t)))
   "Redraw all elements on the page without reloading (see RELOAD) the page."
   (declare (ignore p))
