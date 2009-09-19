@@ -163,3 +163,16 @@
            (application app))
   (gethash id (widgets-of app)))
 (export 'get-widget)
+
+
+(defun load-css (id url &key force-p (viewport *viewport*))
+  (run (format nil "$('head').append(\"<link id='~A' rel='stylesheet' type='text/css' href='~A'></link>\");"
+               id
+               (if force-p
+                   (catstr url "?_=" (id-generator-next-str -id-generator-))
+                 url))
+       viewport))
+
+
+(defun unload-css (id &optional (viewport *viewport*))
+  (run (js-remove id) viewport))
