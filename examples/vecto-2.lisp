@@ -6,7 +6,7 @@
             :initform (zpb-ttf:open-font-loader "/usr/share/fonts/truetype/msttcorefonts/times.ttf")))
 
   (:default-initargs
-   :filename "vecto-2-app"))
+   :filename "vecto-2-app-jadda"))
 
 
 (defmethod redraw ((vc my-vecto-widget))
@@ -17,7 +17,8 @@
   (vecto-simple-draw-string "Hello Lisp World!"
                             (vc-font-of vc)
                             (inner-width-of vc)
-                            (inner-height-of vc)))
+                            (inner-height-of vc)
+                            t))
 
 
 
