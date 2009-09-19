@@ -30,4 +30,5 @@
      (:file "resize-event")
      (:file "vecto-1")
      (:file "vecto-2")
+     (:file "vecto-3")
      ))))

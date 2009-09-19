@@ -39,3 +39,4 @@
 (set-uri 'sw::resize-event-app "/resize-event-app")
 (set-uri 'sw::vecto-1-app "/vecto-1")
 (set-uri 'sw::vecto-2-app "/vecto-2")
+(set-uri 'sw::vecto-3-app "/vecto-3")
