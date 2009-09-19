@@ -110,7 +110,6 @@ Possible ways to specify how to draw:
          (direction nil))
     (declare ((member nil :up :down) direction)
              (double-float font-size last-good-size xmin ymin xmax ymax))
-
     (flet ((calc-bounds ()
              (let ((bounds (vecto:string-bounding-box string-vector font-size font)))
                (setf xmin (svref bounds 0)

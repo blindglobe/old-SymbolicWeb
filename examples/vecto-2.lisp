@@ -1,15 +1,15 @@
 (in-package #:sw)
 
 
-(defclass my-vecto-widget (vecto)
+(defclass vecto-widget-2 (vecto)
   ((vc-font :reader vc-font-of
             :initform (zpb-ttf:open-font-loader "/usr/share/fonts/truetype/msttcorefonts/times.ttf")))
 
   (:default-initargs
-   :filename "vecto-2-app"))
+   :filename "vecto-widget-2"))
 
 
-(defmethod redraw ((vc my-vecto-widget))
+(defmethod redraw ((vc vecto-widget-2))
   (vecto:set-rgb-stroke 0 1 0)
   (vecto:set-line-width 10)
   (vecto:rectangle 0 0 (inner-width-of vc) (inner-height-of vc))
@@ -29,7 +29,7 @@
 
 
 (defmethod render-viewport ((viewport viewport) (app vecto-2-app))
-  (insert (with1 (make-instance 'my-vecto-widget)
+  (insert (with1 (make-instance 'vecto-widget-2)
             (setf (position-of it) "absolute"
                   (width-of it) "50%"
                   (height-of it) "50%"
