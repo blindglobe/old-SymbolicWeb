@@ -16,7 +16,6 @@
       (with-formula viewport
         (when-let (event ~(event-cell-of it))
           #|(dbg-prin1 event)|#
-          ;; TODO: Handle (not (and (plusp width) (plusp height)))
           (let* ((width-str (cdr (find "width" event :key #'car :test #'string=)))
                  (width (parse-integer width-str))
                  (height-str (cdr (find "height" event :key #'car :test #'string=)))
