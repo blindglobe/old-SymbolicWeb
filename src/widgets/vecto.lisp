@@ -5,7 +5,7 @@
 (declaim #.(optimizations :widgets/container.lisp)) ;; TODO: change this.
 
 
-(defclass vecto (image)
+(defclass vecto (container)
   ((inner-width :reader inner-width-of
                 :type (or fixnum null)
                 :initform nil)
@@ -13,6 +13,9 @@
    (inner-height :reader inner-height-of
                  :type (or fixnum null)
                  :initform nil)
+
+   (image :reader image-of
+          :initform (make-instance 'image))
 
    (filename :accessor filename-of
              :initarg :filename
@@ -38,6 +41,13 @@ Possible ways to specify how to draw:
 
 (defmethod initialize-instance :after ((vc vecto) &key)
   (declare (optimize speed))
+  (insert (with1 (image-of vc)
+            #| This'll cause the image to strech in realtime on the client-end before the debouncer times out
+               causing the server to update things proper. |#
+            (setf (position-of it) "absolute"
+                  (width-of it) "100%"
+                  (height-of it) "100%"))
+          :in vc)
   (with (make-instance 'callback-box :widget vc :id "resize")
     (with-formula vc
       (when-let (event ~(event-cell-of it))
@@ -64,7 +74,9 @@ Possible ways to specify how to draw:
                 (vecto:with-canvas (:width (inner-width-of vc) :height (inner-height-of vc))
                   (redraw vc)
                   (vecto:save-png filename))))
-            (setf (src-of vc)
+            #| NOTE: Not using (background-image-of vc) here because this won't resize the image in real-time on the
+            client end. |#
+            (setf (src-of (image-of vc))
                   (mk-static-data-url *app* (catstr (string-downcase (filename-of vc)) "-"
                                                     width-str "x" height-str ".png")))))))))
 
@@ -75,16 +87,10 @@ Possible ways to specify how to draw:
                                   ("height" . ,(format nil "return $('#~A').innerHeight();" (id-of vc)))))))
 
 
-  (defmethod render ((vc vecto))
-    #| TODO: The initial event should be instant, then we should start debouncing -- then go back to the initial
-    state again where the initial one is instant. I think.. At least for quite fast connections this makes sense. |#
-    #| TODO: The client should group messages from multiple VECTO instances together in a single bulk message! |#
+  (defmethod render :after ((vc vecto))
     (run (catstr "$(window).bind('resize." (id-of vc) "', "
                  "$.debounce(" (resize-msg vc) ", 250));" +lf+) ;; TODO: Hardcoded debounce-value.
-         vc))
-
-
-  (defmethod render :after ((vc vecto))
+         vc)
     (run (catstr (resize-msg vc) "();" +lf+)
          vc)))
 
