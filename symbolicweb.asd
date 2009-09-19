@@ -59,6 +59,7 @@
         (:file "html-container")
         (:file "text-input")
         (:file "image")
+        (:file "vecto")
         #|
         (:file "container-with-1-active-item")
         (:file "html-elements")
