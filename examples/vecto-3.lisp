@@ -43,6 +43,5 @@
                   (setf (overflow-of it) "auto"
                         (position-of it) "absolute"
                         (width-of it) "50%"
-                        (height-of it) "50%"
-                        (border-of it) "1px solid red")))
+                        (height-of it) "50%")))
           :in (root)))

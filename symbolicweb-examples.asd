@@ -27,8 +27,8 @@
      (:file "ex-text-input")
      (:file "comet-test")
      (:file "blink-app")
-     (:file "resize-event")
-     (:file "vecto-1")
+     #|(:file "resize-event")|#
+     #|(:file "vecto-1")|#
      (:file "vecto-2")
      (:file "vecto-3")
      ))))
