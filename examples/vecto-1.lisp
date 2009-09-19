@@ -16,6 +16,7 @@
                   (border-of it) "1px solid black"
 
                   ;; VECTO stuff.
+                  (filename-of it) "vecto-1-app"
                   (redraw-fn-of it)
                   (lambda (vc)
                     (vecto:set-rgb-stroke 0 1 0)
