@@ -23,10 +23,10 @@
            (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious") ": collection of source code repositories")
            (:li (:a :href "text-input" "text-input-app") ": dataflow test thing")
            (:li (:a :href "comet-test-app" "comet-test-app") ": comet test thing")
-           (:li (:a :href "vecto-1" "vecto-1")
+           #|(:li (:a :href "vecto-1" "vecto-1")
                 ": "
                 (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/vecto-1.lisp"
-                    "source code"))
+                    "source code"))|#
            (:li (:a :href "vecto-2" "vecto-2")
                 ": "
                 (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/vecto-2.lisp"
