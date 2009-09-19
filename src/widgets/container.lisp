@@ -28,7 +28,8 @@ It also holds while CONTAINER is currently being rendered. |#
 (defmethod (setf model-of) ((model dlist) (container container))
   (prog1
       #λ(when-let (event (event-of model))
-          (handle-model-event container event))
+          (when (eq model (model-of (container-of event)))
+            (handle-model-event container event)))
 
       (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
           ((null dlist-node))
