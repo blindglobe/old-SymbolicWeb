@@ -141,11 +141,16 @@ Possible ways to specify how to draw:
     (values font-size (- xmin) (- ymin))))
 
 
-(defun vecto-simple-draw-string (string font max-width max-height)
+(defun vecto-simple-draw-string (string font max-width max-height &optional centered-p)
   (declare (string string))
   (vecto:with-graphics-state
     (multiple-value-bind (font-size x-adjust y-adjust)
         (calc-font-size font string max-width max-height)
       (vecto:translate x-adjust y-adjust)
       (vecto:set-font font font-size)
-      (vecto:draw-string 0 0 string))))
+      (if centered-p
+          (vecto:draw-centered-string (/ max-width 2)
+                                      (- (/ max-height 2)
+                                         (/ font-size 2))
+                                      string)
+          (vecto:draw-string 0 0 string)))))
