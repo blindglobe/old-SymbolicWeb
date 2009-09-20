@@ -202,3 +202,10 @@ loaded for VIEWPORT."
               (run (js-remove id) viewport))
             nil)))))
 (export 'unload-css)
+
+
+(defun load-js (url &key force-p (viewport *viewport*) )
+  (if force-p
+      (run (format nil "$.getScript('~A');~%" url) viewport)
+      (run (format nil "$.ajax({ dataType: 'script', url: '~A', cache: true });~%" url) viewport)))
+(export 'load-js)
