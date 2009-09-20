@@ -18,21 +18,17 @@ fixing this.
    :404-fn
    (lambda ()
      (sw-http:response-add-chunk
-      #.(sw-http:combine-buffers
-         (sw-http:mk-response-status-code 404)
-         (sw-http:mk-response-header-field "Content-Type: text/html; charset=utf-8")
-         (sw-http:mk-response-header-field "Connection: keep-alive")
-         (sw-http:mk-response-header-field "Expires: Mon, 26 Jul 1997 05:00:00 GMT")
-         (sw-http:mk-response-header-field "Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
-         (sw-http:mk-response-header-field "Pragma: no-cache")))
-     (sw-http:response-add-chunk
-      (sw-http:mk-response-message-body
-       (who (:html
-             (:body
-              (:h1 "SymbolicWeb: HTTP 404")
-              (:p (fmt "Resource at ~A not found." (sw-http:path))))))))
+      (sw-http:combine-buffers
+       (sw-http:mk-response-status-code 200)
+       (sw-http:mk-response-header-field (catstr "X-Sendfile: "
+                                                 (static-data-fs-path-of *server*)
+                                                 (with (sw-http:path)
+                                                   (if (char= #\/ (char it 0))
+                                                       (subseq it 1)
+                                                       it))))
+       (sw-http:mk-response-message-body
+        #.(who (:html (:body (:h1 "SymbolicWeb: HTTP 404")))))))
      (sw-http:done-generating-response))
-
 
     :application-finder-fn
     (lambda (sw-http-server connection)
@@ -96,7 +92,7 @@ fixing this.
                     ;; FIXME: Slot 404-FN is missing from VIEWPORT and APPLICATION.
                     (funcall (the function (404-fn-of (or viewport app)))))))
             (progn
-              (warn "Server (global) HTTP-404 for (SW-HTTP:PATH): ~S" (sw-http:path))
+              #|(warn "Server (global) HTTP-404 for (SW-HTTP:PATH): ~S" (sw-http:path))|#
               (funcall (the function (404-fn-of server))))))))))
 
 
