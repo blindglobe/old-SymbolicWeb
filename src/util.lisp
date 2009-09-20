@@ -165,33 +165,27 @@
 (export 'get-widget)
 
 
-(flet ((js (id url)
-         (format nil "$('head').append(\"<link id='~A' rel='stylesheet' type='text/css' href='~A'></link>\");~%"
-                 id url)))
-  (defun load-css (id url &key force-p (viewport *viewport*))
-    "Returns T when stylesheet was loaded or NIL if it has already been loaded for
-VIEWPORT and FORCE-P was NIL."
-    (with (stylesheets-of viewport)
+(flet ((js (id css-code)
+         (format nil "$('head').append(\"<style id='~A' type='text/css'>\" + decodeURIComponent(\"~A\") + \"</style>\");~%"
+                 id (url-encode css-code))))
+  (defun inject-css (id css-code &key force-p (viewport *viewport*))
+        (with (stylesheets-of viewport)
       (sb-ext:with-locked-hash-table (it)
         (multiple-value-bind (value found-p) (gethash id it)
           (declare (ignore value))
           (if (and found-p (not force-p))
-              (return-from load-css nil)
+              (return-from inject-css nil)
               (prog1 t
                 (when found-p
-                  ;; Remove old stylesheet first.
-                  (run (js-remove id) viewport))
-                (run (js id (if force-p
-                                (catstr url "?_=" (id-generator-next-str -id-generator-))
-                                url))
-                     viewport)
+                  (run (js-remove id) viewport)) ;; Remove old stylesheet first.
+                (run (js id css-code) viewport)
                 (unless found-p
-                  (setf (gethash id it) url)))))))))
-(export 'load-css)
+                  (setf (gethash id it) id)))))))))
+(export 'inject-css)
 
 
-(defun unload-css (id &optional (viewport *viewport*))
-  "Returns T when stylesheet was unloaded or NIL if no such stylesheet has been
+(defun uninject-css (id &optional (viewport *viewport*))
+  "Returns T when stylesheet was uninjected or NIL if no such stylesheet has been
 loaded for VIEWPORT."
   (with (stylesheets-of viewport)
     (sb-ext:with-locked-hash-table (it)
@@ -201,13 +195,4 @@ loaded for VIEWPORT."
             (prog1 t
               (run (js-remove id) viewport))
             nil)))))
-(export 'unload-css)
-
-
-(defun load-js (url &key force-p (viewport *viewport*))
-  "If FORCE-P is NIL (default) the resource will be loaded  from the browser cache
-if possible."
-  (if force-p
-      (run (format nil "$.getScript('~A');~%" url) viewport)
-      (run (format nil "$.ajax({ dataType: 'script', url: '~A', cache: true });~%" url) viewport)))
-(export 'load-js)
+(export 'uninject-css)
