@@ -204,7 +204,9 @@ loaded for VIEWPORT."
 (export 'unload-css)
 
 
-(defun load-js (url &key force-p (viewport *viewport*) )
+(defun load-js (url &key force-p (viewport *viewport*))
+  "If FORCE-P is NIL (default) the resource will be loaded  from the browser cache
+if possible."
   (if force-p
       (run (format nil "$.getScript('~A');~%" url) viewport)
       (run (format nil "$.ajax({ dataType: 'script', url: '~A', cache: true });~%" url) viewport)))
