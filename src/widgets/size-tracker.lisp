@@ -47,10 +47,10 @@
 
 
   (defmethod render :after ((st size-tracker))
-    (dbg-prin1 st)
     (run (catstr "$(window).bind('resize." (id-of st) "', "
                  "$.debounce(" (resize-msg st) ", 250));" +lf+) ;; TODO: Hardcoded debounce-value.
          st)
+    ;; TODO: Need a way to ensure that this is only triggered once pr. "round-trip".
     (run (catstr (resize-msg st) "();" +lf+)
          st)))
 
