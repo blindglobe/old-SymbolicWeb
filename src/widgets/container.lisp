@@ -124,14 +124,14 @@ It also holds while CONTAINER is currently being rendered. |#
       (amx:insert widget ↺(slot-value container 'children) :after after)
       (when (visible-p-of container)
         (propagate-for-add widget container)
-        (run (js-oappend (shtml-of widget) (id-of widget)) container)
+        (run (js-oappend (shtml-of widget) (id-of after)) container)
         (render widget)))
 
      (before
       (amx:insert widget ↺(slot-value container 'children) :before before)
       (when (visible-p-of container)
         (propagate-for-add widget container)
-        (run (js-oprepend (shtml-of widget) (id-of widget)) container)
+        (run (js-oprepend (shtml-of widget) (id-of before)) container)
         (render widget)))
 
      (t
