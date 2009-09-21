@@ -12,7 +12,7 @@
 
    (root-widget :reader root-widget-of :initarg :root-widget
                 :type (or symbol widget)
-                :initform 'container)
+                :initform 'container-st)
 
    (address-bar :reader address-bar-of)
 
@@ -57,7 +57,6 @@ Each instance of VIEWPORT represents a browser window or tab."))
 (defmethod initialize-instance :after ((viewport viewport) &key (id (error ":ID needed.")))
   (declare (ignore id))
   (with-slots (id root-widget address-bar application) viewport
-    (assert (subtypep 'container root-widget)) ;; The reason for this is the (RENDER CONTAINER) :AROUND method in container.lisp. This is needed because of the (render *root*) call in comet.lisp. Update; I suppose a with-code-block here would work, but it doesn't matter much for now.
     (setf address-bar (make-instance 'address-bar :viewport viewport)
           root-widget (make-instance root-widget :id "sw-root")
           (viewport-of root-widget) viewport
@@ -118,6 +117,8 @@ refresh."
 
 
 (defmethod render-viewport :after ((viewport viewport) (app application))
+  (propagate-for-add (root-widget-of viewport) (root-widget-of viewport))
+  (render (root-widget-of viewport))
   (set-loading-p nil)
   (if-let ((widget (with (last-focus-of app)
                      (withp (etypecase it

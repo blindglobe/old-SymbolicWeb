@@ -55,6 +55,7 @@
         (:file "events")
         (:file "html-element")
         (:file "container")
+        (:file "size-tracker")
         (:file "button")
         (:file "html-container")
         (:file "text-input")
