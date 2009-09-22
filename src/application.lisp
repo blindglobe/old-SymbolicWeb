@@ -142,6 +142,8 @@ include the JS libraries required for SW in general."
        (:head
         (:title (str (string-capitalize (type-of app))))
         (:meta :name "Author" :content (http-meta-author-of app))
+        ;; Do want; http://blog.chromium.org/2009/09/introducing-google-chrome-frame.html
+        (:meta :http-equiv "X-UA-Compatible" :content "chrome=1")
         (:meta :http-equiv "X-UA-Compatible" :content "IE=edge") ;; For IE8 and up.
         (:meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
 
