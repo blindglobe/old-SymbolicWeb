@@ -51,7 +51,7 @@ It also holds while CONTAINER is currently being rendered. |#
 
     (let ((relative-object (relative-object-of event)))
       (if relative-object
-          (let ((relative-widget (view-in-context-of container relative-object))
+          (let ((relative-widget (view-in-context-of container ~relative-object))
                 (relative-position (relative-position-of event)))
             (dolist (object (objects-of event))
               (ecase relative-position

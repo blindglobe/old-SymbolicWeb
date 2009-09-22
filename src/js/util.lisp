@@ -136,6 +136,7 @@
                             (value (cookie-value-of app))
                             (viewport *viewport*))
   (declare (string name)
+           ((or null string) value)
            (optimize speed))
   (let ((js-code
          (flet ((inner (domain-p)
@@ -157,7 +158,5 @@
                (catstr (inner t) (inner nil))))))
     (if *js-code-only-p*
         js-code
-        (progn
-          (run js-code viewport)
-          value))))
+        (run js-code viewport))))
 (export 'set-document-cookie)
