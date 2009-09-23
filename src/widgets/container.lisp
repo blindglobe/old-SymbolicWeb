@@ -23,7 +23,7 @@
 (defmethod (setf model-of) ((model dlist) (container container))
   (prog1
       #λ(when-let (event (event-of model))
-          (when (eq model (model-of (container-of event)))
+          (when (eq model (container-of event))
             (handle-model-event container event)))
 
       (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
@@ -32,50 +32,29 @@
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-insert))
-  (flet ((mk-view (object)
-           (etypecase object
-             ;; TODO: With the change in VIEW-IN-CONTEXT-OF this clause might not be needed anymore.
-             (view-base
-              object)
-
-             (dlist-node
-              (view-in-context-of container ~object t))
-
-             (model
-              (view-in-context-of container object t)))))
-
-    (let ((relative-object (relative-object-of event)))
-      (if relative-object
-          (let ((relative-widget (view-in-context-of container ~relative-object))
-                (relative-position (relative-position-of event)))
-            (dolist (object (objects-of event))
-              (ecase relative-position
-                  (:before
-                   (let ((new-widget (mk-view object)))
-                     (container-insert container new-widget :before relative-widget)
-                     (setf relative-widget new-widget
-                           relative-position :after)))
-
-                  (:after
-                   (let ((new-widget (mk-view object)))
-                     (container-insert container new-widget :after relative-widget)
-                     (setf relative-widget new-widget))))))
+  (let ((relative-node (relative-node-of event)))
+    (if relative-node
+        (let ((relative-widget (view-in-context-of container ~relative-node))
+              (relative-position (relative-position-of event)))
           (dolist (object (objects-of event))
-            (container-insert container (mk-view object)))))))
+            (ecase relative-position
+              (:before
+               (let ((new-widget (view-in-context-of container object t)))
+                 (container-insert container new-widget :before relative-widget)
+                 (setf relative-widget new-widget
+                       relative-position :after)))
+
+              (:after
+               (let ((new-widget (view-in-context-of container object t)))
+                 (container-insert container new-widget :after relative-widget)
+                 (setf relative-widget new-widget))))))
+        (dolist (object (objects-of event))
+          (container-insert container (view-in-context-of container object t))))))
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-remove))
   (dolist (object (objects-of event))
-    (container-remove container
-                      (etypecase object
-                        (view-base
-                         object)
-
-                        (dlist-node
-                         (view-in-context-of container ~object))
-
-                        (model
-                         (view-in-context-of container object))))))
+    (container-remove container (view-in-context-of container object))))
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-exchange))
