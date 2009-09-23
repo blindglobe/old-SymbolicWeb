@@ -9,10 +9,7 @@
   ((html-content :accessor html-content-of
                  :type string)
 
-   (closure :type function))
-
-  (:default-initargs
-   :model #λ"")) ;; TODO: This is just a dummy ... hm.
+   (closure :type function)))
 (export 'html-container)
 
 
@@ -83,10 +80,6 @@
   (with-object html-container
     (funcall (truly-the function ¤closure))))
 (export 'generate-html)
-
-
-(defmethod (setf model-of) (model (html-container html-container))
-  )
 
 
 
