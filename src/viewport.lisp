@@ -117,19 +117,19 @@ refresh."
 
 
 (defmethod render-viewport :after ((viewport viewport) (app application))
-  (propagate-for-add (root-widget-of viewport) (root-widget-of viewport))
-  (render (root-widget-of viewport))
-  (set-loading-p nil)
-  (if-let ((widget (with (last-focus-of app)
-                     (withp (etypecase it
-                              (widget it)
-                              (string (gethash it (widgets-of app)))
-                              (null nil))
-                       (visible-p-of it :viewport viewport)))))
-    ;; Ensure that the widget that had focus before page refresh still has it.
-    (focus widget)
-    ;; No widget is assigned focus; we'll try to find a default candidate.
-    (when-commit ()
+  (when-commit ()
+    (propagate-for-add (root-widget-of viewport) (root-widget-of viewport))
+    (render (root-widget-of viewport))
+    (set-loading-p nil)
+    (if-let ((widget (with (last-focus-of app)
+                           (withp (etypecase it
+                                    (widget it)
+                                    (string (gethash it (widgets-of app)))
+                                    (null nil))
+                             (visible-p-of it :viewport viewport)))))
+      ;; Ensure that the widget that had focus before page refresh still has it.
+      (focus widget)
+      ;; No widget is assigned focus; we'll try to find a default candidate.
       (block nil
         (with-each-widget-in-tree (:root (root-widget-of viewport))
           (when (focussable-p-of widget)
