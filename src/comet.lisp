@@ -22,9 +22,8 @@
                (when-commit () ;; TODO: Using a REF for INITIALIZED-P would make sense.
                  (tf (slot-value app 'initialized-p)))
                (main app))
-
              (render-viewport viewport app)
-             (sync-widgets (sw-http:get-parameter "hash") t)
+             #|(sync-widgets (sw-http:get-parameter "hash") t)|#
              (on-refresh app viewport))))
 
         #|((string= do "ack")
