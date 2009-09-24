@@ -168,17 +168,6 @@
 (export 'get-widget)
 
 
-;; TODO: I don't know where to place this.
-(defun load-jquery-ui-core ()
-  (load-resource "jquery-ui-css" :css
-                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                                "jquery-ui/themes/base/jquery-ui.css")))
-  (load-resource "jquery-ui-js" :js
-                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                                "jquery-ui/ui/minified/jquery-ui.min.js"))))
-
-
-
 (flet ((%css (id css-code)
              (format nil "$('head').append(\"<style id='~A' type='text/css'>\" + decodeURIComponent(\"~A\") + \"</style>\");~%"
                      id (url-encode css-code))))

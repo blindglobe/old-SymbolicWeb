@@ -8,17 +8,6 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 |#
 
 
-(defun load-jquery-ui-tabs ()
-  (load-jquery-ui-core)
-  (load-resource "jquery-ui-tabs-css" :css
-                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                                "jquery-ui/themes/base/ui.tabs.css")))
-  (load-resource "jquery-ui-tabs-js" :js
-                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                                "jquery-ui/ui/minified/ui.tabs.min.js"))))
-
-
-
 (defclass tab-pane (container)
   ((label :initarg :label
           :initform (error ":LABEL needed.")))
@@ -65,7 +54,6 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 
 (defmethod render ((tab tab))
-  (load-jquery-ui-tabs)
   (with (id-of tab)
     (run (js-iappend "<ul></ul>" it) tab)
     (run (fmtn "$('#~A').tabs();~%" it) tab)
