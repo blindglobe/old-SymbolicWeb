@@ -46,9 +46,9 @@ Comet timeout or poll frequency in seconds.")
                             :type integer
                             :initform (get-universal-time))
 
-   (stylesheets :reader stylesheets-of
-                :type hash-table
-                :initform (make-hash-table :test #'equal)))
+   (resources :reader resources-of
+              :type hash-table
+              :initform (make-hash-table :test #'equal)))
 
   (:documentation "
 Each instance of VIEWPORT represents a browser window or tab."))

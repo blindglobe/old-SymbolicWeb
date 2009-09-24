@@ -165,34 +165,46 @@
 (export 'get-widget)
 
 
-(flet ((js (id css-code)
-         (format nil "$('head').append(\"<style id='~A' type='text/css'>\" + decodeURIComponent(\"~A\") + \"</style>\");~%"
-                 id (url-encode css-code))))
-  (defun inject-css (id css-code &key force-p (viewport *viewport*))
-        (with (stylesheets-of viewport)
-      (sb-ext:with-locked-hash-table (it)
-        (multiple-value-bind (value found-p) (gethash id it)
-          (declare (ignore value))
-          (if (and found-p (not force-p))
-              (return-from inject-css nil)
-              (prog1 t
-                (when found-p
-                  (run (js-remove id) viewport)) ;; Remove old stylesheet first.
-                (run (js id css-code) viewport)
+(flet ((%css (id css-code)
+             (format nil "$('head').append(\"<style id='~A' type='text/css'>\" + decodeURIComponent(\"~A\") + \"</style>\");~%"
+                     id (url-encode css-code))))
+  (defun load-resource (id type source &key force-p (viewport *viewport*))
+    (declare (string id)
+             ((member :css :js) type)
+             (string source)
+             ((member nil t) force-p)
+             (viewport viewport))
+    (when-commit ()
+      (with (resources-of viewport)
+        (let ((signature (cons id type)))
+          (sb-ext:with-locked-hash-table (it)
+            (multiple-value-bind (value found-p) (gethash signature it)
+              (declare (ignore value))
+              (unless (and found-p (not force-p))
                 (unless found-p
-                  (setf (gethash id it) id)))))))))
-(export 'inject-css)
+                  (setf (gethash signature it) signature))
+                (ecase type
+                  (:css
+                   (when found-p
+                     (run (js-remove id) viewport)) ;; Remove old stylesheet first.
+                   (run (%css id source) viewport))
+
+                  (:js
+                   (run source viewport)))))))))))
 
 
-(defun uninject-css (id &optional (viewport *viewport*))
-  "Returns T when stylesheet was uninjected or NIL if no such stylesheet has been
-loaded for VIEWPORT."
-  (with (stylesheets-of viewport)
-    (sb-ext:with-locked-hash-table (it)
-      (multiple-value-bind (value found-p) (gethash id it)
-        (declare (ignore value))
-        (if found-p
-            (prog1 t
-              (run (js-remove id) viewport))
-            nil)))))
-(export 'uninject-css)
+(defun unload-resource (id type &optional (viewport *viewport*))
+  (declare (string id)
+           ((member :css) type)
+           (viewport viewport))
+  (ecase type
+    (:css
+     (when-commit ()
+       (with (resources-of viewport)
+         (let ((signature (cons id type)))
+           (sb-ext:with-locked-hash-table (it)
+             (multiple-value-bind (value found-p) (gethash signature it)
+               (declare (ignore value))
+               (when found-p
+                 (remhash signature it)
+                 (run (js-remove id) viewport))))))))))
