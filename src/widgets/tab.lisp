@@ -8,20 +8,12 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 |#
 
 
-(progn
-  (load-resource "jquery-ui-css" :css
-                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                                "jquery-ui/themes/base/jquery-ui.css")))
-
+(defun load-jquery-ui-tabs ()
+  (load-jquery-ui-core)
   (load-resource "jquery-ui-tabs-css" :css
                  (read-file-into-string (catstr (static-data-fs-path-of *server*)
                                                 "jquery-ui/themes/base/ui.tabs.css")))
-
-  (load-resource "jquery-ui" :js
-                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                                "jquery-ui/ui/minified/jquery-ui.min.js")))
-
-  (load-resource "jquery-ui-tabs" :js
+  (load-resource "jquery-ui-tabs-js" :js
                  (read-file-into-string (catstr (static-data-fs-path-of *server*)
                                                 "jquery-ui/ui/minified/ui.tabs.min.js"))))
 
@@ -73,6 +65,7 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 
 (defmethod render ((tab tab))
+  (load-jquery-ui-tabs)
   (with (id-of tab)
     (run (js-iappend "<ul></ul>" it) tab)
     (run (fmtn "$('#~A').tabs();~%" it) tab)
