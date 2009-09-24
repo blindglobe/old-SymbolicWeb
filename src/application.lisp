@@ -71,7 +71,11 @@ Last time we had any real user _or_ server (server push) activity in the session
 Last time we had any real user (DOM event or page refresh) activity in the session.")
 
    (http-meta-author :accessor http-meta-author-of
-                     :initform "SymbolicWeb: http://nostdal.org/")))
+                     :initform "SymbolicWeb: http://nostdal.org/")
+
+   (resources :reader resources-of
+              :type hash-table
+              :initform (make-hash-table :test #'equal))))
 
 
 (defmethod initialize-instance :around ((app application) &key
@@ -157,7 +161,13 @@ include the JS libraries required for SW in general."
           "}"
           ".sw-hide {"
           "  display: none !important;"
-          "}"))
+          "}")
+
+        ;; User-specified static CSS files.
+        (maphash (lambda (signature url)
+                   (when (eq :css (cdr signature))
+                     (htm (:link :rel "stylesheet" :type "text/css" :href url))))
+                 (resources-of app)))
 
        (:body
         (:div :id "sw-root")
@@ -179,3 +189,12 @@ include the JS libraries required for SW in general."
     (remove-viewport viewport app))
   (remhash (id-of app) (id->app-of server))
   (remhash (cookie-value-of app) (cookie-value->app-of server)))
+
+
+(defun add-resource (app id type path)
+  (declare (application app)
+           (string id)
+           ((member :css :js) type)
+           (string path))
+  (setf (gethash (cons id type) (resources-of app))
+        (mk-static-data-url (server-of app) path)))

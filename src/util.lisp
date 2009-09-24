@@ -14,9 +14,12 @@
     (mk-static-data-url *server* "javascript/jquery-1.3.2-min.js")
     "'></script>"
 
-    ;;"<script type='text/javascript' src='"
-    ;;(mk-static-data-url *server* "javascript/jquery.address-1.0.min.js")
-    ;;"'></script>"
+    ;; User-specified static JavaScript files.
+    (with-output-to-string (ss)
+      (maphash (lambda (signature url)
+                 (when (eq :js (cdr signature))
+                   (format ss  "<script type='text/javascript' src='~A'></script>" url)))
+               (resources-of application)))
 
     "<script type='text/javascript' src='"
     (mk-static-data-url *server* "javascript/jquery-debounce/jquery.debounce.js")
