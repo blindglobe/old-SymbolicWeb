@@ -116,12 +116,12 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 
 
-(remove-all (root))
+#|(remove-all (root))|#
 
-(with (make-instance 'tab)
+#|(with (make-instance 'tab)
   (insert it :in (root))
   (insert (mk-pair λv"label-1" (dlist λv"content-1")) :in it)
   (insert (mk-pair λv"label-2" (dlist λv"content-2")) :in it)
   (let ((tab-pane-m (mk-pair λv"label-3" (dlist))))
     (insert tab-pane-m :in it)
-    (insert (div "Hello World!") :in (view-in-context-of it tab-pane-m))))
+    (insert (div "Hello World!") :in (view-in-context-of it tab-pane-m))))|#

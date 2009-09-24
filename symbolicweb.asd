@@ -61,6 +61,7 @@
         (:file "text-input")
         (:file "image")
         (:file "vecto")
+        (:file "tab")
         #|
         (:file "container-with-1-active-item")
         (:file "html-elements")
