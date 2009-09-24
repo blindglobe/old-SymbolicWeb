@@ -108,6 +108,12 @@ refresh."
   (declare (ignore app viewport)))
 
 
+(defmethod render-viewport :before ((viewport viewport) (app application))
+  (when-commit ()
+    (propagate-for-add (root-widget-of viewport) (root-widget-of viewport))
+    (render (root-widget-of viewport))))
+
+
 (defmethod render-viewport ((viewport viewport) (app application))
   (declare (ignore app))
   ;; TODO: This is pretty stupid, but it gets rid of the "always loading" thing in Firefox when using random
@@ -118,8 +124,6 @@ refresh."
 
 (defmethod render-viewport :after ((viewport viewport) (app application))
   (when-commit ()
-    (propagate-for-add (root-widget-of viewport) (root-widget-of viewport))
-    (render (root-widget-of viewport))
     (set-loading-p nil)
     (if-let ((widget (with (last-focus-of app)
                            (withp (etypecase it
