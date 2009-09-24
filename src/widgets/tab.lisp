@@ -9,20 +9,21 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 
 (progn
-  (inject-css "jquery-ui-css"
-              (catstr
-               (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                              "jquery-ui/themes/base/jquery-ui.css"))
-               (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                              "jquery-ui/themes/base/ui.tabs.css"))))
+  (load-resource "jquery-ui-css" :css
+                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
+                                                "jquery-ui/themes/base/jquery-ui.css")))
 
-  (run (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                      "jquery-ui/ui/minified/jquery-ui.min.js"))
-       *viewport*)
+  (load-resource "jquery-ui-tabs-css" :css
+                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
+                                                "jquery-ui/themes/base/ui.tabs.css")))
 
-  (run (read-file-into-string (catstr (static-data-fs-path-of *server*)
-                                      "jquery-ui/ui/minified/ui.tabs.min.js"))
-       *viewport*))
+  (load-resource "jquery-ui" :js
+                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
+                                                "jquery-ui/ui/minified/jquery-ui.min.js")))
+
+  (load-resource "jquery-ui-tabs" :js
+                 (read-file-into-string (catstr (static-data-fs-path-of *server*)
+                                                "jquery-ui/ui/minified/ui.tabs.min.js"))))
 
 
 
@@ -44,12 +45,15 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
       )))|#
 
 
+
 (defclass tab (container)
   ()
   (:default-initargs
    :model (make-instance 'sw-mvc:container-with-1-active-item)))
 
 
+;; TODO: Perhaps inheriting from CONTAINIER is a bad idea; I override almost everything anyway, and here I got to
+;; "disallow" some methods.
 (defmethod view-constructor ((tab tab) (model cell))
   (error "..."))
 
@@ -64,7 +68,8 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
                           (typecase it
                             (pointer it)
                             (t (mk-ptr it))))
-                 :model (sw-mvc:right-of pair)))
+                 :model (with1 (sw-mvc:right-of pair)
+                          (check-type it multiple-value-model))))
 
 
 (defmethod render ((tab tab))
@@ -79,10 +84,13 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
       (render child))))
 
 
-(defmethod container-insert ((tab tab) (tab-pane tab-pane) &key before after)
+(defmethod container-insert ((tab tab) tab-pane &key before after)
+  ;; NOTE: So we don't dispatch to (CONTAINER-INSERT CONTAINER WIDGET ..); our superclass.
+  (check-type tab-pane tab-pane)
   (when-let (it (or before after))
     (check-type it tab-pane))
   (when-commit ()
+    ;; TODO: I can probably merge some of this together..
     (cond
      (after
       (amx:insert tab-pane ↺(slot-value tab 'children) :after after)
@@ -126,135 +134,13 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 
 
+
 (remove-all (root))
 
 (with (make-instance 'tab)
   (insert it :in (root))
   (insert (mk-pair λv"label-1" (dlist λv"content-1")) :in it)
-  (let ((pane-2 (mk-pair λv"label-2" (dlist λv"content-2"))))
-    (insert pane-2 :in it)
-    (let ((c (make-instance 'container)))
-      (insert (mk-pair λv"label-3" c) :in it)
-      (insert (mk-html ()
-                (:div
-                 (:h1 "Hello World!")
-                 (:p "Ok, this is a test. Blabla.")))
-              :in c))
-    #|(sleep 1)|#
-    #|(remove pane-2 it)|#))
-
-
-
-
-
-
-#|
- (defclass tab-pane (container)
-  ((tab :reader tab-of :initarg :tab
-        :initform (error ":TAB needed.")))
-  (:default-initargs
-   :element-type "ul"))
-
-
-
- (defmethod initialize-instance :after ((tab-pane tab-pane) &key)
-  (add-class tab-pane "tab-pane")
-  (with-formula tab-pane
-    (withp ~(active-item-of ~(tab-of tab-pane))
-      #|(dbg-prin1 (view-in-context-of tab-pane (sw-mvc:left-of it)))|#
-       #|(dbg-prin1 ~~tab-pane)|#
-       #|(dbg-prin1 (eq it ~tab-pane))|#)))
-
-
- (defmethod view-constructor ((tab-pane tab-pane) (model cell))
-  (with1 (make-instance 'container :element-type "li")
-    (insert (with1 (make-instance 'html-element :element-type "a" :model model)
-              (setf (href-of it) "#"))
-            :in it)))
-
-
-
-
- (defmethod view-constructor ((tab-pane tab-pane) (pair pair))
-  (with1 (view-in-context-of tab-pane (sw-mvc:left-of pair) t)
-    (with-formula it
-      (when (on-click-of it)
-        (setf (active-item-of ~(tab-of tab-pane)) pair)))))
-
-
-
- (defclass tab (container)
-  ((pane :reader pane-of)
-
-   (content :reader content-of
-            :initform (with1 (make-instance 'container)
-                        (add-class it "tab-content")))
-
-   (on-active-label :accessor on-active-label-of
-                    :initform (lambda (label)
-                                (add-class label "tab-pane-active")))
-
-   (on-inactive-label :accessor on-inactive-label-of
-                      :initform (lambda (label)
-                                  (remove-class label "tab-pane-active"))))
-
-
-  (:default-initargs
-   :model (make-instance 'sw-mvc:container-with-1-active-item)))
-
-
- (defmethod initialize-instance :after ((tab tab) &key)
-  (add-class tab "tab")
-  (setf (slot-value tab 'pane) (make-instance 'tab-pane :tab tab)
-        (slot-value tab 'children) (list (pane-of tab) (content-of tab))))
-
-
-
- (defmethod (setf model-of) ((model container-with-1-active-item) (tab tab))
-  (prog1
-      (list
-       #λ(withp (event-of model)
-           (when (eq model (model-of (container-of it)))
-             (handle-model-event tab it)))
-
-       (let ((old-active-item nil))
-         #λ(withp ~(active-item-of model)
-             (funcall (on-active-label-of tab) (view-in-context-of (pane-of tab) (sw-mvc:left-of it) t))
-             (withp (and old-active-item
-                         (view-in-context-of (pane-of tab) (sw-mvc:left-of old-active-item)))
-               (funcall (on-inactive-label-of tab) it))
-             (setf old-active-item it)
-             (remove-all (content-of tab))
-             (insert (view-in-context-of tab (sw-mvc:right-of it) t)
-                     :in (content-of tab)))))
-
-    (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
-        ((null dlist-node))
-      (container-insert tab (view-in-context-of tab ~dlist-node t)))))
-
-
- (defmethod handle-model-event ((tab tab) (event sw-mvc:container-insert))
-  (handle-model-event (pane-of tab) event))
-
-
- (defmethod handle-model-event ((tab tab) (event sw-mvc:container-remove))
-  (handle-model-event (pane-of tab) event))
-
-
-
-
-
- (terpri) (terpri)
- (unload-css "some-css-id")
- (load-css "some-css-id" "http://nostdal.org/sw-static/css/tab.css" :force-p t)
- (remove-all (root))
- (let ((tab (make-instance 'tab :id "my-tab")))
-  (setf (margin-of tab) "10px")
-  (let ((x (mk-pair #λ"label-1" (dlist #λ"content-1"
-                                       (b "blah")
-                                       #λ"more-content-1")))
-        (y (mk-pair #λ"label-2" #λ"content-2"))
-        (z (mk-pair (em "label-3") (b "content-3"))))
-    (insert tab :in (root))
-    (insert (list x y z) :in tab)))
-|#
+  (insert (mk-pair λv"label-2" (dlist λv"content-2")) :in it)
+  (let ((tab-pane-m (mk-pair λv"label-3" (dlist))))
+    (insert tab-pane-m :in it)
+    (insert (div "Hello World!") :in (view-in-context-of it tab-pane-m))))
