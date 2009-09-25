@@ -56,13 +56,15 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
           (text-input-update-client-cache "" text-input))))))
 
 
-(let ((js ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
-       (catstr "if(event.currentTarget.sw_text_input_value == encodeURIComponent(event.currentTarget.value)){"
-               "return false;"
-               "}else{"
-               "event.currentTarget.sw_text_input_value = encodeURIComponent(event.currentTarget.value);"
-               "return true;"
-               "}")))
+;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
+(let ((js (catstr "if(event.currentTarget.sw_text_input_value == encodeURIComponent(event.currentTarget.value)){"
+                  "return false;"
+                  "}else{"
+                  "event.currentTarget.sw_text_input_value = encodeURIComponent(event.currentTarget.value);"
+                  "return true;"
+                  "}")))
+
+
   (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of)))
     js)
 
