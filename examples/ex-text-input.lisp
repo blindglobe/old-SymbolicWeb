@@ -7,20 +7,27 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 
 (defclass text-input-widget-model (self-ref)
-  ((x :initform (random 100))
-   (y :initform (random 100))
-   (square-of-x :initform ↑λf(* ¤x ¤x))
-   (sum :initform ↑λf(+ ¤square-of-x ¤y)))
+  ((x :accessor x-of
+      :initform (random 100))
+
+   (y :accessor y-of
+      :initform (random 100))
+
+   (square-of-x :reader square-of-x-of
+                :initform ↑λf(* ¤x ¤x))
+
+   (sum :reader sum-of
+        :initform ↑λf(+ ¤square-of-x ¤y)))
 
   (:metaclass mvc-class))
 
 
 
 (defclass text-input-widget-view (html-container)
-  ((x :initform (text-input ()))
+  ((x :initform ↑(text-input (:model (cell-of (x-of ¤model)))))
    (x-feedback :initform (span ()))
 
-   (y :initform (text-input ()))
+   (y :initform ↑(text-input (:model (cell-of (y-of ¤model)))))
    (y-feedback :initform (span ()))
 
    (square-of-x :initform (span ()))
@@ -28,7 +35,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
    (sum :initform (span ())))
 
   (:default-initargs
-   :model (make-instance 'text-input-widget-model)))
+   :model (dbg-prin1 (make-instance 'text-input-widget-model))))
 
 
 (defmethod (setf model-of) ((model text-input-widget-model) (view text-input-widget-view))
@@ -65,14 +72,10 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   connections as well. |#
   (with-object view
     ;; TODO: Consider moving some of the piping here to widgets/text-input.lisp ..?
-    (list (setf ~¤x (with-object model
-                      (with1 #λ¤x (forward-cell (mk-number-parser it) (cell-of ¤x)))))
-
+    (list (add-input-handler ¤x #'mk-number-parser)
           #λ(setf ~~¤x-feedback ~(feedback-event-of ¤x))
 
-          (setf ~¤y (with-object model
-                      (with1 #λ¤y (forward-cell (mk-number-parser it) (cell-of ¤y)))))
-
+          (add-input-handler ¤y #'mk-number-parser)
           #λ(setf ~~¤y-feedback ~(feedback-event-of ¤y))
 
           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
