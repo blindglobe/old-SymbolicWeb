@@ -35,7 +35,7 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
    (sum :initform (span ())))
 
   (:default-initargs
-   :model (dbg-prin1 (make-instance 'text-input-widget-model))))
+   :model (make-instance 'text-input-widget-model)))
 
 
 (defmethod (setf model-of) ((model text-input-widget-model) (view text-input-widget-view))
@@ -72,18 +72,18 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
   connections as well. |#
   (with-object view
     ;; TODO: Consider moving some of the piping here to widgets/text-input.lisp ..?
-    (list (add-input-handler ¤x #'mk-number-parser)
-          #λ(setf ~~¤x-feedback ~(feedback-event-of ¤x))
+    (list  (add-input-handler ¤x #'mk-number-parser)
+           #λ(setf ~~¤x-feedback ~(feedback-event-of ¤x))
 
-          (add-input-handler ¤y #'mk-number-parser)
-          #λ(setf ~~¤y-feedback ~(feedback-event-of ¤y))
+           (add-input-handler ¤y #'mk-number-parser)
+           #λ(setf ~~¤y-feedback ~(feedback-event-of ¤y))
 
-          (setf ~¤square-of-x (with-object model #λ¤square-of-x))
-          ;; A second View of the the SQUARE-OF-X Model.
-          (setf ~¤square-of-x-str #λ(handler-case (format nil "~R" ~~¤square-of-x)
-                                      (error () "Can't show this number as text.")))
+           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
+           ;; A second View of the the SQUARE-OF-X Model.
+           (setf ~¤square-of-x-str #λ(handler-case (format nil "~R" ~~¤square-of-x)
+                                       (error () "Can't show this number as text.")))
 
-          (setf ~¤sum (with-object model #λ¤sum)))))
+           (setf ~¤sum (with-object model #λ¤sum)))))
 
 
 (defmethod generate-html ((view text-input-widget-view))
