@@ -2,9 +2,6 @@
 
 (in-package #:sw)
 
-#| NOTE:
-This isn't optimized for LOC; I'm trying to "do the right thing" by separating data and presentation proper. |#
-
 
 (defclass text-input-widget-model (self-ref)
   ((x :accessor x-of
@@ -25,72 +22,28 @@ This isn't optimized for LOC; I'm trying to "do the right thing" by separating d
 
 (defclass text-input-widget-view (html-container)
   ((x :initform ↑(text-input (:model (cell-of (x-of ¤model)))))
-   (x-feedback :initform (span ()))
-
    (y :initform ↑(text-input (:model (cell-of (y-of ¤model)))))
-   (y-feedback :initform (span ()))
 
-   (square-of-x :initform (span ()))
-   (square-of-x-str :initform (span ()))
-   (sum :initform (span ())))
+   (square-of-x :initform ↑(span (:model (cell-of (square-of-x-of ¤model)))))
+   (square-of-x-str :initform ↑(span (:model #λ(handler-case (format nil "~R" (square-of-x-of ¤model))
+                                                 (error () "Can't show this number as text.")))))
+   (sum :initform ↑(span (:model (cell-of (sum-of ¤model))))))
 
   (:default-initargs
    :model (make-instance 'text-input-widget-model)))
 
 
 (defmethod (setf model-of) ((model text-input-widget-model) (view text-input-widget-view))
-  #| We connect MODEL and VIEW for automatic dataflow. At the same time, we make sure to return a list of the
-  connections so the framework can disconnect stuff later if we where to assign another Model to VIEW (reassign).
-
-  A lot of stuff is going on here. The first SETF expression sets up something that looks like this (we use X-MODEL
-  to denote the slot X in TEXT-INPUT-WIDGET-MODEL, X-VIEW to denote the slot X in TEXT-INPUT-WIDGET-VIEW etc. and
-  IT denotes the CELL created at the first argument for the WITH1 macro):
-
-
-                      (sync-back)
-         -----------------------------------
-         |                                 |
-         v                                 |
-      X-MODEL -------> IT ---------> NUMBER-PARSER
-         |             ^
-         |             |
-         |             | (two-way: from X-VIEW to IT is user-input (a string))
-         |             |
-         |             v
-         |           X-VIEW
-         |
-         v
-  SQUARE-OF-X-MODEL
-         |
-         V
-  SQUARE-OF-X-VIEW
-
-
-
-  NUMBER-PARSER is the CELL created and returned by MK-NUMBER-PARSER. An important feature of SW-MVC is that the
-  'sync-back' connection does not cause things to get stuck propagating in circles, this applies for two-way
-  connections as well. |#
   (with-object view
-    ;; TODO: Consider moving some of the piping here to widgets/text-input.lisp ..?
-    (list  (add-input-handler ¤x #'mk-number-parser)
-           #λ(setf ~~¤x-feedback ~(feedback-event-of ¤x))
-
-           (add-input-handler ¤y #'mk-number-parser)
-           #λ(setf ~~¤y-feedback ~(feedback-event-of ¤y))
-
-           (setf ~¤square-of-x (with-object model #λ¤square-of-x))
-           ;; A second View of the the SQUARE-OF-X Model.
-           (setf ~¤square-of-x-str #λ(handler-case (format nil "~R" ~~¤square-of-x)
-                                       (error () "Can't show this number as text.")))
-
-           (setf ~¤sum (with-object model #λ¤sum)))))
+    (list (add-input-handler ¤x #'mk-number-parser)
+          (add-input-handler ¤y #'mk-number-parser))))
 
 
 (defmethod generate-html ((view text-input-widget-view))
   (with-object view
     (who
-      (:p "X: " (:sw ¤x) (:sw ¤x-feedback) :br
-          "Y: " (:sw ¤y) (:sw ¤y-feedback))
+      (:p "X: " (:sw ¤x) :br
+          "Y: " (:sw ¤y))
 
       (:p "SQUARE-OF-X => " (:sw ¤square-of-x) :br
           "(+ SQUARE-OF-X Y) => " (:sw ¤sum))
