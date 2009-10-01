@@ -81,16 +81,22 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
              (id->app-of server))))
 
 
+(defmethod handle-condition (condition server application viewport)
+  (invoke-restart (or (find-restart 'continue)
+                      (find-restart 'sw-mvc:assign-condition)
+                      #|(find-restart 'sw-mvc:user-feedback)|# ;; Try letting the user deal with the problem.
+                      (find-restart 'sw-mvc:skip-cell)
+                      (find-restart 'sw-stm:abort-transaction)
+                      (find-restart 'sw-http:continue-listening))))
+
+
 (defmethod sw-http:maybe-debug ((server server) condition)
   (if (debug-p-of server)
       (invoke-debugger condition)
       (progn
         (warn "~S got condition: ~S~%Set DEBUG-P slot to T to debug in Lisp/Slime."
               server condition)
-        (invoke-restart (or (find-restart 'sw-mvc:assign-condition)
-                            #|(find-restart 'sw-mvc:user-feedback)|# ;; Try letting the user deal with the problem.
-                            (find-restart 'sw-stm:abort-transaction)
-                            (find-restart 'sw-http:continue-listening))))))
+        (handle-condition condition server *app* *viewport*))))
 
 
 (defmethod cookie-expires-of ((server server))
