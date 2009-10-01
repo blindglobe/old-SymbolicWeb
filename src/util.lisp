@@ -39,7 +39,6 @@
     "<script type='text/javascript' defer='defer' src='"
     (mk-static-data-url *server* "javascript/sw/sw-ajax.js")
     "'></script>"))
-(export 'js-sw-headers)
 
 
 (defmethod mk-static-data-url ((server server) (last-part string))
@@ -57,18 +56,15 @@
                 "")
             "/"
             last-part)))
-(export 'mk-static-data-url)
 
 
 (defmethod mk-static-data-url ((app application) (last-part string))
-  (mk-static-data-url *server* last-part))
-(export 'mk-static-data-url)
+  (mk-static-data-url (server-of app) last-part))
 
 
 (defmacro who (&body body)
   `(with-html-output-to-string (,(gensym "who-string"))
      ,@body))
-(export 'who)
 
 
 (defmethod convert-tag-to-string-list ((tag (eql :sw)) attr-list body body-fn)
@@ -94,7 +90,6 @@
     (dolist (child (children-of widget))
       (for-each-widget-in-tree child func)))
   (values))
-(export 'for-each-widget-in-tree)
 
 
 (defun sw-logo (title)
@@ -104,9 +99,8 @@
 \(__   .._ _ |_  _ |* _.|  | _ |_
 .__)\\_|[ | )[_)(_)||(_.|/\\|(/,[_) v0.3
 ====._|=========================> " title "
-<a href=\"http://nostdal.org/\">http://sw.nostdal.org/</a>"
+<a href='http://nostdal.org/'>http://sw.nostdal.org/</a>"
 ))))))
-(export 'sw-logo)
 
 
 (defun sw-heading (&key title)
@@ -119,12 +113,11 @@
          (:ul (:li "(ID-OF *APP*): " (str (id-of *app*)))
               (:li "sw-viewport-id: " (:span :id "sw-viewport-id"))))))
      :hr)))
-(export 'sw-heading)
 
 
 (declaim (inline js-str))
 (defn js-str (string ((str string)))
-  (format nil "\"~A\"" str))
+  (format nil "'~A'" str))
 
 
 ;; TODO: This belongs in SW-MVC.
@@ -144,7 +137,6 @@
   (escape-for-html
    (with-output-to-string (ss)
      (sb-debug:backtrace most-positive-fixnum ss))))
-(export 'generate-backtrace)
 
 
 (defun generate-random-cookie-value (server)
@@ -165,7 +157,6 @@
   (declare (string id)
            (application app))
   (gethash id (widgets-of app)))
-(export 'get-widget)
 
 
 (flet ((%css (id css-code)

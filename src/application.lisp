@@ -197,4 +197,4 @@ include the JS libraries required for SW in general."
            ((member :css :js) type)
            (string path))
   (setf (gethash (cons id type) (resources-of app))
-        (mk-static-data-url (server-of app) path)))
+        (mk-static-data-url app path)))

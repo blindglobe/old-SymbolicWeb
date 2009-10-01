@@ -66,7 +66,8 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 
 (defmethod container-insert ((tab tab) tab-pane &key before after)
-  ;; NOTE: So we don't dispatch to (CONTAINER-INSERT CONTAINER WIDGET ..); our superclass.
+  #| NOTE: So we don't dispatch to (CONTAINER-INSERT CONTAINER WIDGET ..); our superclass where the correct type
+  check will not be done. |#
   (check-type tab-pane tab-pane)
   (when-let (it (or before after))
     (check-type it tab-pane))
