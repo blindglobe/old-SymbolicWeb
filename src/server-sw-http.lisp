@@ -15,19 +15,18 @@ fixing this.
   ()
 
   (:default-initargs
+   ;; TODO: This is not really used as a 404 response anymore, but if this in turn fails Lighttpd will send its
+   ;; 404 page.
    :404-fn
    (lambda ()
      (sw-http:response-add-chunk
       (sw-http:combine-buffers
-       (sw-http:mk-response-status-code 200)
+       #.(sw-http:mk-response-status-code 200)
        (sw-http:mk-response-header-field (catstr "X-Sendfile: "
-                                                 (static-data-fs-path-of *server*)
-                                                 (with (sw-http:path)
-                                                   (if (char= #\/ (char it 0))
-                                                       (subseq it 1)
-                                                       it))))
+                                                 (static-data-fs-path-of (or *app* *server*))
+                                                 (sw-http:path)))
        (sw-http:mk-response-message-body
-        #.(who (:html (:body (:h1 "SymbolicWeb: HTTP 404")))))))
+        #.(who (:html (:body (:h1 "SymbolicWeb: X-Sendfile!")))))))
      (sw-http:done-generating-response))
 
     :application-finder-fn
@@ -85,13 +84,14 @@ fixing this.
               (setf (last-ping-time-of app) *request-time*)
               (when (and +auto-set-app-support-p+ -auto-set-app-p-)
                 (setf *app* app))
-              (or (handle-request server app viewport)
-                  (handle-request app server viewport)
-                  (progn
-                    (warn "404 @ viewport ~A and app ~A for (SW-HTTP:PATH): ~S" viewport app (sw-http:path))
-                    ;; FIXME: Slot 404-FN is missing from VIEWPORT and APPLICATION.
-                    (funcall (the function (404-fn-of (or viewport app)))))))
-            (progn
+              (let ((*app* app))
+                (or (handle-request server app viewport)
+                    (handle-request app server viewport)
+                    (progn
+                      (warn "404 @ viewport ~A and app ~A for ~S" viewport app (sw-http:path))
+                      ;; FIXME: Slot 404-FN is missing from VIEWPORT and APPLICATION.
+                      (funcall (the function (404-fn-of (or viewport app))))))))
+            (let ((*app* nil)) ;; Dodge stale *APP* bound by -AUTO-SET-APP-P-.
               #|(warn "Server (global) HTTP-404 for (SW-HTTP:PATH): ~S" (sw-http:path))|#
               (funcall (the function (404-fn-of server))))))))))
 
@@ -145,7 +145,7 @@ fixing this.
 (defmethod handle-request ((server sw-http-server)
                            (app application)
                            (viewport (eql nil)))
-  (let ((*app* app))
+  (prog1 t
     (sw-http:response-add-chunk
      #.(sw-http:combine-buffers
         (sw-http:mk-response-status-code 200)
@@ -160,40 +160,39 @@ fixing this.
      (sw-http:mk-response-header-field (catstr "Last-Modified: " (rfc-1123-date))))
     (sw-http:response-add-chunk
      (sw-http:mk-response-message-body (with-sync (:name :render-app) (render app))))
-    (sw-http:done-generating-response)
-    t))
+    (sw-http:done-generating-response)))
+
 
 
 (defmethod handle-request ((server sw-http-server)
                            (app application)
                            (viewport viewport))
-  (let ((*app* app)
-        (*viewport* viewport)
-        (*request-type* (let ((request-type (sw-http:get-parameter "_sw_request-type")))
-                          (cond
-                            ((string= request-type "comet") :comet)
-                            ((string= request-type "ajax")  :ajax)
-                            (t (error "Unknown request-type: ~S" request-type))))))
-    (case *request-type*
-      (:comet
-       (sw-http:response-add-chunk
-        #.(sw-http:combine-buffers
-           (sw-http:mk-response-status-code 200)
-           (sw-http:mk-response-header-field "Content-Type: text/javascript; charset=utf-8")
-           (sw-http:mk-response-header-field "Connection: keep-alive")))
-       (handle-comet-request server app viewport))
+  (prog1 t
+    (let ((*viewport* viewport)
+          (*request-type* (let ((request-type (sw-http:get-parameter "_sw_request-type")))
+                            (cond
+                              ((string= request-type "comet") :comet)
+                              ((string= request-type "ajax")  :ajax)
+                              (t (error "Unknown request-type: ~S" request-type))))))
+      (case *request-type*
+        (:comet
+         (sw-http:response-add-chunk
+          #.(sw-http:combine-buffers
+             (sw-http:mk-response-status-code 200)
+             (sw-http:mk-response-header-field "Content-Type: text/javascript; charset=utf-8")
+             (sw-http:mk-response-header-field "Connection: keep-alive")))
+         (handle-comet-request server app viewport))
 
-      (:ajax
-       (setf (last-user-activity-time-of viewport) *request-time*)
-       (with-sync (:name :ajax) (handle-ajax-request server app viewport))
+        (:ajax
+         (setf (last-user-activity-time-of viewport) *request-time*)
+         (with-sync (:name :ajax) (handle-ajax-request server app viewport))
 
-       (sw-http:response-add-chunk
-        #.(sw-http:combine-buffers
-           (sw-http:mk-response-status-code 200)
-           #|(sw-http:mk-response-header-field "Content-Type: text/javascript; charset=utf-8")|#
-           (sw-http:mk-response-header-field "Content-Type: text/plain; charset=utf-8")
-           (sw-http:mk-response-header-field "Connection: keep-alive")
-           (sw-http:mk-response-message-body "")))
-       (sw-http:done-generating-response)
-       (do-comet-response viewport)))
-    t))
+         (sw-http:response-add-chunk
+          #.(sw-http:combine-buffers
+             (sw-http:mk-response-status-code 200)
+             #|(sw-http:mk-response-header-field "Content-Type: text/javascript; charset=utf-8")|#
+             (sw-http:mk-response-header-field "Content-Type: text/plain; charset=utf-8")
+             (sw-http:mk-response-header-field "Connection: keep-alive")
+             (sw-http:mk-response-message-body "")))
+         (sw-http:done-generating-response)
+         (do-comet-response viewport))))))

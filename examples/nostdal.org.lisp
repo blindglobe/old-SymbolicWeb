@@ -6,7 +6,7 @@
 (defclass nostdal-app (application)
   ())
 
-(set-uri 'nostdal-app "/nostdal.org")
+(set-uri 'nostdal-app "nostdal.org")
 
 
 (defmethod render-viewport ((viewport viewport) (app nostdal-app))
@@ -16,7 +16,7 @@
       (:h1 "nostdal.org")
 
       (:ul
-       (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious") ": collection of source code repositories")
+       (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious") ": collection of source code repositories.")
        (:li (:a :href "text-input" "text-input-app") ": dataflow test thing")
        (:li (:a :href "comet-test-app" "comet-test-app") ": comet test thing")
        (:li (:a :href "vecto-2" "vecto-2") ": "

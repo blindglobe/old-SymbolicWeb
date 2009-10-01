@@ -4,7 +4,7 @@
 (defclass tabs-app (application)
   ())
 
-(set-uri 'tabs-app "/tabs-app")
+(set-uri 'tabs-app "tabs-app")
 
 
 (defmethod initialize-instance :after ((app tabs-app) &key)

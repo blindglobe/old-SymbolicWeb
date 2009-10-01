@@ -55,7 +55,7 @@
 (defclass text-input-app (application)
   ((shared-model :initform (make-instance 'text-input-widget-model))))
 
-(set-uri 'text-input-app "/text-input")
+(set-uri 'text-input-app "text-input")
 
 
 (defmethod render-viewport ((viewport viewport) (app text-input-app))
@@ -73,7 +73,6 @@
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/ex-text-input.lisp"
-             "source code")
-         :br
+             "source code") :br
          "Hosted on a crummy ADSL line..."))
      :in (root))))

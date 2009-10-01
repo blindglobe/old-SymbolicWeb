@@ -25,7 +25,7 @@
 (defclass vecto-2-app (application)
   ())
 
-(set-uri 'vecto-2-app "/vecto-2")
+(set-uri 'vecto-2-app "vecto-2")
 
 
 (defmethod render-viewport ((viewport viewport) (app vecto-2-app))

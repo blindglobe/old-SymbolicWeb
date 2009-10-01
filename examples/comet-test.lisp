@@ -10,7 +10,7 @@
 (defclass comet-test-app (application)
   ())
 
-(set-uri 'comet-test-app "/comet-test-app")
+(set-uri 'comet-test-app "comet-test-app")
 
 
 (defmethod main ((app comet-test-app))

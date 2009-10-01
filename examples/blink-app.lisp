@@ -9,7 +9,7 @@
 
   (:metaclass mvc-class))
 
-(set-uri 'blink-app "/blink-app")
+(set-uri 'blink-app "blink-app")
 
 
 (defmethod main ((app blink-app))
