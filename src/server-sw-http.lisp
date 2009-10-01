@@ -34,6 +34,7 @@ fixing this.
       (sw-http-server-request-handler sw-http-server connection))))
 
 
+;; TODO: Move to SW-HTTP?
 (defmethod host ((server sw-http-server) &key (include-subdomain-p t))
   (let ((host (sw-http:host)))
     (if include-subdomain-p

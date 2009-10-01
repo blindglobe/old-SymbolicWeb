@@ -41,6 +41,11 @@
     "'></script>"))
 
 
+#| NOTE: Trying to push a lot of the work here to the client is tricky; i.e. using JavaScript for HTML attributes
+won't work:
+
+  <script type="text/javascript" src=window.location.protocol + ...></script>
+|#
 (defmethod mk-static-data-url ((server server) (last-part string))
   (declare (optimize speed))
   (let ((static-data-subdomain (static-data-subdomain-of server))
