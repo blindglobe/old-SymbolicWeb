@@ -18,7 +18,7 @@
     (with-output-to-string (ss)
       (maphash (lambda (signature url)
                  (when (eq :js (cdr signature))
-                   (format ss  "<script type='text/javascript' src='~A'></script>" url)))
+                   (format ss "<script type='text/javascript' src='~A'></script>" url)))
                (resources-of application)))
 
     "<script type='text/javascript' src='"

@@ -138,49 +138,48 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 RENDER method you most likely want to include a 'sw-root' DIV element, and also
 include the JS libraries required for SW in general."
   (declare (optimize speed))
-  (with-output-to-string (ss)
-    ;; :PROLOGUE set to T generates this (needed to trigger "standards mode" in IE7!):
-    ;; <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
-    (with-html-output (ss ss :prologue t)
-      (:html :xmlns "http://www.w3.org/1999/xhtml" :|xml:lang| "en" :lang "en"
-       (:head
-        (:title (str (string-capitalize (type-of app))))
-        (:meta :name "Author" :content (http-meta-author-of app))
-        ;; Do want; http://blog.chromium.org/2009/09/introducing-google-chrome-frame.html
-        (:meta :http-equiv "X-UA-Compatible" :content "chrome=1")
-        (:meta :http-equiv "X-UA-Compatible" :content "IE=edge") ;; For IE8 and up.
-        (:meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
+  ;; :PROLOGUE set to T generates this (needed to trigger "standards mode" in IE7!):
+  ;; <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">
+  (with-html-output-to-string (ss nil :prologue t)
+    (:html :xmlns "http://www.w3.org/1999/xhtml" :|xml:lang| "en" :lang "en"
+     (:head
+      (:title (str (string-capitalize (type-of app))))
+      (:meta :name "Author" :content (http-meta-author-of app))
+      ;; Do want; http://blog.chromium.org/2009/09/introducing-google-chrome-frame.html
+      (:meta :http-equiv "X-UA-Compatible" :content "chrome=1")
+      (:meta :http-equiv "X-UA-Compatible" :content "IE=edge") ;; For IE8 and up.
+      (:meta :http-equiv "Content-Type" :content "text/html; charset=UTF-8")
 
-        ;; TODO: Move this to a slot in APPLICATION.
-        (:style :type "text/css"
-          "html, body, #sw-root {"
-          "  position: absolute;"
-          "  width: 100%; height: 100%;"
-          "  overflow: hidden;"
-          "  margin: 0; padding: 0; border: 0;"
-          "}"
-          ".sw-hide {"
-          "  display: none !important;"
-          "}")
+      ;; TODO: Move this to a slot in APPLICATION.
+      (:style :type "text/css"
+       "html, body, #sw-root {"
+       "  position: absolute;"
+       "  width: 100%; height: 100%;"
+       "  overflow: hidden;"
+       "  margin: 0; padding: 0; border: 0;"
+       "}"
+       ".sw-hide {"
+       "  display: none !important;"
+       "}")
 
-        ;; User-specified static CSS files.
-        (maphash (lambda (signature url)
-                   (when (eq :css (cdr signature))
-                     (htm (:link :rel "stylesheet" :type "text/css" :href url))))
-                 (resources-of app)))
+      ;; User-specified static CSS files.
+      (maphash (lambda (signature url)
+                 (when (eq :css (cdr signature))
+                   (htm (:link :rel "stylesheet" :type "text/css" :href url))))
+               (resources-of app)))
 
-       (:body
-        (:div :id "sw-root")
-        (:div
-         (:img :id "sw-loading-spinner" :alt ""
-               :style "position: absolute; z-index: 1000; right: 0px; top: 0px;"
-               :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
+     (:body
+      (:div :id "sw-root")
+      (:div
+       (:img :id "sw-loading-spinner" :alt ""
+             :style "position: absolute; z-index: 1000; right: 0px; top: 0px;"
+             :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
 
-         (:a :accesskey 1 :href "javascript:swTerminateSession();")
-         #|(:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")|#
+        (:a :accesskey 1 :href "javascript:swTerminateSession();")
+        #|(:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")|#
 
-         (:noscript (:p "JavaScript needs to be enabled."))
-         (str (js-sw-headers app))))))))
+        (:noscript (:p "JavaScript needs to be enabled."))
+        (str (js-sw-headers app)))))))
 
 
 (defmethod remove-application ((app application) &optional (server *server*))

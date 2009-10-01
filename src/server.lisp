@@ -94,8 +94,8 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
   (if (debug-p-of server)
       (invoke-debugger condition)
       (progn
-        (warn "~S got condition: ~S~%Set DEBUG-P slot to T to debug in Lisp/Slime."
-              server condition)
+        #|(warn "~S got condition: ~S~%Set DEBUG-P slot to T to debug in Lisp/Slime."
+              server condition)|#
         (handle-condition condition server *app* *viewport*))))
 
 
