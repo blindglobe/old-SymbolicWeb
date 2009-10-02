@@ -8,13 +8,11 @@
 
 
 (defmethod initialize-instance :after ((app tabs-app) &key)
-  ;; jQuery UI core.
+  ;; jQuery UI core. ;; TODO: This should be some sort of separate helper-function (method?) or something.
   (add-resource app "jquery-ui-core" :css
                 (mk-static-data-url app "jquery-ui/themes/base/jquery-ui.css"))
   (add-resource app "jquery-ui-core" :js
-                "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"
-                ;; NOTE: For LAN web-apps this is a better idea.
-                #|(mk-static-data-url app "jquery-ui/ui/minified/jquery-ui.min.js")|#)
+                (mk-static-data-url app "jquery-ui/ui/minified/jquery-ui.min.js"))
 
   ;; jQuery UI Tabs widget.
   (add-resource app "jquery-ui-tabs" :css

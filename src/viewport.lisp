@@ -125,12 +125,12 @@ refresh."
 (defmethod render-viewport :after ((viewport viewport) (app application))
   (when-commit ()
     (set-loading-p nil)
-    (if-let ((widget (with (last-focus-of app)
-                           (withp (etypecase it
-                                    (widget it)
-                                    (string (gethash it (widgets-of app)))
-                                    (null nil))
-                             (visible-p-of it :viewport viewport)))))
+    (if-let ((widget (with (last-focus-of app) ;; VIEWPORT when TODO in widgets/focussable.lisp is gone.
+                       (withp (etypecase it
+                                (widget it)
+                                (string (gethash it (widgets-of app)))
+                                (null nil))
+                         (visible-p-of it :viewport viewport)))))
       ;; Ensure that the widget that had focus before page refresh still has it.
       (focus widget)
       ;; No widget is assigned focus; we'll try to find a default candidate.
@@ -159,7 +159,7 @@ refresh."
 
     (if *bulk-update-p*
         (pushnew viewport (cdr *bulk-update-p*) :test #'eq)
-        (when (or (eq *request-type* :unknown)     ;; From the REPL?
+        (when (or (eq *request-type* :unknown)    ;; From the REPL?
                   (not (eq *viewport* viewport))) ;; Cross-viewport?
           ;; ..then send stuff right away.
           (do-comet-response viewport))))
