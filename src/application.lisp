@@ -190,10 +190,10 @@ include the JS libraries required for SW in general."
   (remhash (cookie-value-of app) (cookie-value->app-of server)))
 
 
-(defun add-resource (app id type path)
+(defun add-resource (app id type url)
   (declare (application app)
            (string id)
            ((member :css :js) type)
-           (string path))
+           (string url))
   (setf (gethash (cons id type) (resources-of app))
-        (mk-static-data-url app path)))
+        url))
