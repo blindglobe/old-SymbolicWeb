@@ -107,7 +107,7 @@ Strong hash table; ID->CALLBACK-BOX.")))
 
   ;; Add DOM writer.
   (compile-and-execute
-    `(defun ,lisp-writer-name (property-value dom-mirror &rest args &key client-only-p)
+    `(defun ,lisp-writer-name (property-value dom-mirror &rest args &key client-only-p &allow-other-keys)
        (declare #.(optimizations :dom-property)
                 (dom-mirror dom-mirror)
                 ((member nil t) client-only-p))
