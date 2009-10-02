@@ -44,11 +44,15 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
   (when sync-on-blur-p
     (with-formula text-input
       (when-let (value (on-text-input-blur-of text-input))
+        (when-commit ()
+          (setf (value-of text-input :server-only-p t) value))
         (setf ~~text-input value))))
 
   (when sync-on-enterpress-p
     (with-formula text-input
       (when-let (value (on-enterpress-of text-input))
+        (when-commit ()
+          (setf (value-of text-input :server-only-p t) value))
         (setf ~~text-input value)
 
         (when (clear-on-enterpress-p-of text-input)
@@ -111,9 +115,11 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
     at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
     #λ(let* ((value ~model)
              (value-str (value-marshaller value)))
-        (unless (muffle-compiler-note
-                  (string= value-str (value-marshaller (value-of text-input))))
-          (when-commit ()
+        (when-commit ()
+          #| We could move this test outside of the commit, but that would cause the other commit block in the
+          INITIALIZE-INSTANCE method for TEXT-INPUT to race with this. |#
+          (unless (muffle-compiler-note
+                    (string= value-str (value-marshaller (value-of text-input))))
             (setf (value-of text-input) value)
             (text-input-update-client-cache value-str text-input))))))
 
