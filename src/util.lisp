@@ -37,7 +37,7 @@
     "</script>"
 
     "<script type='text/javascript' defer='defer' src='"
-    (mk-static-data-url *server* "javascript/sw/sw-ajax.js")
+    (mk-static-data-url *server* "javascript/sw/sw-ajax.min.js")
     "'></script>"))
 
 
