@@ -1,3 +1,5 @@
+// NOTE: java -jar /home/lnostdal/programming/javascript/jquery-ui-dev/build/build/yuicompressor-2.4.2.jar sw-ajax.js -o sw-ajax.min.js
+
 /*
 For this file to bootstrap correctly the following variables must be bound:
 
@@ -13,7 +15,7 @@ For this file to bootstrap correctly the following variables must be bound:
 ////////////////////////
 
 if($.browser.mozilla)
-  swGetCurrentHash = 
+  swGetCurrentHash =
   function(){
     if((window.location.hash).length > 1)
       // https://bugzilla.mozilla.org/show_bug.cgi?id=378962 *sigh*
@@ -22,7 +24,7 @@ if($.browser.mozilla)
       return "#";
   };
 else
-  swGetCurrentHash = 
+  swGetCurrentHash =
   function(){
     return location.hash;
   };
@@ -45,7 +47,7 @@ function swURL(){
 //////////////
 
 
-swAjax = 
+swAjax =
   (function(){
      var queue = new Array();
      var timer = false;
@@ -68,28 +70,39 @@ swAjax =
      }
 
      return function(params, callback_data, after_fn){
-       if(queue.push(function(){
-                       var options = {
-                         type: "POST",
-                         // NOTE: I think the reason I'm not using swURL here has to do with HTTP POST requests not
-                         // working vs. "dynamic subdomains". TODO: Confirm that this is the reason .. x)
-                         url: [window.location.pathname,
-                               "?_sw_request-type=ajax",
-                               "&_sw_viewport-id=", sw_viewport_id,
-                               params].join(''),
-                         data: callback_data,
-                         //dataType: "script", // NOTE: The server end always returns an empty result atm..
-                         dataType: "text",
-                         // TODO: 500 should be configurable.
-                         beforeSend: function(){ if(!timer){ timer = setTimeout(displaySpinner, 500); }},
-                         complete: handleRestOfQueue
-                       };
-                       if(after_fn) options.success = after_fn;
-                       $.ajax(options);
-                     }) == 1) // if()..
-         queue[0]();
+         if(queue.push(function(){
+             var url = [window.location.protocol, "//",
+                        window.location.host,
+                        window.location.pathname,
+                        "?_sw_request-type=ajax",
+                        "&_sw_viewport-id=", sw_viewport_id,
+                        params].join('');
+
+             var options = {
+                 type: (function(){
+                     // http://bit.ly/1z3xEu
+                     // MAX for 'GET' is apparently 2048 (IE). We stay a bit below this just in case.
+                     console.log(callback_data.length + url.length);
+                     if(callback_data.length + url.length > 1950)
+                         return "POST";
+                     else
+                         return "GET";
+                 })(),
+                 url: url,
+                 data: callback_data,
+                 cache: false,
+                 //dataType: "script", // NOTE: The server end always returns an empty result atm..
+                 dataType: "text",
+                 // TODO: 500 should be configurable.
+                 beforeSend: function(){ if(!timer){ timer = setTimeout(displaySpinner, 500); }},
+                 complete: handleRestOfQueue
+             };
+             if(after_fn) options.success = after_fn;
+             $.ajax(options);
+         }) == 1) // if()..
+             queue[0]();
      };
-   })();
+  })();
 
 
 
@@ -98,13 +111,13 @@ swAjax =
 
 sw_comet_response = false;
 
-swComet = 
+swComet =
 (function(){
    function callback(){
      if(sw_comet_response)
        sw_comet_response = false, swComet('&do=ack');
-     else 
-       // FIXME: This stuff never happen for Webkit (it doesn't seem to be a big problem atm. though), 
+     else
+       // FIXME: This stuff never happen for Webkit (it doesn't seem to be a big problem atm. though),
        // or Opera (when random subdomains are used).
        setTimeout("swComet('');", 500);
    }
@@ -223,5 +236,5 @@ $.address.change(function(event){
 
 $(document).ready(
 function(){
-  swComet("&do=refresh&hash=" + encodeURIComponent(encodeURIComponent(swGetCurrentHash().substr(1))));          
+  swComet("&do=refresh&hash=" + encodeURIComponent(encodeURIComponent(swGetCurrentHash().substr(1))));
 });

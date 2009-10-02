@@ -22,7 +22,11 @@
                                         callback-id viewport)
                                   (on-invalid-callback-id server app viewport)
                                   (return-from handle-ajax-request))))
-              (arguments sw-http::*post-parameters*))
+              (arguments (ecase (sw-http:http-method)
+                           (:get (remove-if (lambda (str) (char= #\_ (char str 0)))
+                                            sw-http::*get-parameters*
+                                            :key #'car))
+                           (:post sw-http::*post-parameters*))))
          (setf (last-user-activity-time-of app) (get-universal-time))
          (execute-callback callback-box arguments)))
 
