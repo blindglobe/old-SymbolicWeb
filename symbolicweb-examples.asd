@@ -32,4 +32,5 @@
      (:file "vecto-2")
      (:file "vecto-3")
      (:file "tabs")
+     (:file "mvc-validation")
      ))))

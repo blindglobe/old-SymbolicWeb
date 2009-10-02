@@ -38,3 +38,4 @@
 (set-uri 'sw::vecto-2-app "vecto-2")
 (set-uri 'sw::vecto-3-app "vecto-3")
 (set-uri 'sw::tabs-app "tabs-app")
+(set-uri 'sw::mvc-validation-app "mvc-validation")
