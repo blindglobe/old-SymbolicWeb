@@ -27,7 +27,8 @@
        (:li (:a :href "vecto-3" "vecto-3") ": "
             (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/vecto-3.lisp"
                 "source code"))
-       (:li (:a :href "tabs-app" "tabs") ": tab widget test thing"))
+       (:li (:a :href "tabs-app" "tabs") ": tab widget test thing")
+       (:li (:a :href "mvc-validation" "mvc-validation") ": test of tooltips; try entering invalid data"))
 
 
       (:h2 "Got something on your mind?")

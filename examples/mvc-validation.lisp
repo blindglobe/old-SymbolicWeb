@@ -28,31 +28,19 @@
    :model (make-instance 'mvc-validation-model)))
 
 
-;; TODO: This needs a name, some arguments and a proper place (not in this file).
-(defun blah (view)
-  (declare (view-base view))
-  (let ((cell (cell-of ~view))
-        (old nil))
-    #λ(if-let ((fe (feedback-event-of cell)))
-        (when-commit ()
-          (setf old fe)
-          (setf (border-color-of view) :red)
-          (setf (tooltip-of view :show-p t) "This needs to be a number."))
-        (when-commit ()
-          (when old
-            (nilf old)
-            (setf (border-color-of view) :black)
-            (setf (tooltip-of view) nil))))))
+(flet ((fe-handler (fe view)
+         (if fe
+             (setf (border-color-of view) :red
+                   (tooltip-of view :show-p t) "Need valid number input here.")
+             (setf (border-color-of view) :black
+                   (tooltip-of view) nil))))
 
-
-(defmethod (setf model-of) ((model mvc-validation-model) (view mvc-validation-view))
-  (with-object view
-    (list (add-input-handler ¤x #'mk-number-parser)
-          (add-input-handler ¤y #'mk-number-parser)
-          (blah ¤x)
-          (blah ¤y)
-          ;;#λ(dbg-prin1 ~~¤sum)
-          )))
+  (defmethod (setf model-of) ((model mvc-validation-model) (view mvc-validation-view))
+    (with-object view
+      (list (add-input-handler ¤x #'mk-number-parser)
+            (add-input-handler ¤y #'mk-number-parser)
+            (add-on-feedback ¤x (λ (fe) (fe-handler fe ¤x)))
+            (add-on-feedback ¤y (λ (fe) (fe-handler fe ¤y)))))))
 
 
 (defmethod generate-html ((view mvc-validation-view))
@@ -96,8 +84,8 @@
          (:sw ¤view)
 
          :hr
-         #|(:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/mvc-validation.lisp"
-             "source code")|# :br
-         ;;"Hosted on a crummy ADSL line..."
-         ))
+         (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/mvc-validation.lisp"
+             "source code") :br
+             "Hosted on a crummy ADSL line, and this app. currently pulls down a lot of uncompressed and not needed "
+             "stuff."))
      :in (root))))
