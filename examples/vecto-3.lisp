@@ -3,7 +3,9 @@
 
 (defclass vecto-widget-3 (vecto)
   ((vc-font :reader vc-font-of
-            :initform (zpb-ttf:open-font-loader "/usr/share/fonts/truetype/msttcorefonts/times.ttf")))
+            :initform (zpb-ttf:open-font-loader
+                       (catstr (princ-to-string (user-homedir-pathname))
+                               "sw/data/fonts/truetype/mstcorefonts/times.ttf"))))
 
   (:default-initargs
    :filename "vecto-widget-3"))
