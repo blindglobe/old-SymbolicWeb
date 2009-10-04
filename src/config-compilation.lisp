@@ -2,6 +2,7 @@
 
 (in-package #:sw)
 
+;; TODO: This stuff should be part of Aromyxo. The AMX:DEFN stuff I think.
 
 (define-variable -allow-compilation-inlining-p-
     :value nil
@@ -20,9 +21,7 @@
 
 
 (defmethod maybe-inline (function-name &key)
-  (if -default-compilation-inlining-p-
-      `(declaim (inline ,function-name))
-      nil))
+  -default-compilation-inlining-p-)
 
 
 
@@ -88,7 +87,7 @@
 
 
 (defmethod optimizations ((context (eql :code.lisp)) &key)
-  '(optimize (speed 3) (safety 2)))
+  '(optimize (speed 3) (safety 0)))
 
 
 (defmethod optimizations ((context (eql :viewport.lisp)) &key)

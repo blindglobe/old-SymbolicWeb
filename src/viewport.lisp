@@ -57,7 +57,7 @@ Each instance of VIEWPORT represents a browser window or tab."))
 (defmethod initialize-instance :after ((viewport viewport) &key (id (error ":ID needed.")))
   (declare (ignore id))
   (with-slots (id root-widget address-bar application) viewport
-    (setf address-bar (make-instance 'address-bar :viewport viewport)
+    (setf ;;address-bar (make-instance 'address-bar :viewport viewport)
           root-widget (make-instance root-widget :id "sw-root")
           (viewport-of root-widget) viewport
           (gethash id (viewports-of application)) viewport)))
@@ -65,7 +65,8 @@ Each instance of VIEWPORT represents a browser window or tab."))
 
 (defmethod print-object ((viewport viewport) stream)
   (print-unreadable-object (viewport stream :type t :identity t)
-    (format stream "(ID ~A)" (id-of viewport))))
+    (muffle-compiler-note
+      (format stream "(ID ~A)" (id-of viewport)))))
 
 
 #.(maybe-inline 'find-or-create-viewport)
@@ -83,8 +84,9 @@ Returns two values; a VIEWPORT instance and whether a new one was created or not
 
 
 (defmethod visible-p-of ((viewport viewport) &key)
-  (> -viewport-visible-p-timeout-
-     (- (get-universal-time) (last-ping-time-of viewport))))
+  (muffle-compiler-note
+    (> -viewport-visible-p-timeout-
+       (- (get-universal-time) (last-ping-time-of viewport)))))
 
 
 #.(maybe-inline 'for-each-viewport-in-app)

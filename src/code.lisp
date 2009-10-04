@@ -19,7 +19,6 @@ TARGET: If supplied with a WIDGET this will transmit the JS code to
 all contexts (browser sessions (users), tabs and windows) where that widget is
 visible. If supplied with a VIEWPORT this will transmit the JS code to that
 single viewport for execution there."
-  (declare (optimize (safety 0)))
   (cond
     (server-only-p)
 
