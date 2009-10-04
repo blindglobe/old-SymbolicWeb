@@ -133,8 +133,10 @@ body (widgets/container.lisp)."
 
 
 (defmethod remove-widget-from-viewport ((widget widget) (viewport viewport))
+  "Remove WIDGET from VIEWPORT, but only if it actually is part of VIEWPORT."
   ;; WIDGET -/-> VIEWPORT.
-  (nilf (viewport-of widget)))
+  (when (eq viewport (viewport-of widget))
+    (nilf (viewport-of widget))))
 
 
 (defmethod set-show-on-feedback ((widget widget) (cell cell))
