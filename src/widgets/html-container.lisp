@@ -56,7 +56,7 @@
                  (deletef (slot-value html-container 'children) child))
                (when (visible-p-of html-container)
                  (dolist (child removed-children)
-                   (propagate-for-remove child html-container))))))))
+                   (propagate-for-remove child))))))))
   (declare (inline generate-html-wrapper))
 
 
