@@ -82,7 +82,7 @@ swAjax =
                  type: (function(){
                      // http://bit.ly/1z3xEu
                      // MAX for 'GET' is apparently 2048 (IE). We stay a bit below this just in case.
-                     console.log(callback_data.length + url.length);
+                     //console.log(callback_data.length + url.length);
                      if(callback_data.length + url.length > 1950)
                          return "POST";
                      else
