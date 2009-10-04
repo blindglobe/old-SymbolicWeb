@@ -62,9 +62,9 @@
         (:file "image")
         (:file "vecto")
         (:file "tab")
+        (:file "tooltip")
         #|
         (:file "container-with-1-active-item")
-        (:file "html-elements")
         (:file "table-container")
         (:file "location-callback")
         (:file "location-container")
@@ -77,13 +77,12 @@
         (:file "slider")
         (:file "cursor")
         (:file "combo-box")
-        (:file "tab")
         (:file "window")
         (:file "alert-box")
         |#
         ))
 
-     (:file "address-bar")
+     #|(:file "address-bar")|#
      (:file "application")
      (:file "server-sw-http")
      (:file "comet")

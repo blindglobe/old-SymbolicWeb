@@ -18,8 +18,10 @@
 
 
 (defclass mvc-validation-view (html-container)
-  ((x :initform ↑(text-input (:model (cell-of (x-of ¤model)))))
-   (y :initform ↑(text-input (:model (cell-of (y-of ¤model)))))
+  ((x :initform ↑(with1 (text-input (:model (cell-of (x-of ¤model))))
+                   (setf (border-color-of it) :black)))
+   (y :initform ↑(with1 (text-input (:model (cell-of (y-of ¤model))))
+                   (setf (border-color-of it) :black)))
    (sum :initform ↑(span (:model (cell-of (sum-of ¤model))))))
 
   (:default-initargs
@@ -37,10 +39,10 @@
           (setf (border-color-of view) :red)
           (setf (tooltip-of view :show-p t) "This needs to be a number."))
         (when-commit ()
-          ;;(when old ;; ..for black border.
-          (nilf old)
-          (setf (border-color-of view) :black)
-          (nilf (tooltip-of view))))))
+          (when old
+            (nilf old)
+            (setf (border-color-of view) :black)
+            (setf (tooltip-of view) nil))))))
 
 
 (defmethod (setf model-of) ((model mvc-validation-model) (view mvc-validation-view))
