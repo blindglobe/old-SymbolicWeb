@@ -82,21 +82,28 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
 
 
 (defmethod handle-condition (condition server application viewport)
-  (invoke-restart (or (find-restart 'continue)
-                      (find-restart 'sw-mvc:assign-condition)
-                      #|(find-restart 'sw-mvc:user-feedback)|# ;; Try letting the user deal with the problem.
-                      (find-restart 'sw-mvc:skip-cell)
-                      (find-restart 'sw-stm:abort-transaction)
-                      (find-restart 'sw-http:continue-listening))))
+  #| NOTE: Going for the CONTINUE restart here is a bad idea because the CL:ASSERT will cause things to get stuck
+  in an infinite loop. |#
+  (if-let (it (or
+               ;; Let problems in CELLs propagate to child/dependent CELLs.
+               (find-restart 'sw-mvc:assign-condition)
+               ;; Not sure we ever want this to happen at this point in time.
+               #|(find-restart 'sw-mvc:skip-cell)|#
+               #| Drop the entire transaction. TODO: Perhaps this is a bad idea? We'll now send a dummy or
+               incomplete HTTP response(?). This is not a good idea if the transaction is complete and
+               has started committing. |#
+               (prog1 (find-restart 'sw-stm:abort-transaction)
+                 (warn "SW:HANDLE-CONDITION: Aborting transaction."))
+               ;; Drop the entire HTTP request. TODO: Does this make sense? Perhaps as a lost resort only..
+               (find-restart 'sw-http:continue-listening)))
+    (invoke-restart it)
+    (warn "SW:HANDLE-CONDITION: Huh. No restart found?"))) ;; Should never happen.
 
 
 (defmethod sw-http:maybe-debug ((server server) condition)
   (if (debug-p-of server)
       (invoke-debugger condition)
-      (progn
-        #|(warn "~S got condition: ~S~%Set DEBUG-P slot to T to debug in Lisp/Slime."
-              server condition)|#
-        (handle-condition condition server *app* *viewport*))))
+      (handle-condition condition server *app* *viewport*)))
 
 
 (defmethod cookie-expires-of ((server server))
