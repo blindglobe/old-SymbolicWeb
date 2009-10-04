@@ -34,6 +34,7 @@
 
 
 (defun add-on-feedback (view fn)
+  "FN is a function taking one argument; the FEEDBACK-EVENT value from SW-MVC."
   (declare (view-base view)
            (function fn))
   (let ((cell (cell-of ~view))

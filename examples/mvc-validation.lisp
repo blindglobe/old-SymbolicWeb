@@ -28,12 +28,13 @@
    :model (make-instance 'mvc-validation-model)))
 
 
-(flet ((fe-handler (fe view)
+(flet ((fe-handler (fe text-input)
          (if fe
-             (setf (border-color-of view) :red
-                   (tooltip-of view :show-p t) "Need valid number input here.")
-             (setf (border-color-of view) :black
-                   (tooltip-of view) nil))))
+             (setf (border-color-of text-input) :red
+                   (tooltip-of text-input :show-p t) "Need valid number input.")
+             (setf (border-color-of text-input) :black
+                   (tooltip-of text-input) nil))))
+
 
   (defmethod (setf model-of) ((model mvc-validation-model) (view mvc-validation-view))
     (with-object view
