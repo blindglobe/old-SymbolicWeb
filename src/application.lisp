@@ -178,7 +178,13 @@ include the JS libraries required for SW in general."
         (:a :accesskey 1 :href "javascript:swTerminateSession();")
         #|(:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")|#
 
-        (:noscript (:p "JavaScript needs to be enabled."))
+        (:noscript
+         (:h2 "JavaScript needs to be enabled.")
+         (:p (:a :href (sw-http:path)
+                 #| TODO/NOTE: Something like this can be used to log users that do not have JS enabled. Send the
+                 request to SW instead of Lighttpd. |#
+                 (:img :src "gfx/guru-meditation.gif" :alt "Amiga 500"))))
+
         (str (js-sw-headers app)))))))
 
 
