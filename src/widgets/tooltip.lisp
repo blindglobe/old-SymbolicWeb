@@ -2,6 +2,7 @@
 
 (in-package #:sw)
 
+;; TODO: Think about HTMLIZE and ESCAPEP (see widgets/html-element.lisp).
 
 (define-dom-property 'tooltip-of
     :dom-client-writer (lambda (new-value widget &rest args &key show-p)
@@ -9,7 +10,8 @@
                                   (widget widget)
                                   (dynamic-extent args))
                          (let ((js-code (catstr "$('#" (id-of widget) "').tooltip({ "
-                                                "content: function(){ return \"" new-value "\" }, "
+                                                "content: function(){ return decodeURIComponent(\""
+                                                  (url-encode new-value) "\"); }, "
                                                 "tooltipClass: 'ui-state-error'"
                                                 " })" (if show-p
                                                           ".tooltip('show');"
@@ -29,3 +31,17 @@
                           (apply #'run (catstr "$('#" (id-of widget) "').tooltip('destroy');")
                                  widget args)))
 (export 'tooltip-of)
+
+
+(defun add-on-feedback (view fn)
+  (declare (view-base view)
+           (function fn))
+  (let ((cell (cell-of ~view))
+        (old nil))
+    #λ(if-let ((fe (feedback-event-of cell)))
+        (when-commit ()
+          (setf old fe)
+          (funcall fn fe))
+        (when-commit ()
+          (when old
+            (funcall fn nil))))))
