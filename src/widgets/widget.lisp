@@ -139,14 +139,6 @@ body (widgets/container.lisp)."
     (nilf (viewport-of widget))))
 
 
-(defmethod set-show-on-feedback ((widget widget) (cell cell))
-  "WIDGET should only be visible when \"feedback\" from CELL is T."
-  (with-formula widget
-    (if ~(feedback-event-of cell)
-        (show widget)
-        (hide widget))))
-
-
 (defmethod show ((widget widget) &key server-only-p)
   (remove-class widget "sw-hide" :server-only-p server-only-p))
 
