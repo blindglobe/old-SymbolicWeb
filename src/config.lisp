@@ -62,6 +62,13 @@
     :doc "A string like `sw-static' (no dot) or NIL.")
 
 
+(define-variable -server-default-static-data-fs-path-
+    :value (namestring (asdf:system-relative-pathname (asdf:find-system 'symbolicweb) "data"))
+    :type string
+    :doc "This should probably point to the data/ directory of the SymbolicWeb source
+code root.")
+
+
 (define-variable -server-default-gc-frequency-
     :value (* 60 #|seconds|# 1000)
     :type fixnum)

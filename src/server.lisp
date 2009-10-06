@@ -25,6 +25,10 @@ A string like `sw-static' (no slash prefix) or NIL.")
                           :documentation "
 A string like `sw-static' (no dot) or NIL.")
 
+   (static-data-fs-path :accessor static-data-fs-path-of :initarg :static-data-fs-path
+                        :type string
+                        :initform -server-default-static-data-fs-path-)
+
    (last-ping-time :accessor last-ping-time-of
                    :type (or integer null)
                    :initform nil)
