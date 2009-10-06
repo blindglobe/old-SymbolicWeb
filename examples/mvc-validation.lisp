@@ -12,7 +12,8 @@
       :initform (random 100))
 
    (sum :reader sum-of
-        :initform ↑λf(+ ¤x ¤y)))
+        :initform (with1 ↑λf(+ ¤x ¤y)
+                    (setf (accepts-conditions-p-of ~it) t))))
 
   (:metaclass mvc-class))
 
