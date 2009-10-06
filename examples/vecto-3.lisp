@@ -1,4 +1,5 @@
-(in-package #:sw)
+(in-package sw)
+(in-readtable symbolicweb)
 
 
 (defclass vecto-widget-3 (vecto)

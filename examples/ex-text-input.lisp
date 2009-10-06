@@ -1,6 +1,7 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
+(in-package sw)
+(in-readtable symbolicweb)
 
 
 (defclass text-input-widget-model (self-ref)
