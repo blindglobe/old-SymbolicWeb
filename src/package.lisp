@@ -1,8 +1,9 @@
 ;;;; http://nostdal.org/ ;;;;
 
 
-(defpackage #:symbolicweb
+(defpackage symbolicweb
   (:use #:cl
+        #:named-readtables
         #:cl-utilities
         #:alexandria
         #:aromyxo

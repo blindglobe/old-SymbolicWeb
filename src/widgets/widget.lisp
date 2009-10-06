@@ -1,7 +1,7 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
-
+(in-package sw)
+(in-readtable symbolicweb)
 (declaim #.(optimizations :widgets/widget.lisp))
 
 

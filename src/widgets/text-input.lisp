@@ -1,6 +1,7 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
+(in-package sw)
+(in-readtable symbolicweb)
 
 (declaim #.(optimizations :widgets/text-input.lisp))
 
@@ -22,7 +23,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
   (:default-initargs
    :element-type "input"
-   :model #λ""))
+   :model λv""))
 (export 'text-input)
 
 
