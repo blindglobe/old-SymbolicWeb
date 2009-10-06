@@ -1,6 +1,7 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
+(in-package sw)
+(in-readtable symbolicweb)
 
 #| TODO:
 Update ACTIVE-ITEM slot when user selects a tab on the client end.
