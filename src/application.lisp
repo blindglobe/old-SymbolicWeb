@@ -81,12 +81,10 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 (defmethod initialize-instance :around ((app application) &key
                                         (server (error ":SERVER needed."))
                                         (static-data-subdomain (static-data-subdomain-of server))
-                                        (static-data-fs-path (static-data-fs-path-of server))
                                         (cookie-expires (cookie-expires-of server)))
   (let ((*app* app))
     (setf (slot-value app 'server) server
           (slot-value app 'static-data-subdomain) static-data-subdomain
-          (slot-value app 'static-data-fs-path) static-data-fs-path
           (slot-value app 'cookie-expires) cookie-expires)
     (call-next-method)))
 
