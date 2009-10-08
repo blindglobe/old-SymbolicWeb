@@ -62,19 +62,21 @@
 
 
 (defmethod initialize-instance :after ((app mvc-validation-app) &key)
-  ;; NOTE: These point to uncompressed development versions of the jQuery UI libraries.
-  (add-resource app "jquery-ui-core" :css
-                (mk-static-data-url app "jquery-ui-dev/themes/base/ui.all.css"))
-  (add-resource app "jquery-ui-core" :js
-                (mk-static-data-url app "jquery-ui-dev/ui/jquery.ui.core.js"))
+  (add-resource
+   app "jquery-ui" :css
+   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/themes/base/ui.all.css"))
 
-  (add-resource app "jquery-ui-position" :js
-                (mk-static-data-url app "jquery-ui-dev/ui/jquery.ui.position.js"))
+  (add-resource
+   app "jquery-ui" :js
+   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/ui/minified/jquery-ui.min.js"))
 
-  (add-resource app "jquery-ui-tooltip" :css
-                (mk-static-data-url app "jquery-ui-dev/themes/base/ui.tooltip.css"))
-  (add-resource app "jquery-ui-tooltip" :js
-                (mk-static-data-url app "jquery-ui-dev/ui/jquery.ui.tooltip.js")))
+  (add-resource
+   app "jquery-ui-position" :js
+   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/ui/minified/jquery.ui.position.min.js"))
+
+  (add-resource
+   app "jquery-ui-tooltip" :js
+   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/ui/minified/jquery.ui.tooltip.min.js")))
 
 
 (defmethod render-viewport ((viewport viewport) (app mvc-validation-app))
