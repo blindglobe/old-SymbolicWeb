@@ -48,6 +48,7 @@ won't work:
 |#
 (defmethod mk-static-data-url ((server server) (last-part string))
   (declare (optimize speed))
+  ;; NOTE: Lighttpd handles security (document root stuff).
   (let ((static-data-subdomain (static-data-subdomain-of server))
         (static-data-path (static-data-path-of server)))
     ;; TODO: The logic here should perhaps be moved to SW-HTTP.

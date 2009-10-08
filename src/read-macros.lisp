@@ -2,6 +2,7 @@
 
 (in-package sw)
 
+
 (defreadtable symbolicweb
-  (:merge sw-mvc)) ;; sw-mvc <- sw-stm <- aromyxo
+  (:merge sw-mvc))
 (export 'symbolicweb)
