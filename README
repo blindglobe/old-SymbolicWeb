@@ -2,8 +2,28 @@ SymbolicWeb: Lisp and GUI'ish AJAX/Comet stuff
 ==============================================
 
 
-
 Status
 ======
 
 Alpha, and pretty much only interesting for developers of SW itself.
+
+
+Notes
+=====
+
+DNS-scheme wrt. multiple "physical" servers and SW servers spread out amongst them:
+
+  sw-server.physical-server.domain.org
+
+
+DNS entries would look like;
+
+  *.physical-server-1
+  physical-server-1
+  *.physical-server-2
+  physical-server-2
+  ...
+
+
+The reverse proxy on each server will dispatch based on the "sw-server-x" part
+of the URL.
