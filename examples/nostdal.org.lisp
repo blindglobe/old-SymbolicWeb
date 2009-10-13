@@ -15,9 +15,18 @@
    (mk-html ()
      (:div
       (:h1 "nostdal.org")
-
+       
+       (:h2 "Worklogs")
+       (:ul
+        (:li (:a :href "http://gitorious.org/~lnostdal"
+                 "worklog 05.21.2009 - now"))
+        (:li (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/Changelog"
+                 "worklog 04.06.2008 - 01.15.2009")))
 
       (:h2 "Random stuff")
+      (:p "..nothing interesting here unless perhaps if you're a software developer. "
+          "A place for quick tests and notes-to-self..")
+      
       (:ul
        (:li (:a :href "http://gitorious.org/~lnostdal" "gitorious") ": collection of source code repositories.")
        (:li (:a :href "text-input" "text-input-app") ": dataflow test thing")
