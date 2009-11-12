@@ -1,8 +1,5 @@
 ;;;; http://sw.nostdal.org/ ;;;;
 
-(defpackage :symbolicweb-jquery
-  (:use :cl :aromyxo)
-  (:nicknames :sw-jquery))
-
-(in-package :sw-jquery)
-
+(amx:define-package :symbolicweb-jquery
+    :use (:amx)
+    :nicknames '(:sw-jquery))
