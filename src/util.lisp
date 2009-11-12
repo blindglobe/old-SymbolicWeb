@@ -1,8 +1,16 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
-
+(in-package sw)
+(in-readtable symbolicweb)
 (declaim #.(optimizations :util.lisp))
+
+
+(defmacro with-common-context (&body body)
+  `(sw-db:with-db-connection
+     (sw-stm:with-sync ()
+       (sw-db:with-db-transaction
+         (sw-db:with-lazy-db-operations
+           ,@body)))))
 
 
 (defun js-sw-headers (application)
