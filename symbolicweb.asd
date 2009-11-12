@@ -7,7 +7,7 @@
   :licence "See the file LICENSE"
 
   :depends-on (:sw-http
-               ;;:sw-db
+               :sw-db
                :sw-mvc
                :cl-utilities
                :alexandria

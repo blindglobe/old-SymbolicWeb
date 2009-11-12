@@ -16,15 +16,18 @@
       (cond
         ((string= do "refresh")
          ;; TODO: Think about the WITH-SYNC here a bit.
-         (with-sync (:name 'handle-comet-response-refresh)
-           (let ((*replace-address-bar-p* t))
-             (unless (initialized-p-of app)
-               (when-commit () ;; TODO: Using a REF for INITIALIZED-P would make sense.
-                 (tf (slot-value app 'initialized-p)))
-               (main app))
-             (render-viewport viewport app)
-             #|(sync-widgets (sw-http:get-parameter "hash") t)|#
-             (on-refresh app viewport))))
+         (sw-db:with-db-connection
+           (with-sync (:name 'handle-comet-response-refresh)
+             (sw-db:with-db-transaction
+               (sw-db:with-lazy-db-operations
+                 (let ((*replace-address-bar-p* t))
+                   (unless (initialized-p-of app)
+                     (when-commit () ;; TODO: Using a REF for INITIALIZED-P would make sense.
+                       (tf (slot-value app 'initialized-p)))
+                     (main app))
+                   (render-viewport viewport app)
+                   #|(sync-widgets (sw-http:get-parameter "hash") t)|#
+                   (on-refresh app viewport)))))))
 
         #|((string= do "ack")
         (nilf (slot-value viewport 'prev-response-data)))|#))
