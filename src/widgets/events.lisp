@@ -35,7 +35,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
    (event-cell :reader event-cell-of :initarg :event-cell
                :type cell
-               :initform λvnil)
+               :initform λVnil)
 
    (argument-parser :accessor argument-parser-of :initarg :argument-parser
                     :type function
@@ -52,8 +52,8 @@ Instances of this is bound to *CURRENT-EVENT*."))
         callback-box))
 
 
-(defmethod deref ((callback-box callback-box))
-  (sw-mvc::cell-deref (event-cell-of callback-box)))
+#|(defmethod deref ((callback-box callback-box))
+  (sw-mvc::cell-deref (event-cell-of callback-box)))|#
 
 
 (defun remove-callback-box (callback-box widget)
@@ -120,7 +120,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
             (progn
               (unless found-p
                 (setf callback-box (make-instance 'callback-box :widget dom-mirror)))
-              (multiple-value-prog1 (values ~callback-box t)
+              (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
                 (unless found-p
                   (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
                   (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror))))
