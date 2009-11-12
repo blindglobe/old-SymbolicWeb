@@ -4,8 +4,8 @@
 (in-readtable symbolicweb)
 
 
-(defvar x #λ0)
-(defvar square #λ(* ~x ~x))
+(defvar x λV0)
+(defvar square λI(* ~x ~x))
 
 
 (defclass comet-test-app (application)
