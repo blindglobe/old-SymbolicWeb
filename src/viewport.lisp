@@ -122,6 +122,7 @@ refresh."
   ;; subdomains and the "page" is empty on initial load.
   ;; NOTE: This isn't needed anymore since we call SET-LOADING-P in the :AFTER method.
   #|(run "2+2;" viewport)|#)
+(export 'render-viewport)
 
 
 (defmethod render-viewport :after ((viewport viewport) (app application))
@@ -171,6 +172,7 @@ refresh."
 (declaim (inline root))
 (defun root ()
   (root-widget-of *viewport*))
+(export 'root)
 
 
 (defmethod remove-viewport ((viewport viewport) (app application))

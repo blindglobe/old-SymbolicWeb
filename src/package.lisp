@@ -10,6 +10,8 @@
 
 
 (unintern 'sw-mvc:value-of)
+(unintern 'sw-mvc:left-of)
+(unintern 'sw-mvc:right-of)
 (unintern 'sw-mvc:container)
 (unintern 'sw-mvc:container-insert)
 (unintern 'sw-mvc:container-remove)

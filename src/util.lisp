@@ -74,6 +74,7 @@ won't work:
 
 (defmethod mk-static-data-url ((app application) (last-part string))
   (mk-static-data-url (server-of app) last-part))
+(export 'mk-static-data-url)
 
 
 (defmacro who (&body body)
