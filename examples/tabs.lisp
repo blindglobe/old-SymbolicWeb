@@ -25,7 +25,7 @@
 (defmethod render-viewport ((viewport viewport) (app tabs-app))
   (with (make-instance 'tab)
     (dotimes (i 3)
-      (insert (mk-pair λv(fmtn "label-~D" i) (dlist λv(fmtn "content-~D" i)))
+      (insert (mk-pair λV(fmtn "label-~D" i) (dlist λV(fmtn "content-~D" i)))
               :in it))
 
     (with (mk-html ()
