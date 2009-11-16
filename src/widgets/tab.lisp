@@ -16,10 +16,6 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
   (:metaclass mvc-class))
 
 
-(defmethod label-of ((tab-pane tab-pane))
-  (princ-to-string (slot-value tab-pane 'label)))
-
-
 #|(defmethod initialize-instance :after ((tab-pane tab-pane) &key)
   ;; TODO: Finish this.
   (with-formula tab-pane
@@ -32,6 +28,7 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
   ()
   (:default-initargs
    :model (make-instance 'sw-mvc:container-with-1-active-item)))
+(export 'tab)
 
 
 ;; TODO: Perhaps inheriting from CONTAINIER is a bad idea; I override almost everything anyway, and here I got to
@@ -46,10 +43,7 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 (defmethod view-constructor ((tab tab) (pair pair))
   (make-instance 'tab-pane
-                 :label (with (sw-mvc:left-of pair)
-                          (typecase it
-                            (pointer it)
-                            (t (mk-ptr it))))
+                 :label (sw-mvc:as-formula (sw-mvc:left-of pair))
                  :model (with1 (sw-mvc:right-of pair)
                           (check-type it multiple-value-model))))
 
