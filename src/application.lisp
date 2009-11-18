@@ -132,6 +132,7 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 
 (defmethod main ((app application))
   (declare (ignore app)))
+(export 'main)
 
 
 (defmethod render ((app application))

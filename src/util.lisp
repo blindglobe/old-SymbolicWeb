@@ -80,6 +80,7 @@ won't work:
 (defmacro who (&body body)
   `(with-html-output-to-string (,(gensym "who-string"))
      ,@body))
+(export 'who)
 
 
 (defmethod convert-tag-to-string-list ((tag (eql :sw)) attr-list body body-fn)
