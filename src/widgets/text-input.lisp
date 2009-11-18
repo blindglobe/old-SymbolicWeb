@@ -2,7 +2,6 @@
 
 (in-package sw)
 (in-readtable symbolicweb)
-
 (declaim #.(optimizations :widgets/text-input.lisp))
 
 
@@ -23,7 +22,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
   (:default-initargs
    :element-type "input"
-   :model λv""))
+   :model λV""))
 (export 'text-input)
 
 
@@ -75,8 +74,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 
   (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of)))
-    (catstr "if(event.which != 13){ return false; }"
-            js)))
+    "if(event.which != 13){ return false; } else { return true; }"))
 
 
 (flet ((parse-client-args (args)
