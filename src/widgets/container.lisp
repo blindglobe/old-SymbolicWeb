@@ -23,7 +23,7 @@
 
 (defmethod (setf model-of) ((model dlist) (container container))
   (prog1
-      #λ(when-let (event (event-of model))
+      λI(when-let (event (event-of model))
           (when (eq model (container-of event))
             (handle-model-event container event)))
 

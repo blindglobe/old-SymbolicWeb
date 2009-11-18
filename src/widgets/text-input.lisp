@@ -2,7 +2,6 @@
 
 (in-package sw)
 (in-readtable symbolicweb)
-
 (declaim #.(optimizations :widgets/text-input.lisp))
 
 
@@ -23,7 +22,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
   (:default-initargs
    :element-type "input"
-   :model λv""))
+   :model λV""))
 (export 'text-input)
 
 

@@ -17,13 +17,10 @@
   (let* ((container-view (make-instance 'button))
          (container-model ~container-view))
     (prog1 container-view
-      (typecase content
+      (etypecase content
         (string
          (sw-mvc:insert #~content :in container-model))
 
         ((or single-value-model sw-mvc:container)
-         (sw-mvc:insert content :in container-model))
-
-        (otherwise
-         (error "Don't know what to do with ~S." content))))))
+         (sw-mvc:insert content :in container-model))))))
 (export 'mk-button)
