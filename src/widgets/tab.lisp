@@ -10,7 +10,7 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 
 (defclass tab-pane (container)
-  ((label :initarg :label
+  ((label :reader label-of :initarg :label
           :initform (error ":LABEL needed.")))
 
   (:metaclass mvc-class))
