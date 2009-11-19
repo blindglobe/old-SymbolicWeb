@@ -6,21 +6,14 @@
 #| TODO:
 Update ACTIVE-ITEM slot when user selects a tab on the client end.
 Update tab on the client end when ACTIVE-ITEM slot is changed.
+
+LABEL (in TAB-PANE) needs to do the dataflow thing.
 |#
 
 
 (defclass tab-pane (container)
   ((label :reader label-of :initarg :label
-          :initform (error ":LABEL needed.")))
-
-  (:metaclass mvc-class))
-
-
-#|(defmethod initialize-instance :after ((tab-pane tab-pane) &key)
-  ;; TODO: Finish this.
-  (with-formula tab-pane
-    (let ((label (label-of tab-pane)))
-      )))|#
+          :initform (error ":LABEL needed."))))
 
 
 
@@ -43,7 +36,7 @@ Update tab on the client end when ACTIVE-ITEM slot is changed.
 
 (defmethod view-constructor ((tab tab) (pair pair))
   (make-instance 'tab-pane
-                 :label (sw-mvc:as-formula (sw-mvc:left-of pair))
+                 :label ~(sw-mvc:left-of pair)
                  :model (with1 (sw-mvc:right-of pair)
                           (check-type it multiple-value-model))))
 

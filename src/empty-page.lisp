@@ -1,13 +1,13 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
+(in-package sw)
+(in-readtable symbolicweb)
 
 
 (defclass empty-page-app (application)
   ())
 
-
-(set-uri 'empty-page-app "/")
+(set-uri 'empty-page-app "empty-page")
 
 
 
@@ -23,5 +23,3 @@
   ;; ..here (in your application subclass).
   nil)
   ;;(catstr "sw.dyn-" (generate-id)))
-
-
