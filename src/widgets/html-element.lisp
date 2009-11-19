@@ -44,12 +44,10 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
     (update-html html-element new-html))
 
 
-  (defmethod (setf model-of) ((model cell) (html-element html-element))
-    #λ(with ~model
-        (when-commit ()
-          (setf (html-content-of html-element) it)))))
-
-
+  (defmethod set-model nconc ((html-element html-element) (model cell))
+    (list λI(with ~model
+              (when-commit ()
+                (setf (html-content-of html-element) it))))))
 
 
 ;; TODO: Finish and improve all this stuff:

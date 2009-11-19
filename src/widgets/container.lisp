@@ -21,11 +21,15 @@
   (make-instance 'container :model model))
 
 
-(defmethod (setf model-of) ((model dlist) (container container))
+(defmethod set-model nconc ((container container) (model dlist))
   (prog1
-      λI(when-let (event (event-of model))
-          (when (eq model (container-of event))
-            (handle-model-event container event)))
+      (list λI(when-let (event (event-of model))
+                (when (eq model (container-of event))
+                  (handle-model-event container event))))
+
+      ;; TODO: Uh. Is this right? (switching models..)
+      (unless (null (children-of container))
+        (remove-all container))
 
       (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
           ((null dlist-node))
