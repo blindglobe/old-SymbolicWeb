@@ -21,7 +21,8 @@ If this is T (default), the renedring of HTML-ELEMENT will be escaped as text in
 If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 
   (:default-initargs
-   :model #λ""))
+   :model λV""))
+(export 'html-element)
 
 
 (flet ((update-html (html-element new-html)
