@@ -7,7 +7,8 @@
 
 
 (defclass combo-box (container)
-  ()
+  ((selected-option :reader selected-option-of
+                    :initform nil))
 
   (:default-initargs
    :element-type "select"
@@ -35,9 +36,29 @@
 
 
 (defmethod set-model nconc ((combo-box combo-box) (model container-with-1-active-item))
-  (list λI(when-let (new-active-item (on-combo-box-change-of combo-box))
-            (setf (active-item-of model)
-                  new-active-item))))
+  (list λI(let* ((active-item (active-item-of model))
+                 (item-model active-item)
+                 (item-view (when item-model (view-in-context-of combo-box item-model))))
+            (when-commit ()
+              (let ((old-item-view (selected-option-of combo-box)))
+                (unless (eq item-view old-item-view)
+                  (when item-view
+                    (tf (selected-p-of item-view)))
+                  (when old-item-view
+                    (nilf (selected-p-of old-item-view :server-only-p t)))
+                  (setf (slot-value combo-box 'selected-option) item-view)))))
+
+        λI(when-let* ((item-view (on-combo-box-change-of combo-box))
+                      (item-model (model-of item-view)))
+            (when-commit ()
+              (let ((old-item-view (selected-option-of combo-box)))
+                (unless (eq item-view old-item-view)
+                  (tf (selected-p-of item-view :server-only-p t))
+                  (when old-item-view
+                    (nilf (selected-p-of (selected-option-of combo-box) :server-only-p t)))
+                  (setf (slot-value combo-box 'selected-option) item-view))))
+            (setf (active-item-of model) item-model))))
+
 
 
 (define-event-property
@@ -47,17 +68,20 @@
 (defmethod initialize-callback-box ((combo-box combo-box) (lisp-accessor-name (eql 'on-combo-box-change-of))
                                     (callback-box callback-box))
   (setf (argument-parser-of callback-box)
-        (let ((model ~combo-box))
-          (lambda (args)
-            (setf (active-item-of model)
-                  (model-of (get-widget (cdr (assoc "value" args :test #'string=)))))))))
+        (lambda (args)
+          (get-widget (cdr (assoc "value" args :test #'string=))))))
+
+
 
 
 #|(progn
   (remove-all (root))
-  (with (make-instance 'combo-box)
+  (with (make-instance 'combo-box :id "blah")
     (let ((b λV"b"))
       (insert λV"a" :in it)
       (insert b :in it)
-      (insert λV"c" :in it))
+      (insert λV"c" :in it)
+      (setf (active-item-of ~it) b))
     (insert it :in (root))))|#
+
+#|(define-symbol-macro =blah=  ~(get-widget "blah"))|#
