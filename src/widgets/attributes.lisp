@@ -102,6 +102,11 @@
   :value-removal-checker (lambda (value) (eq :dom-property-remove value)))
 
 
+(define-attribute-property selected-p-of "selected"
+  :value-marshaller (lambda (value) (if value "selected" ""))
+  :value-removal-checker (lambda (value) (eq :dom-property-remove value)))
+
+
 (define-attribute-property name-of "name")
 
 
