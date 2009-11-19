@@ -74,11 +74,13 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 
 (defmacro def-elt (element-type &key (xml-p t))
   (declare (ignore xml-p))
-  `(defmacro ,element-type (args &body html-content)
-     `(mk-elt (,(make-keyword ',element-type) ,@(when (listp args) args))
-        ,@(if (listp args)
-              html-content
-              (list args)))))
+  `(progn
+     (defmacro ,element-type (args &body html-content)
+       `(mk-elt (,(make-keyword ',element-type) ,@(when (listp args) args))
+          ,@(if (listp args)
+                html-content
+                (list args))))
+     (export ',element-type)))
 
 ;; *GRR* the syntax is (DIV (:MODEL #λ42))
 (def-elt div)
