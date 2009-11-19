@@ -64,6 +64,7 @@
         (:file "vecto")
         (:file "tab")
         (:file "tooltip")
+        (:file "combo-box")
         #|
         (:file "container-with-1-active-item")
         (:file "table-container")
@@ -77,7 +78,7 @@
         (:file "link")
         (:file "slider")
         (:file "cursor")
-        (:file "combo-box")
+
         (:file "window")
         (:file "alert-box")
         |#
