@@ -26,7 +26,7 @@
 (export 'combo-box-option)
 
 
-(defmethod render :after ((combo-box-option combo-box-option))
+(defmethod initialize-instance :after ((combo-box-option combo-box-option) &key)
   (setf (value-of combo-box-option)
         (id-of combo-box-option)))
 
