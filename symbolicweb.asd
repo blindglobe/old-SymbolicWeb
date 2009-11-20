@@ -65,6 +65,7 @@
         (:file "tab")
         (:file "tooltip")
         (:file "combo-box")
+        (:file "check-box")
         #|
         (:file "container-with-1-active-item")
         (:file "table-container")
@@ -74,7 +75,6 @@
         (:file "text-area")
         (:file "toggle-button")
         (:file "radio-button")
-        (:file "checkbox")
         (:file "link")
         (:file "slider")
         (:file "cursor")
