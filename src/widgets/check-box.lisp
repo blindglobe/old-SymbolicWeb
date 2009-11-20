@@ -9,7 +9,8 @@
   ()
 
   (:default-initargs
-   :element-type "input"))
+   :element-type "input"
+    :model λVnil))
 (export 'check-box)
 
 
