@@ -113,7 +113,8 @@ refresh."
 (defmethod render-viewport :before ((viewport viewport) (app application))
   (when-commit ()
     (propagate-for-add (root-widget-of viewport) (root-widget-of viewport))
-    (render (root-widget-of viewport))))
+    (when-commit ()
+      (render (root-widget-of viewport)))))
 
 
 (defmethod render-viewport ((viewport viewport) (app application))

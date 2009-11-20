@@ -19,7 +19,7 @@
 
 
 (defmethod set-model nconc ((check-box check-box) (model cell))
-  (list λI(with (sw-mvc:value-of model)
+  (list λI(with (value-of model)
             ;; Model → View.
             (when-commit ()
               (unless (eq it (checked-p-of check-box))
