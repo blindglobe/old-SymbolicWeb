@@ -112,8 +112,8 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
     #| We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
     representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
     at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
-    λI(list
-       (let* ((value ~model)
+    (list
+     λI(let* ((value ~model)
               (value-str (value-marshaller value)))
          (when-commit ()
            #| We could move this test outside of the commit, but that would cause the other commit block in the
