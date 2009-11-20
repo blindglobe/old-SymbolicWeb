@@ -10,7 +10,7 @@
 
   (:default-initargs
    :element-type "input"
-    :model λVnil))
+   :model λVnil))
 (export 'check-box)
 
 
