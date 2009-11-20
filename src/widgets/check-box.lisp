@@ -50,3 +50,10 @@
 #|(progn
   (remove-all (root))
   (insert (make-instance 'check-box) :in (root)))|#
+
+
+#|(progn
+  (defvar *check-box-model* λVnil)
+  (defmethod render-viewport ((viewport viewport) (app empty-page-app))
+    (insert (make-instance 'check-box :model *check-box-model*)
+            :in (root))))|#

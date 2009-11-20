@@ -12,10 +12,10 @@
       :initform (random 100))
 
    (square-of-x :reader square-of-x-of
-                :initform ↑λf(* ¤x ¤x))
+                :initform ↑λF(* ¤x ¤x))
 
    (sum :reader sum-of
-        :initform ↑λf(+ ¤square-of-x ¤y)))
+        :initform ↑λF(+ ¤square-of-x ¤y)))
 
   (:metaclass mvc-class))
 
@@ -26,7 +26,7 @@
    (y :initform ↑(text-input (:model (cell-of (y-of ¤model)))))
 
    (square-of-x :initform ↑(span (:model (cell-of (square-of-x-of ¤model)))))
-   (square-of-x-str :initform ↑(span (:model #λ(handler-case (format nil "~R" (square-of-x-of ¤model))
+   (square-of-x-str :initform ↑(span (:model λI(handler-case (format nil "~R" (square-of-x-of ¤model))
                                                  (error () "Can't show this number as text.")))))
    (sum :initform ↑(span (:model (cell-of (sum-of ¤model))))))
 

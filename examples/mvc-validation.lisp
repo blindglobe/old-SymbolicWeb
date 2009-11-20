@@ -66,7 +66,6 @@
   (add-resource
    app "jquery-ui" :css
    (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/themes/base/ui.all.css"))
-
   (add-resource
    app "jquery-ui" :js
    (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/ui/minified/jquery-ui.min.js"))
@@ -91,7 +90,5 @@
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/mvc-validation.lisp"
-             "source code") :br
-             "Hosted on a crummy ADSL line, and this app. currently pulls down a lot of uncompressed and not needed "
-             "stuff."))
+             "source code") :br))
      :in (root))))
