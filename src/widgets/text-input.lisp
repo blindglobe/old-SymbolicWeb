@@ -107,20 +107,21 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
     (text-input-update-client-cache (value-marshaller (value-of text-input)) text-input))
 
 
-  (defmethod (setf model-of) ((model cell) (text-input text-input))
+  (defmethod set-model nconc ((text-input text-input) (model cell))
     (declare (optimize speed (safety 2)))
     #| We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
     representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
     at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
-    λI(let* ((value ~model)
-             (value-str (value-marshaller value)))
-        (when-commit ()
-          #| We could move this test outside of the commit, but that would cause the other commit block in the
-          INITIALIZE-INSTANCE method for TEXT-INPUT to race with this. |#
-          (unless (muffle-compiler-note
-                    (string= value-str (value-marshaller (value-of text-input))))
-            (setf (value-of text-input) value)
-            (text-input-update-client-cache value-str text-input))))))
+    λI(list
+       (let* ((value ~model)
+              (value-str (value-marshaller value)))
+         (when-commit ()
+           #| We could move this test outside of the commit, but that would cause the other commit block in the
+           INITIALIZE-INSTANCE method for TEXT-INPUT to race with this. |#
+           (unless (muffle-compiler-note
+                     (string= value-str (value-marshaller (value-of text-input))))
+             (setf (value-of text-input) value)
+             (text-input-update-client-cache value-str text-input)))))))
 
 
 
