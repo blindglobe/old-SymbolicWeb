@@ -8,13 +8,13 @@
 (defclass dom-mirror ()
   ((dom-mirror-data :reader dom-mirror-data-of
                     :type hash-table
-                    :initform (make-hash-table :test #'eq)
+                    :initform (make-hash-table :test #'eq :synchronized t)
                     :documentation "
 DOM attributes, CSS properties etc.")
 
    (callbacks :reader callbacks-of
               :type hash-table
-              :initform (make-hash-table :test #'equal)
+              :initform (make-hash-table :test #'equal :synchronized t)
               :documentation "
 Strong hash table; ID->CALLBACK-BOX.")))
 
