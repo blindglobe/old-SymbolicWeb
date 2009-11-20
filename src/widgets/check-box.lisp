@@ -30,7 +30,7 @@
             (with (car res)
               (when-commit ()
                 (setf (checked-p-of check-box :server-only-p t) it))
-              (setf ~~check-box it)))))
+              (setf (sw-mvc:value-of model) it)))))
 
 
 (define-event-property
@@ -43,7 +43,7 @@
         (lambda (args)
           #| Wrap it in a LIST since SW-MVC:PULSE will "use NIL already". The recieving end must take care to
           unpack this (CAR). |#
-          (list (with1 (string= "true" (cdr (assoc "checked" args :test #'string=))))))))
+          (list (string= "true" (cdr (assoc "checked" args :test #'string=)))))))
 
 
 
