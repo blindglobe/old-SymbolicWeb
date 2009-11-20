@@ -111,7 +111,8 @@
 
 
 (define-attribute-property checked-p-of "checked"
-  :value-marshaller (lambda (value) (if value "checked" "")))
+  :value-marshaller (lambda (value) (if value "checked" ""))
+  :value-removal-checker (lambda (value) (eq :dom-property-remove value)))
 
 
 (define-attribute-property href-of "href")
