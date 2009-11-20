@@ -5,7 +5,6 @@
 (declaim #.(optimizations :widgets/combo-box.lisp))
 
 
-
 (defclass combo-box (container)
   ((selected-option :reader selected-option-of
                     :initform nil))
@@ -18,7 +17,8 @@
 
 
 (defclass combo-box-option (html-element)
-  ()
+  ((combo-box :reader combo-box-of :initarg :combo-box
+              :initform (error ":COMBO-BOX needed.")))
 
   (:default-initargs
    :element-type "option"
@@ -32,13 +32,14 @@
 
 
 (defmethod view-constructor ((combo-box combo-box) (model cell))
-  (make-instance 'combo-box-option :model model))
+  (make-instance 'combo-box-option :combo-box combo-box :model model))
 
 
 (defmethod set-model nconc ((combo-box combo-box) (model container-with-1-active-item))
   (list λI(let* ((active-item (active-item-of model))
                  (item-model active-item)
                  (item-view (when item-model (view-in-context-of combo-box item-model))))
+            ;; Model → View.
             (when-commit ()
               (let ((old-item-view (selected-option-of combo-box)))
                 (unless (eq item-view old-item-view)
@@ -50,6 +51,7 @@
 
         λI(when-let* ((item-view (on-combo-box-change-of combo-box))
                       (item-model (model-of item-view)))
+            ;; View → Model.
             (when-commit ()
               (let ((old-item-view (selected-option-of combo-box)))
                 (unless (eq item-view old-item-view)
