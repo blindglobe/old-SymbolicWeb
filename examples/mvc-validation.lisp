@@ -65,18 +65,14 @@
 (defmethod initialize-instance :after ((app mvc-validation-app) &key)
   (add-resource
    app "jquery-ui" :css
-   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/themes/base/ui.all.css"))
+   (mk-static-data-url app "jquery-ui-dev/themes/base/ui.all.css"))
   (add-resource
    app "jquery-ui" :js
-   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/ui/minified/jquery-ui.min.js"))
-
-  (add-resource
-   app "jquery-ui-position" :js
-   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/ui/minified/jquery.ui.position.min.js"))
+   (mk-static-data-url app "jquery-ui-dev/ui/jquery-ui.js"))
 
   (add-resource
    app "jquery-ui-tooltip" :js
-   (mk-static-data-url app "jquery-ui-dev/build/dist/jquery-ui-1.8pre/ui/minified/jquery.ui.tooltip.min.js")))
+   (mk-static-data-url app "jquery-ui-dev/ui/jquery.ui.tooltip.js")))
 
 
 (defmethod render-viewport ((viewport viewport) (app mvc-validation-app))
