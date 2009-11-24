@@ -1,8 +1,7 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
+(in-package sw)
 
-;; TODO: This is epic fail in a meta-class context.
 
 (class-forward-reference server)
 (class-forward-reference application)

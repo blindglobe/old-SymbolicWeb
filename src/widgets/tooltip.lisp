@@ -13,7 +13,7 @@
                                   (dynamic-extent args))
                          (let ((js-code (catstr "$('#" (id-of widget) "').tooltip({ "
                                                 "content: function(){ return decodeURIComponent(\""
-                                                  (url-encode new-value) "\"); }, "
+                                                (url-encode new-value) "\"); }, "
                                                 "tooltipClass: 'ui-state-error'"
                                                 " })" (if show-p
                                                           ".tooltip('show');"
@@ -41,7 +41,7 @@
            (function fn))
   (let ((cell (cell-of ~view))
         (old nil))
-    #λ(if-let ((fe (feedback-event-of cell)))
+    λI(if-let ((fe (feedback-event-of cell)))
         (when-commit ()
           (setf old fe)
           (funcall fn fe))

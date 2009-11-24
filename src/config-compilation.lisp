@@ -1,6 +1,7 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package #:sw)
+(in-package sw)
+(in-readtable symbolicweb)
 
 ;; TODO: This stuff should be part of Aromyxo. The AMX:DEFN stuff I think.
 
