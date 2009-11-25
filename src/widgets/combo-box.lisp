@@ -12,7 +12,7 @@
   (:default-initargs
    :element-type "select"
    :model (make-instance 'sw-mvc:container-with-1-active-item)))
-(export 'combo-box)
+(export '(combo-box selected-option-of))
 
 
 
@@ -35,9 +35,15 @@
   (make-instance 'combo-box-option :combo-box combo-box :model model))
 
 
+(defmethod (setf html-content-of) :around (new-html (combo-box-option combo-box-option))
+  "We'd like +NULL-MODEL+ to be rendered in a custom fashion."
+  (if (eq +null-model+ (model-of combo-box-option))
+      (call-next-method "<none selected>" combo-box-option)
+      (call-next-method)))
+
+
 (defmethod set-model nconc ((combo-box combo-box) (model container-with-1-active-item))
-  (list λI(let* ((active-item (active-item-of model))
-                 (item-model active-item)
+  (list λI(let* ((item-model (active-item-of model))
                  (item-view (when item-model (view-in-context-of combo-box item-model))))
             ;; Model → View.
             (when-commit ()
@@ -79,11 +85,14 @@
 #|(progn
   (remove-all (root))
   (with (make-instance 'combo-box :id "blah")
+    (insert +null-model+ :in it)
+    (setf (fallback-item-of ~it) +null-model+)
     (let ((b λV"b"))
       (insert λV"a" :in it)
       (insert b :in it)
       (insert λV"c" :in it)
-      (setf (active-item-of ~it) b))
+      (setf (active-item-of ~it) b)
+      (remove b it))
     (insert it :in (root))))|#
 
 #|(define-symbol-macro =blah=  ~(get-widget "blah"))|#
