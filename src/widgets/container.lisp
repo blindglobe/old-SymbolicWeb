@@ -27,13 +27,13 @@
                 (when (eq model (container-of event))
                   (handle-model-event container event))))
 
-      ;; TODO: Uh. Is this right? (switching models..)
-      (unless (null (children-of container))
-        (remove-all container))
+    ;; TODO: Uh. Is this right? (switching models..)
+    (unless (null (children-of container))
+      (remove-all container))
 
-      (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
-          ((null dlist-node))
-        (container-insert container (view-in-context-of container ~dlist-node t)))))
+    (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
+        ((null dlist-node))
+      (container-insert container (view-in-context-of container ~dlist-node t)))))
 
 
 (defmethod handle-model-event ((container container) (event sw-mvc:container-insert))
