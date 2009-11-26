@@ -16,4 +16,5 @@
 (unintern 'sw-mvc:container)
 (unintern 'sw-mvc:container-insert)
 (unintern 'sw-mvc:container-remove)
+(unintern 'sw-mvc:container-remove-all)
 (unintern 'sw-mvc:container-exchange)

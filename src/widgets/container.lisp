@@ -62,6 +62,10 @@
     (container-remove container (view-in-context-of container object))))
 
 
+(defmethod handle-model-event ((container container) (event sw-mvc:container-remove-all))
+  (container-remove-all container))
+
+
 (defmethod handle-model-event ((container container) (event sw-mvc:container-exchange))
   (container-exchange container
                       (view-in-context-of container (object-of event))
@@ -125,12 +129,23 @@
 
 
 (defmethod container-remove ((container container) (widget widget))
-  "Implements SW-MVC:REMOVE and SW-MVC:REMOVE-ALL for SW:CONTAINER."
+  "Implements SW-MVC:REMOVE for SW:CONTAINER."
   (when-commit ()
     (deletef (slot-value container 'children) widget)
     (when (visible-p-of container)
       (run (js-remove (id-of widget)) container)
       (propagate-for-remove widget))))
+
+
+(defmethod container-remove-all ((container container))
+  "Implements SW-MVC:REMOVE-ALL for SW:CONTAINER."
+  (when-commit ()
+    (when (visible-p-of container)
+      (dolist (child (children-of container))
+        (run (js-remove (id-of child)) container)
+        (propagate-for-remove child)))
+    ;; TODO: Hm, the order here is different from CONTAINER-REMOVE, above. Does this matter?
+    (nilf (slot-value container 'children))))
 
 
 (defmethod container-exchange ((container container) (widget-a widget) (widget-b widget))
