@@ -5,6 +5,10 @@
 (declaim #.(optimizations :widgets/combo-box.lisp))
 
 
+#| TODO: Implement support for the `multiple' attribute. I'll need another back-end Model for this (SW-MVC:CONTAINER-
+WITH-N-ACTIVE-ITEMS). |#
+
+
 (defclass combo-box (container)
   ((selected-option :reader selected-option-of
                     :initform nil))
@@ -96,3 +100,5 @@
     (insert it :in (root))))|#
 
 #|(define-symbol-macro =blah=  ~(get-widget "blah"))|#
+
+#|(remove (active-item-of =blah=) =blah=)|#
