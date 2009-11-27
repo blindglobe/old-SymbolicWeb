@@ -20,6 +20,13 @@ WITH-N-ACTIVE-ITEMS). |#
 (export '(combo-box selected-option-of))
 
 
+(defmethod initialize-instance :after ((combo-box combo-box) &key (fallback-to-null-p t))
+  (when fallback-to-null-p
+    (insert +null-model+ :in combo-box)
+    (setf (fallback-item-of (model-of combo-box))
+          +null-model+)))
+
+
 
 (defclass combo-box-option (html-element)
   ((combo-box :reader combo-box-of :initarg :combo-box
