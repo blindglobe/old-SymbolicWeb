@@ -22,7 +22,9 @@ WITH-N-ACTIVE-ITEMS). |#
 
 (defmethod initialize-instance :after ((combo-box combo-box) &key (fallback-to-null-p t))
   (when fallback-to-null-p
-    (insert +null-model+ :in combo-box)
+    (if (empty-p-of ~~combo-box)
+        (insert +null-model+ :in combo-box)
+        (insert +null-model+ :before (head-of ~~combo-box)))
     (setf (fallback-item-of (model-of combo-box))
           +null-model+)))
 
