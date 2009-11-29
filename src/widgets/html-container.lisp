@@ -23,6 +23,11 @@
       (generate-html html-container)))
 
 
+(defmethod set-model nconc ((html-container html-container) (model model))
+  ;; This widget/View doesn't care about Models or the MVC thing.
+  )
+
+
 (defmethod update-client ((html-container html-container))
   (run (setf (js-html-of (id-of html-container)) (html-content-of html-container))
        html-container)
