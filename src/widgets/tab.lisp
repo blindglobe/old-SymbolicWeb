@@ -17,21 +17,12 @@ LABEL (in TAB-PANE) needs to do the dataflow thing.
 
 
 
-(defclass tab (container)
+(defclass tab (abstract-container)
   ()
   (:default-initargs
-   :model (make-instance 'sw-mvc:container-with-1-active-item)))
+   :model (make-instance 'sw-mvc:container-with-1-active-item
+                         :model (make-instance 'sw-mvc:dlist))))
 (export 'tab)
-
-
-;; TODO: Perhaps inheriting from CONTAINIER is a bad idea; I override almost everything anyway, and here I got to
-;; "disallow" some methods.
-(defmethod view-constructor ((tab tab) (model cell))
-  (error "..."))
-
-
-(defmethod view-constructor ((tab tab) (model multiple-value-model))
-  (error "..."))
 
 
 (defmethod view-constructor ((tab tab) (pair pair))
@@ -53,43 +44,46 @@ LABEL (in TAB-PANE) needs to do the dataflow thing.
       (render child))))
 
 
+(defmethod set-model nconc ((tab tab) (model container-with-1-active-item))
+  )
+
+
 (defmethod container-insert ((tab tab) tab-pane &key before after)
-  #| NOTE: So we don't dispatch to (CONTAINER-INSERT CONTAINER WIDGET ..); our superclass where the correct type
-  check will not be done. |#
+  #| NOTE: So we don't dispatch to (CONTAINER-INSERT CONTAINER WIDGET ..) where the operation/event will succeed. |#
   (check-type tab-pane tab-pane)
   (when-let (it (or before after))
     (check-type it tab-pane))
   (when-commit ()
     ;; TODO: I can probably merge some of this together..
     (cond
-     (after
-      (amx:insert tab-pane ↺(slot-value tab 'children) :after after)
-      (when (visible-p-of tab)
-        (propagate-for-add tab-pane tab)
-        (run (fmtn "$(\"#~A\").tabs(\"add\", \"#~A\", decodeURIComponent(\"~A\"), ~A);~%"
-                   (id-of tab) (id-of tab-pane) (url-encode (label-of tab-pane))
-                   (position tab-pane (slot-value tab 'children)))
-             tab)
-        (render tab-pane)))
+      (after
+       (amx:insert tab-pane ↺(slot-value tab 'children) :after after)
+       (when (visible-p-of tab)
+         (propagate-for-add tab-pane tab)
+         (run (fmtn "$(\"#~A\").tabs(\"add\", \"#~A\", decodeURIComponent(\"~A\"), ~A);~%"
+                    (id-of tab) (id-of tab-pane) (url-encode (label-of tab-pane))
+                    (position tab-pane (slot-value tab 'children)))
+              tab)
+         (render tab-pane)))
 
-     (before
-      (amx:insert tab-pane ↺(slot-value tab 'children) :before before)
-      (when (visible-p-of tab)
-        (propagate-for-add tab-pane tab)
-        (run (fmtn "$(\"#~A\").tabs(\"add\", \"#~A\", decodeURIComponent(\"~A\"), ~A);~%"
-                   (id-of tab) (id-of tab-pane) (url-encode (label-of tab-pane))
-                   (position tab-pane (slot-value tab 'children)))
-             tab)
-        (render tab-pane)))
+      (before
+       (amx:insert tab-pane ↺(slot-value tab 'children) :before before)
+       (when (visible-p-of tab)
+         (propagate-for-add tab-pane tab)
+         (run (fmtn "$(\"#~A\").tabs(\"add\", \"#~A\", decodeURIComponent(\"~A\"), ~A);~%"
+                    (id-of tab) (id-of tab-pane) (url-encode (label-of tab-pane))
+                    (position tab-pane (slot-value tab 'children)))
+              tab)
+         (render tab-pane)))
 
-     (t
-      (amx:insert tab-pane ↺(slot-value tab 'children) :last-p t)
-      (when (visible-p-of tab)
-        (propagate-for-add tab-pane tab)
-        (run (fmtn "$(\"#~A\").tabs(\"add\", \"#~A\", decodeURIComponent(\"~A\"));~%"
-                   (id-of tab) (id-of tab-pane) (url-encode (label-of tab-pane)))
-             tab)
-        (render tab-pane))))))
+      (t
+       (amx:insert tab-pane ↺(slot-value tab 'children) :last-p t)
+       (when (visible-p-of tab)
+         (propagate-for-add tab-pane tab)
+         (run (fmtn "$(\"#~A\").tabs(\"add\", \"#~A\", decodeURIComponent(\"~A\"));~%"
+                    (id-of tab) (id-of tab-pane) (url-encode (label-of tab-pane)))
+              tab)
+         (render tab-pane))))))
 
 
 (defmethod container-remove ((tab tab) (tab-pane tab-pane))
