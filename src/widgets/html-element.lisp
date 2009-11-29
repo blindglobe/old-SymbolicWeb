@@ -45,7 +45,7 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
     (update-html html-element new-html))
 
 
-  (defmethod set-model nconc ((html-element html-element) (model cell))
+  (defmethod set-model nconc ((html-element html-element) model)
     (list λI(with ~model
               (when-commit ()
                 (setf (html-content-of html-element) it))))))
