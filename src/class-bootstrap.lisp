@@ -7,6 +7,7 @@
 (class-forward-reference application)
 (class-forward-reference widget-base)
 (class-forward-reference widget)
+(class-forward-reference abstract-container)
 (class-forward-reference container)
 (class-forward-reference viewport)
 (class-forward-reference callback-box)
