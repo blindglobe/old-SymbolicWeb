@@ -91,5 +91,6 @@
      (:file "comet")
      (:file "ajax")
      ;;(:file "pagination")
+     (:file "package-export")
      ))
    ))

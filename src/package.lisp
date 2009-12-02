@@ -1,8 +1,9 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(amx:define-package :symbolicweb
-    :use (:amx :sw-mvc :sw-stm)
-    :nicknames '(:sw))
+
+(defpackage :symbolicweb
+  (:use :sw-mvc)
+  (:nicknames :sw))
 (in-package sw)
 
 
@@ -10,11 +11,12 @@
   (shadowing-import sym))
 
 
-(unintern 'sw-mvc:value-of)
-(unintern 'sw-mvc:left-of)
-(unintern 'sw-mvc:right-of)
-(unintern 'sw-mvc:container)
-(unintern 'sw-mvc:container-insert)
-(unintern 'sw-mvc:container-remove)
-(unintern 'sw-mvc:container-remove-all)
-(unintern 'sw-mvc:container-exchange)
+(shadow 'value-of)
+(shadow 'left-of)
+(shadow 'right-of)
+(shadow 'container)
+(shadow 'container-insert)
+(shadow 'container-remove)
+(shadow 'container-remove-all)
+(shadow 'container-exchange)
+(shadow 'optimizations)
