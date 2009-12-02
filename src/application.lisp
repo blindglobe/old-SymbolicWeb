@@ -76,7 +76,6 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
    (resources :reader resources-of
               :type hash-table
               :initform (make-hash-table :test #'equal))))
-(export '(application))
 
 
 (defmethod initialize-instance :around ((app application) &key
@@ -132,7 +131,6 @@ Last time we had any real user (DOM event or page refresh) activity in the sessi
 
 (defmethod main ((app application))
   (declare (ignore app)))
-(export 'main)
 
 
 (defmethod render ((app application))
@@ -205,4 +203,3 @@ include the JS libraries required for SW in general."
            (string url))
   (setf (gethash (cons id type) (resources-of app))
         url))
-(export 'add-resource)

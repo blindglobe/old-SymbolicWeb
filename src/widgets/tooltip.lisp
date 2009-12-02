@@ -32,7 +32,6 @@
                                    (dynamic-extent args))
                           (apply #'run (catstr "$('#" (id-of widget) "').tooltip('destroy');")
                                  widget args)))
-(export 'tooltip-of)
 
 
 (defun add-on-feedback (view fn)

@@ -112,7 +112,6 @@ in any session in any viewport."
   "These methods must never 'pull' from their MODEL ends; the MODEL should 'push' to the VIEW-side (slots in the
 VIEW). These methods might be called from within the dynamic scope of a WHEN-COMMIT body (widgets/container.lisp)."
   )
-(export 'render)
 
 
 (defmethod focus ((widget widget) &key server-only-p)

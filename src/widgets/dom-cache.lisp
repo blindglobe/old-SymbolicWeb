@@ -149,7 +149,6 @@ Strong hash table; ID->CALLBACK-BOX.")))
                                      `property-value)
                                 dom-mirror))
            dom-mirror))))
-(export 'define-dom-property)
 
 
 (defmethod remove-dom-property ((lisp-accessor-name symbol) (dom-client-remover function)
@@ -179,11 +178,9 @@ Strong hash table; ID->CALLBACK-BOX.")))
                               (list (find-class 'dom-mirror)
                                     (make-instance 'eql-specializer :object lisp-accessor-name)
                                     (find-class 't)))))
-(export 'remove-dom-property)
 
 
 (defun value-marshaller-of (lisp-accessor-name)
   (declare (symbol lisp-accessor-name))
   (with1 (get lisp-accessor-name 'value-marshaller)
     (check-type it function)))
-(export 'value-marshaller-of)

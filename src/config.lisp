@@ -10,7 +10,6 @@
 
 #| TODO: Think about this; this is only used by code below in this file. |#
 (define-variable *sw-debug* :value t)
-(export '*sw-debug*)
 
 
 ;; Make random random.
@@ -96,7 +95,6 @@ code root.")
 (define-variable -auto-set-viewport-p-
     :value t
     :type (member t nil))
-(export '-auto-set-viewport-p-)
 
 (define-variable +auto-set-app-support-p+
     :value *sw-debug*
@@ -104,7 +102,6 @@ code root.")
 (define-variable -auto-set-app-p-
     :value t
     :type (member t nil))
-(export '-auto-set-app-p-)
 
 
 
@@ -116,16 +113,13 @@ code root.")
     :value (/ -server-default-gc-frequency- 1000
               2)
     :type fixnum)
-(export '-default-long-poll-frequency-)
 
 ;; This must be larger than *DEFAULT-LONG-POLL-FREQUENCY*
 (define-variable -app-visible-p-timeout-
     :value (+ 10 -default-long-poll-frequency-)
     :type fixnum)
-(export '-app-visible-p-timeout-)
 
 
 (define-variable -viewport-visible-p-timeout-
     :value -app-visible-p-timeout-
     :type fixnum)
-(export '-viewport-visible-p-timeout-)

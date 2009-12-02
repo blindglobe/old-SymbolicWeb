@@ -11,7 +11,6 @@
   (:default-initargs
    :element-type "input"
    :model λVnil))
-(export 'check-box)
 
 
 (defmethod initialize-instance :before ((check-box check-box) &key)

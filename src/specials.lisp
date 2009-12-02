@@ -18,22 +18,18 @@
 (define-variable *server*
     :value nil
     :type (or null server))
-(export '*server*)
 
 (define-variable *app*
     :value nil
     :type (or null application))
-(export '*app*)
 
 (define-variable *viewport*
     :value nil
     :type (or null viewport))
-(export '*viewport*)
 
 
 ;; Ok, this might be somewhat of a "wrong" thing to do.. TODO: Not a special variable.
 (define-symbol-macro *root* (root-widget-of *viewport*))
-(export '*root*)
 
 
 (define-variable *js-code-only-p*

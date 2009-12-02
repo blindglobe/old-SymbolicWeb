@@ -10,7 +10,6 @@
 
   (:default-initargs
    :model (sw-mvc:dlist)))
-(export 'container)
 
 
 (defmethod view-constructor ((container container) (model cell))

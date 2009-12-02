@@ -10,7 +10,6 @@
 
   (:default-initargs
    :element-type "button"))
-(export 'button)
 
 
 (defun mk-button (content)
@@ -23,4 +22,3 @@
 
         ((or single-value-model sw-mvc:container)
          (sw-mvc:insert content :in container-model))))))
-(export 'mk-button)

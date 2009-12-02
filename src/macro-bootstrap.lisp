@@ -10,7 +10,6 @@
                             (lambda (,widget-sym)
                               (declare (type widget ,widget-sym))
                               ,@body)))
-(export '(with-each-widget-in-tree widget))
 
 
 (defmacro with-each-viewport-in-app ((&key (viewport-sym 'viewport) (app '*app*)) &body body)
@@ -20,7 +19,6 @@ Also see WITH-EACH-VIEWPORT-OF-WIDGET."
                              (declare (type viewport ,viewport-sym))
                              ,@body)
                            ,app))
-(export '(with-each-viewport-in-app viewport))
 
 
 (defmacro with-each-viewport-in-server ((&key (viewport-sym '*viewport*) (server '*server*) (app '*app*))
@@ -30,7 +28,6 @@ Also see WITH-EACH-VIEWPORT-OF-WIDGET."
               (with-each-viewport-in-app (:viewport-sym ,viewport-sym :app ,app)
                 ,@body))
             (id->app-of ,server)))
-(export 'with-each-viewport-in-server)
 
 
 
@@ -42,7 +39,6 @@ Also see WITH-EACH-VIEWPORT-OF-WIDGET."
 executing it there."
   `(let ((*js-code-only-p* t))
      ,form))
-(export 'js-code-of)
 
 
 (defmacro with-js-code-from (&body body)
@@ -55,13 +51,11 @@ executing it there."
        (iambda (write-line \"A button was clicked on the client, it is now blue.\")))"
   `(let ((*js-code-only-p* t))
      (catstr ,@body)))
-(export 'with-js-code-from)
 
 
 (defmacro with-js-code-only (&body body)
   `(let ((*js-code-only-p* t))
      ,@body))
-(export 'with-js-code-only)
 
 
 ;; The "other end" of this is implemented in APPEND-TO-RESPONSE-DATA-OF in viewport.lisp.
@@ -73,4 +67,3 @@ See examples/comet-test.lisp for usage."
          (progn ,@body)
        (dolist (viewport (cdr *bulk-update-p*))
          (do-comet-response viewport)))))
-(export 'with-bulk-update)

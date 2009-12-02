@@ -44,10 +44,6 @@
 
    (on-state-change-of-pages-after-current-p :accessor on-state-change-of-pages-after-current-p-of
                                              :initform (iambda))))
-(export '(pagination add-entries-fn-of remove-entries-fn-of entry-ids-of current-page-of num-entries-pr-page-of total-num-entries-of
-          total-num-pages-of on-state-change-of-pages-before-current-p-of on-state-change-of-pages-after-current-p-of
-          on-page-change-fn-of
-          ))
 
 
 (defmethod (setf entry-ids-of) (new-entry-ids (pagination pagination))
@@ -61,28 +57,23 @@
   (funcall (on-state-change-of-pages-after-current-p-of pagination)
            (more-pages-after-current-p-of pagination))
   (render pagination))
-(export 'entry-ids-of)
 
 
 (defmethod num-pages-before-current-of ((pagination pagination))
   (current-page-of pagination))
-(export 'num-pages-before-current-of)
 
 
 (defmethod num-pages-after-current-of ((pagination pagination))
   (max (- (total-num-pages-of pagination) (current-page-of pagination) 1)
        0))
-(export 'num-pages-after-current-of)
 
 
 (defmethod more-pages-after-current-p-of ((pagination pagination))
   (plusp (num-pages-after-current-of pagination)))
-(export 'more-pages-after-current-p-of)
 
 
 (defmethod more-pages-before-current-p-of ((pagination pagination))
   (plusp (num-pages-before-current-of pagination)))
-(export 'more-pages-before-current-p-of)
 
 
 (defmethod render ((pagination pagination))
@@ -110,17 +101,14 @@
 
 (defmethod navigate-to-next-page ((pagination pagination))
   (incf (current-page-of pagination)))
-(export 'navigate-to-next-page)
 
 
 (defmethod navigate-to-prev-page ((pagination pagination))
   (decf (current-page-of pagination)))
-(export 'navigate-to-prev-page)
 
 
 (define-condition pagination-out-of-bounds ()
   ())
-(export 'pagination-out-of-bounds)
 
 
 (defmethod (setf current-page-of) ((page-num integer) (pagination pagination) &optional force-update-p)
@@ -143,14 +131,12 @@ callback is triggered."
         (handle-address-bar pagination)
         (funcall (on-page-change-fn-of pagination) page-num))
       (error 'pagination-out-of-bounds)))
-(export 'current-page-of)
 
 
 
 (defmethod force-update ((pagination pagination))
   (setf (current-page-of pagination t)
         (current-page-of pagination)))
-(export 'force-update)
 
 
 (defmethod uri-value<-state ((pagination pagination))

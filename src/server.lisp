@@ -180,7 +180,6 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
           #| TODO: Here we can add entries to a shared (more than usual; before any servers might even exist) global
           variable and let server instances fall back on it. |#
           (warn "SW: (SET-URI ~A ~S) had no effect because *SERVER* was NIL." app-class-sym path))))
-(export 'set-uri)
 
 
 (defmethod remove-application ((app (eql t)) &optional (server *server*))

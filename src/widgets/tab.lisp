@@ -22,7 +22,6 @@ LABEL (in TAB-PANE) needs to do the dataflow thing.
   (:default-initargs
    :model (make-instance 'sw-mvc:container-with-1-active-item
                          :model (make-instance 'sw-mvc:dlist))))
-(export 'tab)
 
 
 (defmethod view-constructor ((tab tab) (pair pair))

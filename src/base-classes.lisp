@@ -17,7 +17,6 @@ possible and be able to optimize type-checking code based on this. |#
 anymore. |#
 (defclass widget-base (id-mixin self-ref view-base dom-mirror)
   ())
-(export 'widget-base)
 
 
 
@@ -28,7 +27,4 @@ anymore. |#
   ((children :reader children-of
              :type list
              :initform nil
-             :documentation "
-Contains View instances. Note that this is also the only hard link to the View part of
-a Model <-> View relationship.")))
-(export '(container-base children children-of))
+             :documentation "Contains View instances. Note that this is also the only hard link (GC) to the View part of a Model <-> View relationship.")))

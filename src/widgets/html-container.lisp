@@ -10,7 +10,6 @@
                  :type string)
 
    (closure :type function)))
-(export 'html-container)
 
 
 (defmethod initialize-instance :after ((html-container html-container) &key
@@ -33,7 +32,6 @@
        html-container)
   (dolist (child (children-of html-container))
     (render child)))
-(export 'update-client)
 
 
 (defmethod render ((html-container html-container))
@@ -84,7 +82,6 @@
 (defmethod generate-html ((html-container html-container))
   (with-object html-container
     (funcall (truly-the function ¤closure))))
-(export 'generate-html)
 
 
 
@@ -110,4 +107,3 @@ Saw: ~S" res))
                     ;; We pass a closure here so the :AROUND GENERATE-HTML method can capture or detect child
                     ;; widgets referred to in the WHO form.
                     :html-content (lambda () (who ,@(rest html))))))
-(export 'mk-html)

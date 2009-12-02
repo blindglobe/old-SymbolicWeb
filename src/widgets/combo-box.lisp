@@ -17,7 +17,6 @@ WITH-N-ACTIVE-ITEMS). |#
    :element-type "select"
    :model (make-instance 'sw-mvc:container-with-1-active-item
                          :model (make-instance 'sw-mvc:dlist))))
-(export '(combo-box selected-option-of))
 
 
 (defmethod initialize-instance :after ((combo-box combo-box) &key (fallback-to-null-p t))
@@ -37,7 +36,6 @@ WITH-N-ACTIVE-ITEMS). |#
   (:default-initargs
    :element-type "option"
    :model λV""))
-(export 'combo-box-option)
 
 
 (defmethod initialize-instance :after ((combo-box-option combo-box-option) &key)

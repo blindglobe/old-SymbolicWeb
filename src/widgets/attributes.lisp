@@ -10,7 +10,6 @@
   (declare (string attribute)
            (widget widget))
   (js-get-attribute (id-of widget) attribute))
-(export 'attribute)
 
 
 #.(maybe-inline '(setf attribute))
@@ -24,7 +23,6 @@
     (if *js-code-only-p*
         (js-code)
         (apply #'run (js-code) widget args))))
-(export 'attribute)
 
 
 (declaim (inline attribute-remove))
@@ -38,7 +36,6 @@
     (if *js-code-only-p*
         (js-code)
         (apply #'run (js-code) widget args))))
-(export 'attribute-remove)
 
 
 
@@ -54,8 +51,7 @@
          :dom-client-remover (lambda (widget &rest args)
                                (declare (inline attribute-remove))
                                (apply #'attribute-remove ,dom-name widget args))
-         ,@args)
-     (export ',lisp-name)))
+         ,@args)))
 
 
 (define-attribute-property value-of "value"
@@ -75,7 +71,6 @@
                    (css-class-of widget))))
     (pushnew class-name classes :test #'string=)
     (setf (css-class-of widget :server-only-p server-only-p) classes)))
-(export 'add-class)
 
 
 (defun remove-class (widget class-name &key server-only-p)
@@ -86,7 +81,6 @@
                    (css-class-of widget))))
     (deletef classes class-name :test #'string=)
     (setf (css-class-of widget :server-only-p server-only-p) classes)))
-(export 'remove-class)
 
 
 (define-attribute-property title-of "title")

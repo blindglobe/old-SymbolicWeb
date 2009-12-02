@@ -74,13 +74,11 @@ won't work:
 
 (defmethod mk-static-data-url ((app application) (last-part string))
   (mk-static-data-url (server-of app) last-part))
-(export 'mk-static-data-url)
 
 
 (defmacro who (&body body)
   `(with-html-output-to-string (,(gensym "who-string"))
      ,@body))
-(export 'who)
 
 
 (defmethod convert-tag-to-string-list ((tag (eql :sw)) attr-list body body-fn)

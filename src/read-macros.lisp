@@ -5,4 +5,3 @@
 
 (defreadtable symbolicweb
   (:merge sw-mvc))
-(export 'symbolicweb)

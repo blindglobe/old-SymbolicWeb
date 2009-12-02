@@ -22,7 +22,6 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 
   (:default-initargs
    :model λV""))
-(export 'html-element)
 
 
 (flet ((update-html (html-element new-html)
@@ -68,7 +67,6 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
                     ,@(when (and (not (member :model args))
                                  html-content)
                      `(:model #λ,@html-content)))))
-(export 'mk-elt)
 
 
 (defmacro def-elt (element-type &key (xml-p t))
@@ -78,8 +76,8 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
        `(mk-elt (,(make-keyword ',element-type) ,@(when (listp args) args))
           ,@(if (listp args)
                 html-content
-                (list args))))
-     (export ',element-type)))
+                (list args))))))
+
 
 ;; *GRR* the syntax is (DIV (:MODEL #λ42))
 (def-elt div)

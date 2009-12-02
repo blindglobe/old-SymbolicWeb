@@ -88,7 +88,6 @@ Instances of this is bound to *CURRENT-EVENT*."))
   (declare (ignore event-type widget))
   #|(setf (event event-type widget) nil)|#
   #|(remove-callback-box event-type widget)|#)|#
-#|(export 'event-remove)|#
 
 
 (defmethod js-before-check ((widget dom-mirror) (lisp-accessor-name symbol))
@@ -106,7 +105,6 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
 (defmethod initialize-callback-box ((dom-mirror dom-mirror) (lisp-accessor-name symbol) (callback-box callback-box))
   )
-(export 'initialize-callback-box)
 
 
 (defun event-dom-server-reader (dom-mirror lisp-accessor-name)
@@ -145,9 +143,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
        :dom-server-reader #'event-dom-server-reader
        :value-marshaller nil
        :value-removal-checker nil
-       ,@args)
-     (export ',lisp-name)))
-
+       ,@args)))
 
 
 (define-event-property (on-blur-of "blur"))

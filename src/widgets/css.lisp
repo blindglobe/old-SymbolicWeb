@@ -10,7 +10,6 @@
   (declare (string property)
            (widget widget))
   (js-get-css (id-of widget) property))
-(export 'css)
 
 
 #.(maybe-inline '(setf css))
@@ -24,7 +23,6 @@
     (if *js-code-only-p*
         (js-code)
         (apply #'run (js-code) widget args))))
-(export 'css)
 
 
 (declaim (inline css-remove))
@@ -32,7 +30,6 @@
   (declare (string property)
            (widget widget))
   (write-line "TODO: CSS-REMOVE"))
-(export 'css-remove)
 
 
 
@@ -48,8 +45,7 @@
          :dom-client-remover (lambda (widget &rest args)
                                (declare (inline css-remove))
                                (apply #'css-remove ,dom-name widget args))
-         ,@args)
-     (export ',lisp-name)))
+         ,@args)))
 
 
 
