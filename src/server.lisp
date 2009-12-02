@@ -85,19 +85,14 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
   #| NOTE: Going for the CONTINUE restart here is a bad idea because the CL:ASSERT will cause things to get stuck
   in an infinite loop. |#
   (if-let (it (or
-               ;; Let problems in CELLs propagate to child/dependent CELLs.
-               (find-restart 'sw-mvc:assign-condition)
-               ;; Not sure we ever want this to happen at this point in time.
-               #|(find-restart 'sw-mvc:skip-cell)|#
                #| Drop the entire transaction. TODO: Perhaps this is a bad idea? We'll now send a dummy or
-               incomplete HTTP response(?). This is not a good idea if the transaction is complete and
-               has started committing. |#
+               incomplete HTTP response(?). |#
                (prog1 (find-restart 'sw-stm:abort-transaction)
-                 (warn "SW:HANDLE-CONDITION: Aborting transaction."))
-               ;; Drop the entire HTTP request. TODO: Does this make sense? Perhaps as a lost resort only..
+                 (warn "SW:HANDLE-CONDITION: Aborting transaction, got: ~S" condition))
+               ;; Drop the entire HTTP request. TODO: Does this make sense? Perhaps as a last resort only.
                (find-restart 'sw-http:continue-listening)))
     (invoke-restart it)
-    (warn "SW:HANDLE-CONDITION: Huh. No restart found?"))) ;; Should never happen.
+    (warn "SW:HANDLE-CONDITION: Huh. No restart found?")))
 
 
 (defmethod sw-http:maybe-debug ((server server) condition)
