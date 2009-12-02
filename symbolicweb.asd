@@ -24,7 +24,9 @@
     :serial t
     :components
     ((:file "package")
+     (:file "bootstrap")
      (:file "read-macros")
+
      (:file "class-bootstrap")
      (:file "macro-bootstrap")
      (:file "specials")

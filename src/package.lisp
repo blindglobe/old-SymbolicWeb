@@ -2,7 +2,7 @@
 
 
 (defpackage :symbolicweb
-  (:use :sw-mvc)
+  (:use :sw-db)
   (:nicknames :sw))
 (in-package sw)
 
