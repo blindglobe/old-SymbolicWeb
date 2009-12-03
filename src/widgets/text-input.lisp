@@ -48,14 +48,13 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
   (when sync-on-enterpress-p
     (with-event ((value (on-enterpress-of text-input)))
-      (when-let (value (on-enterpress-of text-input))
-        (when-commit ()
-          (setf (attribute-value-of text-input :server-only-p t) value))
-        (setf ~~text-input value)
+      (when-commit ()
+        (setf (attribute-value-of text-input :server-only-p t) value))
+      (setf ~~text-input value)
 
-        (when (clear-on-enterpress-p-of text-input)
-          (setf (attribute-value-of text-input :client-only-p t) "")
-          (text-input-update-client-cache "" text-input))))))
+      (when (clear-on-enterpress-p-of text-input)
+        (setf (attribute-value-of text-input :client-only-p t) "")
+        (text-input-update-client-cache "" text-input)))))
 
 
 ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
