@@ -88,7 +88,10 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
                #| Drop the entire transaction. TODO: Perhaps this is a bad idea? We'll now send a dummy or
                incomplete HTTP response(?). |#
                (prog1 (find-restart 'sw-stm:abort-transaction)
-                 (warn "SW:HANDLE-CONDITION: Aborting transaction, got: ~S" condition))
+                 (let ((msg (fmtn "SW:HANDLE-CONDITION: Aborting transaction, got ~S~%~A"
+                                  condition condition)))
+                   (warn msg)
+                   (alert msg)))
                ;; Drop the entire HTTP request. TODO: Does this make sense? Perhaps as a last resort only.
                (find-restart 'sw-http:continue-listening)))
     (invoke-restart it)
