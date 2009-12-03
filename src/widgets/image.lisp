@@ -9,12 +9,12 @@
 
   (:default-initargs
    :element-type "image"
-   :model #λ""))
+   :model λV""))
 
 
 (defun mk-image (src &rest initargs)
   (with1 (apply #'make-instance 'image initargs)
-    (setf (src-of it) src)))
+    (setf (attribute-src-of it) src)))
 
 
 (defmethod (setf model-of) ((model cell) (view image))

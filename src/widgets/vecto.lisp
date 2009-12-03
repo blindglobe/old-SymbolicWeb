@@ -44,10 +44,10 @@ Possible ways to specify how to draw:
   (insert (with1 (image-of vc)
             #| This'll cause the image to strech in realtime on the client-end before the debouncer times out
                causing the server to update things proper. |#
-            (setf (position-of it) "absolute"
-                  (width-of it) "100%"
-                  (height-of it) "100%"
-                  (z-index-of it) "-1"))
+            (setf (css-position-of it) "absolute"
+                  (css-width-of it) "100%"
+                  (css-height-of it) "100%"
+                  (css-z-index-of it) "-1"))
           :in vc)
   (with (make-instance 'callback-box :widget vc :id "resize")
     (with-formula vc
@@ -77,7 +77,7 @@ Possible ways to specify how to draw:
                   (vecto:save-png filename))))
             #| NOTE: Not using (background-image-of vc) here because this won't resize the image in real-time on the
             client end. |#
-            (setf (src-of (image-of vc))
+            (setf (attribute-src-of (image-of vc))
                   (mk-static-data-url *app* (catstr (string-downcase (filename-of vc)) "-"
                                                     width-str "x" height-str ".png")))))))))
 

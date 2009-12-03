@@ -22,19 +22,20 @@
   (list λI(with (sw-mvc:value-of model)
             ;; Model → View.
             (when-commit ()
-              (unless (eq it (checked-p-of check-box))
-                (setf (checked-p-of check-box) it))))
+              (unless (eq it (attribute-checked-p-of check-box))
+                (setf (attribute-checked-p-of check-box) it))))
 
         λI(when-let ((res (on-check-box-change-of check-box)))
             ;; View → Model.
             (with (car res)
               (when-commit ()
-                (setf (checked-p-of check-box :server-only-p t) it))
+                (setf (attribute-checked-p-of check-box :server-only-p t) it))
               (setf (sw-mvc:value-of model) it)))))
 
 
 (define-event-property
-    (on-check-box-change-of "change" :callback-data (list (cons "checked" (js-code-of (checked-p-of widget))))))
+    (on-check-box-change-of "change" :callback-data (list (cons "checked"
+                                                                (js-code-of (attribute-checked-p-of widget))))))
 
 
 (defmethod initialize-callback-box ((check-box check-box) (lisp-accessor-name (eql 'on-check-box-change-of))

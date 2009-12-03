@@ -39,7 +39,7 @@ WITH-N-ACTIVE-ITEMS). |#
 
 
 (defmethod initialize-instance :after ((combo-box-option combo-box-option) &key)
-  (setf (value-of combo-box-option)
+  (setf (attribute-value-of combo-box-option)
         (id-of combo-box-option)))
 
 
@@ -62,9 +62,9 @@ WITH-N-ACTIVE-ITEMS). |#
               (let ((old-item-view (selected-option-of combo-box)))
                 (unless (eq item-view old-item-view)
                   (when item-view
-                    (tf (selected-p-of item-view)))
+                    (tf (attribute-selected-p-of item-view)))
                   (when old-item-view
-                    (nilf (selected-p-of old-item-view :server-only-p t)))
+                    (nilf (attribute-selected-p-of old-item-view :server-only-p t)))
                   (setf (slot-value combo-box 'selected-option) item-view)))))
 
         λI(when-let* ((item-view (on-combo-box-change-of combo-box))
@@ -73,16 +73,17 @@ WITH-N-ACTIVE-ITEMS). |#
             (when-commit ()
               (let ((old-item-view (selected-option-of combo-box)))
                 (unless (eq item-view old-item-view)
-                  (tf (selected-p-of item-view :server-only-p t))
+                  (tf (attribute-selected-p-of item-view :server-only-p t))
                   (when old-item-view
-                    (nilf (selected-p-of (selected-option-of combo-box) :server-only-p t)))
+                    (nilf (attribute-selected-p-of (selected-option-of combo-box) :server-only-p t)))
                   (setf (slot-value combo-box 'selected-option) item-view))))
             (setf (active-item-of model) item-model))))
 
 
 
 (define-event-property
-    (on-combo-box-change-of "change" :callback-data (list (cons "value" (js-code-of (value-of widget))))))
+    (on-combo-box-change-of "change" :callback-data (list (cons "value"
+                                                                (js-code-of (attribute-value-of widget))))))
 
 
 (defmethod initialize-callback-box ((combo-box combo-box) (lisp-accessor-name (eql 'on-combo-box-change-of))

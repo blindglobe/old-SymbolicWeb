@@ -11,9 +11,6 @@
   (shadowing-import sym))
 
 
-(shadow 'value-of)
-(shadow 'left-of)
-(shadow 'right-of)
 (shadow 'container)
 (shadow 'container-insert)
 (shadow 'container-remove)

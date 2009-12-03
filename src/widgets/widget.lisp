@@ -165,7 +165,7 @@ VIEW). These methods might be called from within the dynamic scope of a WHEN-COM
 
 (defmethod shown-p-of ((widget widget))
   "Returns T or NIL."
-  (not (member "sw-hide" (css-class-of widget) :test #'string=)))
+  (not (member "sw-hide" (attribute-class-of widget) :test #'string=)))
 
 
 (defmethod hidden-p-of ((widget widget))

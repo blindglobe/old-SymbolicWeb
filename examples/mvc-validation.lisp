@@ -33,9 +33,9 @@
 
 (flet ((fe-handler (fe text-input)
          (if fe
-             (setf (border-color-of text-input) :red
+             (setf (css-border-color-of text-input) :red
                    (tooltip-of text-input :show-p t) "Need valid number input.")
-             (setf (border-color-of text-input) :black
+             (setf (css-border-color-of text-input) :black
                    (tooltip-of text-input) nil))))
 
 

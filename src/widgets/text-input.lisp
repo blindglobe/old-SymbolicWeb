@@ -26,10 +26,10 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 
 (define-event-property
-    (on-enterpress-of "keyup" :callback-data (list (cons "value" (js-code-of (value-of widget))))))
+    (on-enterpress-of "keyup" :callback-data (list (cons "value" (js-code-of (attribute-value-of widget))))))
 
 (define-event-property
-    (on-text-input-blur-of "blur" :callback-data (list (cons "value" (js-code-of (value-of widget))))))
+    (on-text-input-blur-of "blur" :callback-data (list (cons "value" (js-code-of (attribute-value-of widget))))))
 
 
 (defmethod initialize-instance :before ((text-input text-input) &key password-p)
@@ -43,18 +43,18 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
   (when sync-on-blur-p
     (with-event ((value (on-text-input-blur-of text-input)))
       (when-commit ()
-        (setf (value-of text-input :server-only-p t) value))
+        (setf (attribute-value-of text-input :server-only-p t) value))
       (setf ~~text-input value)))
 
   (when sync-on-enterpress-p
     (with-event ((value (on-enterpress-of text-input)))
       (when-let (value (on-enterpress-of text-input))
         (when-commit ()
-          (setf (value-of text-input :server-only-p t) value))
+          (setf (attribute-value-of text-input :server-only-p t) value))
         (setf ~~text-input value)
 
         (when (clear-on-enterpress-p-of text-input)
-          (setf (value-of text-input :client-only-p t) "")
+          (setf (attribute-value-of text-input :client-only-p t) "")
           (text-input-update-client-cache "" text-input))))))
 
 
@@ -97,12 +97,12 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
        text-input))
 
 
-(fflet ((value-marshaller (the function (value-marshaller-of 'value-of))))
+(fflet ((value-marshaller (the function (value-marshaller-of 'attribute-value-of))))
 
 
   (defmethod render ((text-input text-input))
     (declare (optimize speed (safety 2)))
-    (text-input-update-client-cache (value-marshaller (value-of text-input)) text-input))
+    (text-input-update-client-cache (value-marshaller (attribute-value-of text-input)) text-input))
 
 
   (defmethod set-model nconc ((text-input text-input) (model cell))
@@ -117,8 +117,8 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
            #| We could move this test outside of the commit, but that would cause the other commit block in the
            INITIALIZE-INSTANCE method for TEXT-INPUT to race with this. |#
            (unless (muffle-compiler-note
-                     (string= value-str (value-marshaller (value-of text-input))))
-             (setf (value-of text-input) value)
+                     (string= value-str (value-marshaller (attribute-value-of text-input))))
+             (setf (attribute-value-of text-input) value)
              (text-input-update-client-cache value-str text-input)))))))
 
 

@@ -41,7 +41,7 @@
 
 (defmacro define-attribute-property (lisp-name dom-name &body args)
   `(progn
-     (define-dom-property ',lisp-name
+     (define-dom-property ',(symbolicate 'attribute- lisp-name)
          :dom-client-writer (lambda (new-value widget &rest args)
                               (declare (inline (setf attribute)))
                               (setf (apply #'attribute ,dom-name widget args) new-value))
@@ -58,7 +58,7 @@
   :dom-server-reader-fallback-value "")
 
 
-(define-attribute-property css-class-of "class"
+(define-attribute-property class-of "class"
   :value-marshaller (lambda (value) (format nil "~{~A~^ ~}" value))
   :value-removal-checker nil)
 
@@ -68,9 +68,9 @@
   "Add a CSS class to WIDGET."
   (setf class-name (string-downcase class-name))
   (let ((classes (let ((*js-code-only-p* nil))
-                   (css-class-of widget))))
+                   (attribute-class-of widget))))
     (pushnew class-name classes :test #'string=)
-    (setf (css-class-of widget :server-only-p server-only-p) classes)))
+    (setf (attribute-class-of widget :server-only-p server-only-p) classes)))
 
 
 (defun remove-class (widget class-name &key server-only-p)
@@ -78,9 +78,9 @@
   "Remove a CSS class from WIDGET."
   (setf class-name (string-downcase class-name))
   (let ((classes (let ((*js-code-only-p* nil))
-                   (css-class-of widget))))
+                   (attribute-class-of widget))))
     (deletef classes class-name :test #'string=)
-    (setf (css-class-of widget :server-only-p server-only-p) classes)))
+    (setf (attribute-class-of widget :server-only-p server-only-p) classes)))
 
 
 (define-attribute-property title-of "title")

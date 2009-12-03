@@ -35,7 +35,7 @@
 
 (defmacro define-css-property (lisp-name dom-name &body args)
   `(progn
-     (define-dom-property ',lisp-name
+     (define-dom-property ',(symbolicate 'css- lisp-name)
          :dom-client-writer (lambda (new-value widget &rest args)
                               (declare (inline (setf css)))
                               (setf (apply #'css ,dom-name widget args) new-value))
