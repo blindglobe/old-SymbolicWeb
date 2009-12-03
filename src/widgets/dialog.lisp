@@ -7,7 +7,7 @@
 
 (defclass dialog-model (dlist)
   ((title :accessor title-of
-          :initform ""))
+          :initform nil))
 
   (:metaclass mvc-class))
 
@@ -28,7 +28,7 @@
 
 
 (flet ((set-option (dialog option-name value)
-         (run (fmtn "$('#~A').dialog('option', '~A', decodeURIComponent('~A'));"
+         (run (fmtn "$('#~A').dialog('option', '~A', decodeURIComponent('~A'));~%"
                     (id-of dialog)
                     option-name
                     (htmlize value))
@@ -36,10 +36,10 @@
 
 
   (defmethod set-model nconc ((dialog dialog) (model dialog-model))
-    (list λI(with (title-of model)
-              (set-option dialog "title" it)))))
+    (list λI(when-let (title (title-of model))
+              (set-option dialog "title" title)))))
 
 
 (defmethod render :after ((dialog dialog))
-  (run (fmtn "$('#~A').dialog();" (id-of dialog))
+  (run (fmtn "$('#~A').dialog();~%" (id-of dialog))
        dialog))
