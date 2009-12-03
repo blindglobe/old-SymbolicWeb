@@ -88,7 +88,7 @@
 
 
 (defmethod optimizations ((context (eql :code.lisp)) &key)
-  '(optimize (speed 3) (safety 0)))
+  '(optimize (speed 3) (safety 1)))
 
 
 (defmethod optimizations ((context (eql :viewport.lisp)) &key)
