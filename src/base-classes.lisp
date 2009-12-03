@@ -13,10 +13,10 @@ possible and be able to optimize type-checking code based on this. |#
 ;;; widget-base.lisp
 ;;;;;;;;;;;;;;;;;;;;
 
-#| TODO: A PARENT slot would actually make sense now; we're not doing the one-widget-in-multiple-viewports thing
-anymore. |#
 (defclass widget-base (id-mixin self-ref view-base dom-mirror)
-  ())
+  ((parent :reader parent-of
+           :type (or widget-base null)
+           :initform nil)))
 
 
 

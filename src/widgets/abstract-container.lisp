@@ -74,6 +74,7 @@
 
 #.(maybe-inline 'propagate-for-add)
 (defn propagate-for-add (null ((widget widget) (container container-base)))
+  (setf (slot-value widget 'parent) container)
   (let* ((viewport (viewport-of container))
          (widgets (widgets-of (application-of viewport))))
     (with-each-widget-in-tree (:root widget)
@@ -86,6 +87,7 @@
 
 #.(maybe-inline 'propagate-for-remove)
 (defn propagate-for-remove (null ((widget widget)))
+  (nilf (slot-value widget 'parent))
   (let* ((viewport (viewport-of widget))
          (widgets (widgets-of (application-of viewport))))
     (with-each-widget-in-tree (:root widget)
