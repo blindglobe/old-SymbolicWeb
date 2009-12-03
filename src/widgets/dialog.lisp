@@ -12,6 +12,7 @@
   (:metaclass mvc-class))
 
 
+
 (defclass dialog (container)
   ()
 
@@ -37,7 +38,8 @@
 
   (defmethod set-model nconc ((dialog dialog) (model dialog-model))
     (list λI(when-let (title (title-of model))
-              (set-option dialog "title" title)))))
+              (when-commit ()
+                (set-option dialog "title" title))))))
 
 
 (defmethod render :after ((dialog dialog))
