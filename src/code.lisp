@@ -5,6 +5,9 @@
 (declaim #.(optimizations :code.lisp))
 
 
+;; NOTE: I do not use WHEN-COMMIT here since the View actually needs to maintain some state also. E.g., CONTAINER has a CHILDREN slot.
+
+
 #.(maybe-inline 'run)
 (eval-now
   (proclaim '(ftype (function (string (or viewport widget) &key (:server-only-p (member t nil)) &allow-other-keys)

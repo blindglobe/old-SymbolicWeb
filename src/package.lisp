@@ -4,7 +4,7 @@
 (defpackage :symbolicweb
   (:use :sw-db)
   (:nicknames :sw))
-(in-package sw)
+(in-package :sw)
 
 
 (do-external-symbols (sym (find-package :cl-who)) ;; HTM, STR, ...

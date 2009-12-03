@@ -95,12 +95,12 @@ WITH-N-ACTIVE-ITEMS). |#
 
 
 
+
 #|(progn
   (remove-all (root))
   (with (make-instance 'combo-box :id "blah")
     (let ((p2 (make-instance 'container-with-1-active-item :model (dbg-prin1 ~~it)))
           (b λV"b"))
-      #|(setf (fallback-item-of p2) +null-model+)|#
       (insert λV"a" :in it)
       (insert b :in it)
       (insert λV"c" :in it)

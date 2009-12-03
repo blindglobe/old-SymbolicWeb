@@ -196,6 +196,7 @@ include the JS libraries required for SW in general."
   (remhash (cookie-value-of app) (cookie-value->app-of server)))
 
 
+;; The "receiving end" of this is the (RENDER APPLICATION) method in src/application.lisp.
 (defun add-resource (app id type url)
   (declare (application app)
            (string id)
