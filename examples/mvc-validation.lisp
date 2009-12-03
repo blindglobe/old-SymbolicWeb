@@ -22,9 +22,9 @@
 
 (defclass mvc-validation-view (html-container)
   ((x :initform ↑(with1 (text-input (:model (cell-of (x-of ¤model))))
-                   (setf (border-color-of it) :black)))
+                   (setf (css-border-color-of it) :black)))
    (y :initform ↑(with1 (text-input (:model (cell-of (y-of ¤model))))
-                   (setf (border-color-of it) :black)))
+                   (setf (css-border-color-of it) :black)))
    (sum :initform ↑(span (:model (cell-of (sum-of ¤model))))))
 
   (:default-initargs
