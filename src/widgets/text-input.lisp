@@ -41,14 +41,13 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
                                        (sync-on-blur-p (not (clear-on-enterpress-p-of text-input)))
                                        (sync-on-enterpress-p t))
   (when sync-on-blur-p
-    (with-formula text-input
-      (when-let (value (on-text-input-blur-of text-input))
-        (when-commit ()
-          (setf (value-of text-input :server-only-p t) value))
-        (setf ~~text-input value))))
+    (with-event ((value (on-text-input-blur-of text-input)))
+      (when-commit ()
+        (setf (value-of text-input :server-only-p t) value))
+      (setf ~~text-input value)))
 
   (when sync-on-enterpress-p
-    (with-formula text-input
+    (with-event ((value (on-enterpress-of text-input)))
       (when-let (value (on-enterpress-of text-input))
         (when-commit ()
           (setf (value-of text-input :server-only-p t) value))

@@ -23,6 +23,18 @@ Instances of this is bound to *CURRENT-EVENT*."))
   (id-of (callback-box-of event)))
 
 
+(defmacro with-event (binding-event &body handler)
+  "Syntax:
+
+  (with-event (on-click-of some-button)
+    ..)
+
+  (with-event ((value (on-enterpress-of some-text-input)))
+    ..)"
+  `(with-observer ,binding-event
+     ,@handler))
+
+
 
 (defclass callback-box ()
   ((id :reader id-of :initarg :id
