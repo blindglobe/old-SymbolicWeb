@@ -69,6 +69,7 @@
         (:file "tooltip")
         (:file "combo-box")
         (:file "check-box")
+        (:file "dialog")
         #|
         (:file "container-with-1-active-item")
         (:file "table-container")
