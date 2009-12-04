@@ -5,7 +5,7 @@
 (declaim #.(optimizations :viewport.lisp))
 
 
-(defclass viewport (id-mixin dom-mirror)
+(defclass viewport (id-mixin)
   ((application :reader application-of :initarg :application
                 :type application
                 :initform (error ":APPLICATION must be supplied."))

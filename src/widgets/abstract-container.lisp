@@ -72,7 +72,6 @@
       (render child))))
 
 
-#.(maybe-inline 'propagate-for-add)
 (defn propagate-for-add (null ((widget widget) (container container-base)))
   (setf (slot-value widget 'parent) container)
   (let* ((viewport (viewport-of container))
@@ -80,12 +79,11 @@
     (with-each-widget-in-tree (:root widget)
       (with (viewport-of widget)
         (when (and it (not (eq it viewport)))
-          (warn "SW:PROPAGATE-FOR-ADD: ~A is already part of ~A. Adding it to ~A." widget viewport it)))
+          (error "SW:PROPAGATE-FOR-ADD: ~A is already part of ~A. Adding it to ~A." widget viewport it)))
       (setf (gethash (id-of widget) widgets) widget
             (viewport-of widget) viewport))))
 
 
-#.(maybe-inline 'propagate-for-remove)
 (defn propagate-for-remove (null ((widget widget)))
   (nilf (slot-value widget 'parent))
   (let* ((viewport (viewport-of widget))
@@ -95,52 +93,79 @@
       (nilf (viewport-of widget)))))
 
 
-(defmethod container-insert ((container abstract-container) (widget widget) &key before after)
-  "Implements SW-MVC:INSERT for SW:CONTAINER widget."
-  (when-let (it (or before after))
-    (check-type it widget))
-  (when-commit ()
-    (cond
-     (after
-      (amx:insert widget ↺(slot-value container 'children) :after after)
-      (when (visible-p-of container)
-        (propagate-for-add widget container)
-        (run (js-oappend (shtml-of widget) (id-of after)) container)
-        (render widget)))
-
-     (before
-      (amx:insert widget ↺(slot-value container 'children) :before before)
-      (when (visible-p-of container)
-        (propagate-for-add widget container)
-        (run (js-oprepend (shtml-of widget) (id-of before)) container)
-        (render widget)))
-
-     (t
-      (amx:insert widget ↺(slot-value container 'children) :last-p t)
-      (when (visible-p-of container)
-        (propagate-for-add widget container)
-        (run (js-iappend (shtml-of widget) (id-of container)) container)
-        (render widget))))))
+(let ((tmp-node "<div id='sw-tmp'></div>"))
+  (flet ((replace-tmp-node (widget container)
+           (run (fmtn "$('#sw-tmp').replaceWith($('#~A'));~%" (id-of widget))
+                container)))
+    (declare (inline replace-tmp-node))
 
 
-(defmethod container-remove ((container abstract-container) (widget widget))
-  "Implements SW-MVC:REMOVE for SW:CONTAINER."
-  (when-commit ()
-    (deletef (slot-value container 'children) widget)
-    (when (visible-p-of container)
-      (run (js-remove (id-of widget)) container)
-      (propagate-for-remove widget))))
+    (defmethod container-insert ((container abstract-container) (widget widget) &key before after)
+      "Implements SW-MVC:INSERT for SW:CONTAINER widget."
+      (when-let (it (or before after))
+        (check-type it widget))
+      (when-commit ()
+        (cond
+          (after
+           (amx:insert widget ↺(slot-value container 'children) :after after)
+           (when (visible-p-of container)
+             (propagate-for-add widget container)
+             (if (in-dom-p-of widget)
+                 (progn
+                   (run (js-oappend tmp-node (id-of after)) container)
+                   (replace-tmp-node widget container))
+                 (progn
+                   (run (js-oappend (shtml-of widget) (id-of after)) container)
+                   (render widget)
+                   (ensure-in-client-dom widget)))))
+
+          (before
+           (amx:insert widget ↺(slot-value container 'children) :before before)
+           (when (visible-p-of container)
+             (propagate-for-add widget container)
+             (if (in-dom-p-of widget)
+                 (progn
+                   (run (js-oprepend tmp-node (id-of before)) container)
+                   (replace-tmp-node widget container))
+                 (progn
+                   (run (js-oprepend (shtml-of widget) (id-of before)) container)
+                   (render widget)
+                   (ensure-in-client-dom widget)))))
+
+          (t
+           (amx:insert widget ↺(slot-value container 'children) :last-p t)
+           (when (visible-p-of container)
+             (propagate-for-add widget container)
+             (if (in-dom-p-of widget)
+                 (progn
+                   (run (js-iappend tmp-node (id-of container)) container)
+                   (replace-tmp-node widget container))
+                 (progn
+                   (run (js-iappend (shtml-of widget) (id-of container)) container)
+                   (render widget)
+                   (ensure-in-client-dom widget)))))))
 
 
-(defmethod container-remove-all ((container abstract-container))
-  "Implements SW-MVC:REMOVE-ALL for SW:CONTAINER."
-  (when-commit ()
-    (when (visible-p-of container)
-      (dolist (child (children-of container))
-        (run (js-remove (id-of child)) container)
-        (propagate-for-remove child)))
-    ;; TODO: Hm, the order here is different from CONTAINER-REMOVE, above. Does this matter?
-    (nilf (slot-value container 'children))))
+      (defmethod container-remove ((container abstract-container) (widget widget))
+        "Implements SW-MVC:REMOVE for SW:CONTAINER."
+        (when-commit ()
+          (deletef (slot-value container 'children) widget)
+          (when (visible-p-of container)
+            (run (js-iappend tmp-node "sw-recycler") container)
+            (replace-tmp-node widget container)
+            (propagate-for-remove widget))))
+
+
+      (defmethod container-remove-all ((container abstract-container))
+        "Implements SW-MVC:REMOVE-ALL for SW:CONTAINER."
+        (when-commit ()
+          (when (visible-p-of container)
+            (dolist (child (children-of container))
+              (run (js-iappend tmp-node "sw-recycler") container)
+              (replace-tmp-node child container)
+              (propagate-for-remove child)))
+          ;; TODO: Hm, the order here is different from CONTAINER-REMOVE, above. Does this matter?
+          (nilf (slot-value container 'children)))))))
 
 
 (defmethod container-exchange ((container abstract-container) (widget-a widget) (widget-b widget))

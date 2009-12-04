@@ -1,7 +1,7 @@
 ;;;; http://nostdal.org/ ;;;;
 
 (in-package #:sw)
-
+(in-readtable symbolicweb)
 (declaim #.(optimizations :widgets/attributes.lisp))
 
 
@@ -15,28 +15,31 @@
 #.(maybe-inline '(setf attribute))
 (defun (setf attribute) (new-value attribute widget &rest args)
   (declare (string new-value attribute)
-           (widget widget)
-           (dynamic-extent args))
+           (widget widget))
   (flet ((js-code ()
            (js-set-attribute (id-of widget) attribute new-value)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
-        (apply #'run (js-code) widget args))))
+        (if (in-dom-p-of widget)
+            (apply #'run (js-code) widget args)
+            (add-delayed-operation widget :attribute attribute
+                                   λλ(apply #'run (js-code) widget args))))))
 
 
 (declaim (inline attribute-remove))
 (defun attribute-remove (attribute widget &rest args)
   (declare (string attribute)
-           (widget widget)
-           (dynamic-extent args))
+           (widget widget))
   (flet ((js-code ()
            (js-remove-attribute (id-of widget) attribute)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
-        (apply #'run (js-code) widget args))))
-
+        (if (in-dom-p-of widget)
+            (apply #'run (js-code) widget args)
+            (add-delayed-operation widget :attribute attribute
+                                   λλ(apply #'run (js-code) widget args))))))
 
 
 (defmacro define-attribute-property (lisp-name dom-name &body args)
@@ -54,8 +57,7 @@
          ,@args)))
 
 
-(define-attribute-property value-of "value"
-  :dom-server-reader-fallback-value "")
+(define-attribute-property value-of "value")
 
 
 (define-attribute-property class-of "class"
@@ -130,5 +132,4 @@
 (define-attribute-property rowspan-of "rowspan")
 
 
-(define-attribute-property tabindex-of "tabindex"
-  :dom-server-reader-fallback-value 0)
+(define-attribute-property tabindex-of "tabindex")

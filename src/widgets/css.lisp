@@ -1,6 +1,6 @@
 ;;;; http://sw.nostdal.org/ ;;;;
 
-(in-package sw)
+(in-package :sw)
 (in-readtable symbolicweb)
 (declaim #.(optimizations :widgets/css.lisp))
 
@@ -15,14 +15,16 @@
 #.(maybe-inline '(setf css))
 (defun (setf css) (new-value property widget &rest args)
   (declare (string new-value property)
-           (widget widget)
-           (dynamic-extent args))
+           (widget widget))
   (flet ((js-code ()
            (js-set-css (id-of widget) property new-value)))
     (declare (inline js-code))
     (if *js-code-only-p*
         (js-code)
-        (apply #'run (js-code) widget args))))
+        (if (in-dom-p-of widget)
+            (apply #'run (js-code) widget args)
+            (add-delayed-operation widget :css property
+                                   λλ(apply #'run (js-code) widget args))))))
 
 
 (declaim (inline css-remove))
@@ -107,20 +109,17 @@
 (define-css-property border-right-of "border-right")
 (define-css-property border-bottom-of "border-bottom")
 (define-css-property border-left-of "border-left")
-(define-css-property width-of "width"
-  :dom-server-reader-fallback-value :auto)
-(define-css-property height-of "height"
-  :dom-server-reader-fallback-value :auto)
+(define-css-property width-of "width")
+(define-css-property height-of "height")
 (define-css-property float-of "float")
-(define-css-property clear-of "clear"
-  :dom-server-reader-fallback-value :none)
+(define-css-property clear-of "clear")
+
 
 
 ;; Classification properties
 
 (define-css-property display-of "display")
-(define-css-property white-space-of "white-space"
-  :dom-server-reader-fallback-value :normal)
+(define-css-property white-space-of "white-space")
 (define-css-property list-style-type-of "list-style-type")
 (define-css-property list-style-image-of "list-style-image")
 (define-css-property list-style-position-of "list-style-position")
@@ -138,22 +137,14 @@
 (define-css-property border-bottom-of "border-bottom")
 (define-css-property border-left-of "border-left")
 (define-css-property border-of "border")
-(define-css-property position-of "position"
-  :dom-server-reader-fallback-value :static)
-(define-css-property overflow-of "overflow"
-  :dom-server-reader-fallback-value :visible)
-(define-css-property cursor-of "cursor"
-  :dom-server-reader-fallback-value :auto)
-(define-css-property top-of "top"
-  :dom-server-reader-fallback-value :auto)
-(define-css-property right-of "right"
-  :dom-server-reader-fallback-value :auto)
-(define-css-property bottom-of "bottom"
-  :dom-server-reader-fallback-value :auto)
-(define-css-property left-of "left"
-  :dom-server-reader-fallback-value :auto)
-(define-css-property z-index-of "z-index"
-  :dom-server-reader-fallback-value :auto)
+(define-css-property position-of "position")
+(define-css-property overflow-of "overflow")
+(define-css-property cursor-of "cursor")
+(define-css-property top-of "top")
+(define-css-property right-of "right")
+(define-css-property bottom-of "bottom")
+(define-css-property left-of "left")
+(define-css-property z-index-of "z-index")
 (define-css-property direction-of "direction")
 (define-css-property unicode-bidi-of "unicode-bidi")
 (define-css-property visibility-of "visibility")

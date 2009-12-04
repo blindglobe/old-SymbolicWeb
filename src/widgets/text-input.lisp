@@ -18,7 +18,13 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 (defclass text-input (widget focussable)
   ((clear-on-enterpress-p :accessor clear-on-enterpress-p-of :initarg :clear-on-enterpress-p
                           :type (member t nil)
-                          :initform nil))
+                          :initform nil)
+
+   (sync-on-blur-p :reader sync-on-blur-p-of :initarg :sync-on-blur-p
+                   :initform ↑(not ¤clear-on-enterpress-p))
+
+   (sync-on-enterpress-p :reader sync-on-enterpress-p-of :initarg :sync-on-enterpress-p
+                         :initform t))
 
   (:default-initargs
    :element-type "input"
@@ -26,10 +32,13 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 
 (define-event-property
-    (on-enterpress-of "keyup" :callback-data (list (cons "value" (js-code-of (attribute-value-of widget))))))
+    (on-enterpress-of "keyup"
+                      :callback-data (list (cons "value" (js-code-of (attribute-value-of widget))))))
+
 
 (define-event-property
-    (on-text-input-blur-of "blur" :callback-data (list (cons "value" (js-code-of (attribute-value-of widget))))))
+    (on-text-input-blur-of "blur"
+                           :callback-data (list (cons "value" (js-code-of (attribute-value-of widget))))))
 
 
 (defmethod initialize-instance :before ((text-input text-input) &key password-p)
@@ -37,41 +46,19 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
         (slot-value text-input 'static-attributes)))
 
 
-(defmethod initialize-instance :after ((text-input text-input) &key
-                                       (sync-on-blur-p (not (clear-on-enterpress-p-of text-input)))
-                                       (sync-on-enterpress-p t))
-  (when sync-on-blur-p
-    (with-event ((value (on-text-input-blur-of text-input)))
-      (when-commit ()
-        (setf (attribute-value-of text-input :server-only-p t) value))
-      (setf ~~text-input value)))
-
-  (when sync-on-enterpress-p
-    (with-event ((value (on-enterpress-of text-input)))
-      (when-commit ()
-        (setf (attribute-value-of text-input :server-only-p t) value))
-      (setf ~~text-input value)
-
-      (when (clear-on-enterpress-p-of text-input)
-        (setf (attribute-value-of text-input :client-only-p t) "")
-        (text-input-update-client-cache "" text-input)))))
+(defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of)))
+  ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
+  (catstr "if(event.currentTarget.sw_text_input_value == encodeURIComponent(event.currentTarget.value)){"
+          "return false;"
+          "}else{"
+          "event.currentTarget.sw_text_input_value = encodeURIComponent(event.currentTarget.value);"
+          "return true;"
+          "}"))
 
 
-;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
-(let ((js (catstr "if(event.currentTarget.sw_text_input_value == encodeURIComponent(event.currentTarget.value)){"
-                  "return false;"
-                  "}else{"
-                  "event.currentTarget.sw_text_input_value = encodeURIComponent(event.currentTarget.value);"
-                  "return true;"
-                  "}")))
-
-
-  (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-text-input-blur-of)))
-    js)
-
-
-  (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of)))
-    "if(event.which != 13){ return false; } else { return true; }"))
+(defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of)))
+  ;; No equality check done here; the enterpress event might be directly observed.
+  "if(event.which != 13){ return false; } else { return true; }")
 
 
 (flet ((parse-client-args (args)
@@ -91,7 +78,6 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 (defun text-input-update-client-cache (value-str text-input)
   (declare (string value-str)
            (text-input text-input))
-  (declare (optimize speed (safety 2)))
   (run (catstr "$('#" (id-of text-input) "')[0].sw_text_input_value = \"" (url-encode value-str) "\";" +lf+)
        text-input))
 
@@ -99,26 +85,24 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 (fflet ((value-marshaller (the function (value-marshaller-of 'attribute-value-of))))
 
 
-  (defmethod render ((text-input text-input))
-    (declare (optimize speed (safety 2)))
-    (text-input-update-client-cache (value-marshaller (attribute-value-of text-input)) text-input))
-
-
   (defmethod set-model nconc ((text-input text-input) (model cell))
-    (declare (optimize speed (safety 2)))
-    #| We do not assign anything to (EQUAL-P-FN-OF MODEL) here because objects that have the same printed
-    representation (the VALUE-MARSHALLER of VALUE-OF is really just PRINC-TO-STRING) might not actually be equal
-    at all wrt. other stuff (CELLS) depending on MODEL. We do the check (STRING=) below, or later, instead. |#
-    (list
-     λI(let* ((value ~model)
-              (value-str (value-marshaller value)))
-         (when-commit ()
-           #| We could move this test outside of the commit, but that would cause the other commit block in the
-           INITIALIZE-INSTANCE method for TEXT-INPUT to race with this. |#
-           (unless (muffle-compiler-note
-                     (string= value-str (value-marshaller (attribute-value-of text-input))))
-             (setf (attribute-value-of text-input) value)
-             (text-input-update-client-cache value-str text-input)))))))
+    (multiple-value-call #'list
+      ;; View → Model
+      (if (sync-on-blur-p-of text-input)
+          (with-event ((value (on-text-input-blur-of text-input)))
+            (setf ~model value))
+          (values))
+      (if (sync-on-enterpress-p-of text-input)
+          (with-event ((value (on-enterpress-of text-input)))
+            (setf ~model value))
+          (values))
+
+      ;; Model → View
+      λI(let ((value-str (value-marshaller ~model)))
+          (when-commit ()
+            ;; TODO: To do this proper a maybe-update-client type thing + client side merge is needed.
+            (setf (attribute-value-of text-input) value-str)
+            (text-input-update-client-cache value-str text-input))))))
 
 
 

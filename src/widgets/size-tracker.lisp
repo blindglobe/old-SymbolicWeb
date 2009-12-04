@@ -14,8 +14,8 @@
 
 (defmethod initialize-instance :after ((st size-tracker) &key)
   (assert (subtypep (type-of st) 'widget))
-  (with (make-instance 'callback-box :widget st :id "resize")
-    (with-formula st
+  (with-formula st
+    (with (make-instance 'callback-box :widget st :id "resize" :observer-cell =cell=)
       (when-let (event ~(event-cell-of it))
         (let* ((width-str (cdr (find "width" event :key #'car :test #'string=)))
                (width (parse-integer width-str))

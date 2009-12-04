@@ -1,6 +1,6 @@
 ;;;; http://nostdal.org/ ;;;;
 
-(in-package sw)
+(in-package :sw)
 (in-readtable symbolicweb)
 (declaim #.(optimizations :widgets/events.lisp))
 
@@ -42,8 +42,12 @@ Instances of this is bound to *CURRENT-EVENT*."))
        :initform (id-generator-next-str -id-generator-))
 
    (widget :reader widget-of :initarg :widget
-           :type dom-mirror
-           :initform (error ":WIDGET needed"))
+           :type widget-base
+           :initform (error ":WIDGET needed."))
+
+   (observer-cell :reader observer-cell-of :initarg :observer-cell
+                  :type cell
+                  :initform (error ":OBSERVER-CELL needed."))
 
    (event-cell :reader event-cell-of :initarg :event-cell
                :type cell
@@ -64,13 +68,9 @@ Instances of this is bound to *CURRENT-EVENT*."))
         callback-box))
 
 
-#|(defmethod deref ((callback-box callback-box))
-  (sw-mvc::cell-deref (event-cell-of callback-box)))|#
-
-
 (defun remove-callback-box (callback-box widget)
   (declare (callback-box callback-box)
-           (dom-mirror widget))
+           (widget-base widget))
   (remhash (id-of callback-box) (callbacks-of widget)))
 
 
@@ -86,7 +86,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
   (declare (callback-box callback-box)
            (list args))
   (let ((*current-event* (make-instance 'event :callback-box callback-box)))
-    (pulse ~(event-cell-of callback-box)
+    (pulse (cell-deref (event-cell-of callback-box))
            (with1 (or (funcall (argument-parser-of callback-box) args) t)
              (setf (slot-value *current-event* 'parsed-args) it)))))
 
@@ -102,7 +102,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
   #|(remove-callback-box event-type widget)|#)|#
 
 
-(defmethod js-before-check ((widget dom-mirror) (lisp-accessor-name symbol))
+(defmethod js-before-check ((widget widget-base) (lisp-accessor-name symbol))
   "return true;")
 
 
@@ -112,29 +112,29 @@ Instances of this is bound to *CURRENT-EVENT*."))
                      (setf (code-of cb) (funcall js-code-fn)))))
     (if *js-code-only-p*
         js-code
-        (apply #'run js-code widget args))))
+        (if (in-dom-p-of widget)
+            (apply #'run js-code widget args)
+            (add-delayed-operation widget :event "click"
+                                   λλ(apply #'run js-code widget args))))))
 
 
-(defmethod initialize-callback-box ((dom-mirror dom-mirror) (lisp-accessor-name symbol) (callback-box callback-box))
+(defmethod initialize-callback-box ((widget widget-base) (lisp-accessor-name symbol) (callback-box callback-box))
   )
 
 
-(defun event-dom-server-reader (dom-mirror lisp-accessor-name)
-  (declare (dom-mirror dom-mirror)
+(defun event-dom-server-reader (widget lisp-accessor-name)
+  (declare (widget-base widget)
            (symbol lisp-accessor-name))
-  (let ((dom-mirror-data (dom-mirror-data-of dom-mirror)))
-    (sb-ext:with-locked-hash-table (dom-mirror-data)
-      (multiple-value-bind (callback-box found-p)
-          (dom-server-reader dom-mirror lisp-accessor-name)
-        (if =cell=
-            (progn
-              (unless found-p
-                (setf callback-box (make-instance 'callback-box :widget dom-mirror)))
-              (multiple-value-prog1 (values ~(event-cell-of callback-box) t)
-                (unless found-p
-                  (initialize-callback-box dom-mirror lisp-accessor-name callback-box)
-                  (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box dom-mirror))))
-            (values callback-box found-p))))))
+  (if (init-evalp-of =cell=)
+      (let ((callback-box (callback-box-of *current-event*)))
+        (assert (eq =cell= (observer-cell-of callback-box)))
+        (values (cell-deref (event-cell-of callback-box))
+                t))
+      (let ((callback-box (make-instance 'callback-box :widget widget :observer-cell =cell=)))
+        (initialize-callback-box widget lisp-accessor-name callback-box)
+        (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box widget)
+        (values (cell-deref (event-cell-of callback-box))
+                nil))))
 
 
 (defmacro define-event-property ((lisp-name event-type &rest js-msg-args) &rest args)
@@ -143,7 +143,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
        :dom-client-writer
        (lambda (cb widget &rest args)
          (declare (callback-box cb)
-                  (dom-mirror widget))
+                  (widget-base widget))
          (apply #'event-dom-client-writer widget cb
                 (lambda ()
                   (js-bind (id-of widget) ,event-type

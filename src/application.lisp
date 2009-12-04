@@ -170,6 +170,7 @@ include the JS libraries required for SW in general."
 
      (:body
       (:div :id "sw-root")
+      (:div :id "sw-recycler" :class "sw-hide")
       (:div
        (:img :id "sw-loading-spinner" :alt ""
              :style "position: absolute; z-index: 1000; right: 0px; top: 0px;"

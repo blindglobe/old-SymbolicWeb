@@ -17,6 +17,10 @@
              :type (or viewport null)
              :initform nil)
 
+   (in-dom-p :accessor in-dom-p-of
+             :type (member t nil)
+             :initform nil)
+
    (focussable-p :reader focussable-p-of :initarg :focussable-p
                  :type (member t nil)
                  :initform nil))
