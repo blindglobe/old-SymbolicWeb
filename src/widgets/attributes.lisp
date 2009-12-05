@@ -5,14 +5,12 @@
 (declaim #.(optimizations :widgets/attributes.lisp))
 
 
-#.(maybe-inline 'attribute)
 (defun attribute (attribute widget)
   (declare (string attribute)
            (widget widget))
   (js-get-attribute (id-of widget) attribute))
 
 
-#.(maybe-inline '(setf attribute))
 (defun (setf attribute) (new-value attribute widget &rest args &key lisp-name)
   (declare (string new-value attribute)
            (widget widget)

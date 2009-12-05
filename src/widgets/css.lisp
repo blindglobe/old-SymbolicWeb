@@ -5,14 +5,12 @@
 (declaim #.(optimizations :widgets/css.lisp))
 
 
-#.(maybe-inline 'css)
 (defun css (property widget)
   (declare (string property)
            (widget widget))
   (js-get-css (id-of widget) property))
 
 
-#.(maybe-inline '(setf css))
 (defun (setf css) (new-value property widget &rest args &key lisp-name)
   (declare (string new-value property)
            (widget widget)
