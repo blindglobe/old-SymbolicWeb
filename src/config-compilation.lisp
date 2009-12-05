@@ -6,6 +6,7 @@
 ;; TODO: This stuff should be part of Aromyxo. The AMX:DEFN stuff I think.
 
 (define-variable -allow-compilation-inlining-p-
+    ;; NOTE: Setting this to T makes debugging and development very annoying.
     :value nil
     :kind :global)
 
@@ -56,7 +57,7 @@
 
 
 (defmethod optimizations ((context (eql :dom-property)) &key)
-  '(optimize (speed 3) (space 0) (safety 0) (debug 3) (compilation-speed 0)))
+  '(optimize (speed 3) (space 0) (safety 1) (debug 3) (compilation-speed 0)))
 
 
 (defmethod optimizations ((context (eql :widgets/dom-cache.lisp)) &key)

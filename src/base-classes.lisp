@@ -27,6 +27,8 @@ possible and be able to optimize type-checking code based on this. |#
              :type (member nil t)
              :initform nil)
 
+   ;; TODO: It does seem like this is a fairly important thing so perhaps the (SETF ATTRIBUTE) etc. functions should
+   ;; promote :LISP-NAME to a primary argument?
    (delayed-operations :accessor delayed-operations-of
                        :type list
                        :initform nil

@@ -58,7 +58,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'on-enterpress-of)))
   ;; No equality check done here; the enterpress event might be directly observed.
-  "if(event.which != 13){ return false; } else { return true; }")
+  "if(event.which == 13){ return true; } else { return false; }")
 
 
 (flet ((parse-client-args (args)
