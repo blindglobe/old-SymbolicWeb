@@ -107,15 +107,20 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
 
 ;; (SETF EVENT)
-(defun event-dom-client-writer (widget cb js-code-fn &rest args)
+(defun event-dom-client-writer (widget cb js-code-fn &rest args &key lisp-name)
+  (declare (widget-base widget)
+           (callback-box cb)
+           ((or null symbol) lisp-name))
   (let ((js-code (or (code-of cb)
                      (setf (code-of cb) (funcall js-code-fn)))))
     (if *js-code-only-p*
         js-code
         (if (in-dom-p-of widget)
             (apply #'run js-code widget args)
-            (add-delayed-operation widget :event "click"
-                                   λλ(apply #'run js-code widget args))))))
+            (progn
+              (assert lisp-name)
+              (add-delayed-operation widget lisp-name
+                                     λλ(apply #'run js-code widget args)))))))
 
 
 (defmethod initialize-callback-box ((widget widget-base) (lisp-accessor-name symbol) (callback-box callback-box))
@@ -132,7 +137,8 @@ Instances of this is bound to *CURRENT-EVENT*."))
                 t))
       (let ((callback-box (make-instance 'callback-box :widget widget :observer-cell =cell=)))
         (initialize-callback-box widget lisp-accessor-name callback-box)
-        (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box widget)
+        (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box widget
+                 :lisp-name lisp-accessor-name)
         (values (cell-deref (event-cell-of callback-box))
                 nil))))
 

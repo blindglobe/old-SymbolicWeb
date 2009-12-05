@@ -51,18 +51,15 @@ possible and be able to optimize type-checking code based on this. |#
                            (run (js-remove id) viewport)))))))
 
 
-(defun add-delayed-operation (widget type key operation)
+(defun add-delayed-operation (widget lisp-accessor-name operation)
   (declare (widget-base widget)
-           (symbol type)
-           (string key)
+           (symbol lisp-accessor-name)
            (function operation)
            (optimize speed))
-  (let* ((signature (cons type key))
-         (existing-entry (find signature (truly-the list (delayed-operations-of widget))
-                               :key #'car :test #'equal)))
+  (let ((existing-entry (assoc lisp-accessor-name (truly-the list (delayed-operations-of widget)) :test #'eq)))
     (if existing-entry
         (setf (cdr existing-entry) operation) ;; Overwrite existing operation based on SIGNATURE being equal.
-        (push (cons signature operation)
+        (push (cons lisp-accessor-name operation)
               (delayed-operations-of widget)))))
 
 

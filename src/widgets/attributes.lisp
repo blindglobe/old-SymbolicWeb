@@ -13,9 +13,10 @@
 
 
 #.(maybe-inline '(setf attribute))
-(defun (setf attribute) (new-value attribute widget &rest args)
+(defun (setf attribute) (new-value attribute widget &rest args &key lisp-name)
   (declare (string new-value attribute)
-           (widget widget))
+           (widget widget)
+           ((or null symbol) lisp-name))
   (flet ((js-code ()
            (js-set-attribute (id-of widget) attribute new-value)))
     (declare (inline js-code))
@@ -23,14 +24,17 @@
         (js-code)
         (if (in-dom-p-of widget)
             (apply #'run (js-code) widget args)
-            (add-delayed-operation widget :attribute attribute
-                                   λλ(apply #'run (js-code) widget args))))))
+            (progn
+              (assert lisp-name)
+              (add-delayed-operation widget lisp-name
+                                     λλ(apply #'run (js-code) widget args)))))))
 
 
 (declaim (inline attribute-remove))
-(defun attribute-remove (attribute widget &rest args)
+(defun attribute-remove (attribute widget &rest args &key lisp-name)
   (declare (string attribute)
-           (widget widget))
+           (widget widget)
+           ((or null symbol) lisp-name))
   (flet ((js-code ()
            (js-remove-attribute (id-of widget) attribute)))
     (declare (inline js-code))
@@ -38,22 +42,27 @@
         (js-code)
         (if (in-dom-p-of widget)
             (apply #'run (js-code) widget args)
-            (add-delayed-operation widget :attribute attribute
-                                   λλ(apply #'run (js-code) widget args))))))
+            (progn
+              (assert lisp-name)
+              (add-delayed-operation widget lisp-name
+                                     λλ(apply #'run (js-code) widget args)))))))
 
 
 (defmacro define-attribute-property (lisp-name dom-name &body args)
+  (setf lisp-name (symbolicate 'attribute- lisp-name))
   `(progn
-     (define-dom-property ',(symbolicate 'attribute- lisp-name)
+     (define-dom-property ',lisp-name
          :dom-client-writer (lambda (new-value widget &rest args)
                               (declare (inline (setf attribute)))
-                              (setf (apply #'attribute ,dom-name widget args) new-value))
+                              (setf (apply #'attribute ,dom-name widget :lisp-name ',lisp-name args)
+                                    new-value))
          :dom-client-reader (lambda (widget)
                               (declare (inline attribute))
                               (attribute ,dom-name widget))
          :dom-client-remover (lambda (widget &rest args)
                                (declare (inline attribute-remove))
-                               (apply #'attribute-remove ,dom-name widget args))
+                               (apply #'attribute-remove ,dom-name widget :lisp-name ',lisp-name
+                                      args))
          ,@args)))
 
 

@@ -13,9 +13,10 @@
 
 
 #.(maybe-inline '(setf css))
-(defun (setf css) (new-value property widget &rest args)
+(defun (setf css) (new-value property widget &rest args &key lisp-name)
   (declare (string new-value property)
-           (widget widget))
+           (widget widget)
+           ((or null symbol) lisp-name))
   (flet ((js-code ()
            (js-set-css (id-of widget) property new-value)))
     (declare (inline js-code))
@@ -23,30 +24,35 @@
         (js-code)
         (if (in-dom-p-of widget)
             (apply #'run (js-code) widget args)
-            (add-delayed-operation widget :css property
-                                   λλ(apply #'run (js-code) widget args))))))
+            (progn
+              (assert lisp-name)
+              (add-delayed-operation widget lisp-name
+                                     λλ(apply #'run (js-code) widget args)))))))
 
 
 (declaim (inline css-remove))
-(defun css-remove (property widget &key server-only-p)
+(defun css-remove (property widget &rest args &key server-only-p lisp-name)
   (declare (string property)
-           (widget widget))
+           (widget widget)
+           (ignore property widget args server-only-p lisp-name))
   (write-line "TODO: CSS-REMOVE"))
 
 
 
 (defmacro define-css-property (lisp-name dom-name &body args)
+  (setf lisp-name (symbolicate 'css- lisp-name))
   `(progn
-     (define-dom-property ',(symbolicate 'css- lisp-name)
+     (define-dom-property ',lisp-name
          :dom-client-writer (lambda (new-value widget &rest args)
                               (declare (inline (setf css)))
-                              (setf (apply #'css ,dom-name widget args) new-value))
+                              (setf (apply #'css ,dom-name widget :lisp-name ',lisp-name args)
+                                    new-value))
          :dom-client-reader (lambda (widget)
                               (declare (inline css))
                               (css ,dom-name widget))
          :dom-client-remover (lambda (widget &rest args)
                                (declare (inline css-remove))
-                               (apply #'css-remove ,dom-name widget args))
+                               (apply #'css-remove ,dom-name widget :lisp-name ',lisp-name args))
          ,@args)))
 
 
