@@ -29,8 +29,9 @@ Instances of this is bound to *CURRENT-EVENT*."))
     (dbg-prin1 value))"
   (with-gensyms (args)
     `(with-observer ((,args ,event-extr))
-       (destructuring-bind (&key ,@bindings &allow-other-keys) ,args
-         ,@handler))))
+       (when ,args
+         (destructuring-bind (&key ,@bindings &allow-other-keys) ,args
+           ,@handler)))))
 
 
 (defclass callback-box ()
