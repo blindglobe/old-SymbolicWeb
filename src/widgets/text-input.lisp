@@ -89,12 +89,12 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
   (defmethod set-model nconc ((text-input text-input) (model cell))
     ;; View → Model
     (when (sync-on-enterpress-p-of text-input)
-      (defmethod on-event progn ((event (eql 'enterpress)) (widget (eql text-input)) &key value)
+      (defmethod on-enterpress ((widget (eql text-input)) &key value)
         (setf ~model value))
       (activate-event 'enterpress text-input))
 
     (when (sync-on-blur-p-of text-input)
-      (defmethod on-event progn ((event (eql 'text-input-blur)) (widget (eql text-input)) &key value)
+      (defmethod on-text-input-blur ((widget (eql text-input)) &key value)
         (setf ~model value))
       (activate-event 'text-input-blur text-input))
 
