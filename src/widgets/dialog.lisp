@@ -24,7 +24,7 @@
 
 
 (defmethod initialize-instance :after ((dialog dialog) &key)
-  (with-event (on-dialog-close dialog)
+  (with-event nil (on-dialog-close dialog)
     (remove dialog (parent-of dialog))))
 
 

@@ -23,17 +23,14 @@ Instances of this is bound to *CURRENT-EVENT*."))
   (id-of (callback-box-of event)))
 
 
-(defmacro with-event (binding-event &body handler)
-  "Syntax:
-
-  (with-event (on-click-of some-button)
-    ..)
-
-  (with-event ((value (on-enterpress-of some-text-input)))
-    ..)"
-  `(with-observer ,binding-event
-     ,@handler))
-
+(defmacro with-event (bindings event-extr &body handler)
+  "Usage:
+  (with-event (value) (on-event-enterpress it)
+    (dbg-prin1 value))"
+  (with-gensyms (args)
+    `(with-observer ((,args ,event-extr))
+       (destructuring-bind (&key ,@bindings &allow-other-keys) ,args
+         ,@handler))))
 
 
 (defclass callback-box ()
@@ -44,6 +41,10 @@ Instances of this is bound to *CURRENT-EVENT*."))
    (widget :reader widget-of :initarg :widget
            :type widget-base
            :initform (error ":WIDGET needed."))
+
+   (event-name :reader event-name-of :initarg :event-name
+               :type symbol
+               :initform (error ":EVENT-NAME needed."))
 
    (observer-cell :reader observer-cell-of :initarg :observer-cell
                   :type cell
@@ -82,15 +83,6 @@ Instances of this is bound to *CURRENT-EVENT*."))
       (gethash callback-id (callbacks-of *viewport*))))
 
 
-(defun execute-callback (callback-box args)
-  (declare (callback-box callback-box)
-           (list args))
-  (let ((*current-event* (make-instance 'event :callback-box callback-box)))
-    (pulse (cell-deref (event-cell-of callback-box))
-           (with1 (or (funcall (argument-parser-of callback-box) args) t)
-             (setf (slot-value *current-event* 'parsed-args) it)))))
-
-
 ;; TODO: I think I need to implement something using this http://docs.jquery.com/Namespaced_Events
 ;; to do this proper.
 #|(defun event-remove (event-type widget &key server-only-p)
@@ -104,6 +96,42 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
 (defmethod js-before-check ((widget widget-base) (lisp-accessor-name symbol))
   "return true;")
+
+
+(defmethod initialize-callback-box ((widget widget-base) (lisp-accessor-name symbol) (callback-box callback-box))
+  )
+
+
+(defgeneric on-event (event widget &rest args)
+  (:method-combination progn))
+
+
+(defmethod on-event :around (event widget &rest args)
+  ;; Forward to something that might want to use another method-combination than the "brute force" PROGN used here.
+  (let* ((gf-name (intern (format nil "ON-~A" event) (symbol-package event)))
+         (gf (and (fboundp gf-name)
+                  (symbol-function gf-name))))
+    (when gf
+      (apply gf widget (append args '(:allow-other-keys t)))))
+  (call-next-method))
+
+
+;; So the APPLY in EXECUTE-CALLBACK (below) always finds at least on applicable method.
+(defmethod on-event progn (event widget &rest args)
+  (declare (ignore args)))
+
+
+(defun execute-callback (callback-box args)
+  (declare (callback-box callback-box)
+           (list args))
+  (let ((*current-event* (make-instance 'event :callback-box callback-box)))
+    (pulse (cell-deref (event-cell-of callback-box))
+           (with1 (or (funcall (argument-parser-of callback-box) args)
+                      ;; (&KEY &ALLOW-OTHER-KEYS) in WITH-EVENT needs this as a default fallback.
+                      '(:dummy t))
+             (setf (slot-value *current-event* 'parsed-args) it)
+             (apply #'on-event (event-name-of callback-box) (widget-of callback-box)
+                    it)))))
 
 
 ;; (SETF EVENT)
@@ -123,65 +151,93 @@ Instances of this is bound to *CURRENT-EVENT*."))
                                      λλ(apply #'run js-code widget args)))))))
 
 
-(defmethod initialize-callback-box ((widget widget-base) (lisp-accessor-name symbol) (callback-box callback-box))
-  )
-
-
-(defun event-dom-server-reader (widget lisp-accessor-name)
+(defun event-dom-server-reader (widget lisp-accessor-name event-target-gf-name)
   (declare (widget-base widget)
-           (symbol lisp-accessor-name))
+           (symbol lisp-accessor-name event-target-gf-name))
   (if (init-evalp-of =cell=)
       (let ((callback-box (callback-box-of *current-event*)))
         (assert (eq =cell= (observer-cell-of callback-box)))
         (values (cell-deref (event-cell-of callback-box))
                 t))
-      (let ((callback-box (make-instance 'callback-box :widget widget :observer-cell =cell=)))
-        (initialize-callback-box widget lisp-accessor-name callback-box)
+      (let ((callback-box (make-instance 'callback-box
+                                         :widget widget :observer-cell =cell=
+                                         :event-name event-target-gf-name)))
+        (initialize-callback-box widget event-target-gf-name callback-box)
         (funcall (fdefinition `(setf ,lisp-accessor-name)) callback-box widget
                  :lisp-name lisp-accessor-name)
         (values (cell-deref (event-cell-of callback-box))
                 nil))))
 
 
-(defmacro define-event-property ((lisp-name event-type &rest js-msg-args) &rest args)
-  `(progn
-     (define-dom-property ',lisp-name
-       :dom-client-writer
-       (lambda (cb widget &rest args)
-         (declare (callback-box cb)
-                  (widget-base widget))
-         (apply #'event-dom-client-writer widget cb
-                (lambda ()
-                  (js-bind (id-of widget) ,event-type
-                           (js-msg (id-of widget) (id-of cb)
-                                   :context-sym 'event
-                                   :js-before (js-before-check widget ',lisp-name)
-                                   ,@js-msg-args)))
-                args))
-       :dom-server-reader #'event-dom-server-reader
-       :value-marshaller nil
-       :value-removal-checker nil
-       ,@args)))
+#|(defmethod add-method ((gf (eql #'on-click)) method)
+  (let ((widget nil)) ;; TODO: Check if we're specializing on a widget instance.
+    (when widget
+      (activate-event 'click widget)))
+  (call-next-method))|#
 
 
-(define-event-property (on-blur-of "blur"))
-(define-event-property (on-change-of "change"))
-(define-event-property (on-click-of "click"))
-(define-event-property (on-dblclick-of "dblclick"))
-(define-event-property (on-focus-of "focus"))
+#|(defmethod add-method ((gf (eql #'on-event)) method)
+  (let ((widget nil)) ;; TODO: Check if we're specializing on a widget instance.
+    (when widget
+      (let ((event nil)) ;; TODO: Check if we're specializing on a particular event type.
+        (when (symbolp event)
+          (activate-event event widget)))))
+  (call-next-method))|#
+
+
+(defmacro define-event-property ((lisp-name event-type &rest js-msg-args) &rest args) ;; CLICK
+  (let ((event-target-gf-name (symbolicate 'on- lisp-name))) ;; ON-CLICK
+    `(progn
+
+       #| TODO: ಠ_ಠ, and anyways the need for "manually" calling (an improved version of) this could probably
+       be replaced by ADD-METHOD methods. |#
+       (defmethod activate-event ((event (eql ',lisp-name)) (widget widget-base))
+         (with-event nil (,(symbolicate 'on-event- lisp-name) widget)
+           #|(write-line "dummy")|#))
+
+       (define-dom-property ',(symbolicate 'on-event- lisp-name) ;; ON-EVENT-CLICK
+         :dom-client-writer
+         (lambda (cb widget &rest args)
+           (declare (callback-box cb)
+                    (widget-base widget))
+           (apply #'event-dom-client-writer widget cb
+                  (lambda ()
+                    (js-bind (id-of widget) ,event-type
+                             (js-msg (id-of widget) (id-of cb)
+                                     :context-sym 'event
+                                     :js-before (js-before-check widget ',lisp-name)
+                                     ,@js-msg-args)))
+                  args))
+
+         :dom-server-reader
+         (lambda (widget lisp-accessor-name)
+           (funcall 'event-dom-server-reader
+                    widget lisp-accessor-name ',lisp-name))
+
+         :value-marshaller nil
+         :value-removal-checker nil
+         ,@args))))
+
+
+
+(define-event-property (blur "blur"))
+(define-event-property (change "change"))
+(define-event-property (click "click"))
+(define-event-property (dblclick "dblclick"))
+(define-event-property (focus "focus"))
 
 (let ((js-which "event.which"))
-  (define-event-property (on-keyup-of "keydown" :callback-data (list (cons "which" js-which))))
-  (define-event-property (on-keyup-of "keypress" :callback-data (list (cons "which" js-which))))
-  (define-event-property (on-keyup-of "keyup" :callback-data (list (cons "which" js-which)))))
+  (define-event-property (keyup "keydown" :callback-data (list (cons "which" js-which))))
+  (define-event-property (keyup "keypress" :callback-data (list (cons "which" js-which))))
+  (define-event-property (keyup "keyup" :callback-data (list (cons "which" js-which)))))
 
-(define-event-property (on-load-of "load"))
-(define-event-property (on-mousedown-of "mousedown"))
-(define-event-property (on-mousemove-of "mousemove"))
-(define-event-property (on-mouseout-of "mouseout"))
-(define-event-property (on-mouseover-of "mouseover"))
-(define-event-property (on-mouseup-of "mouseup"))
-(define-event-property (on-resize-of "resize"))
-(define-event-property (on-scroll-of "scroll"))
-(define-event-property (on-select-of "select"))
-(define-event-property (on-unload "unload"))
+(define-event-property (load "load"))
+(define-event-property (mousedown "mousedown"))
+(define-event-property (mousemove "mousemove"))
+(define-event-property (mouseout "mouseout"))
+(define-event-property (mouseover "mouseover"))
+(define-event-property (mouseup "mouseup"))
+(define-event-property (resize "resize"))
+(define-event-property (scroll "scroll"))
+(define-event-property (select "select"))
+(define-event-property (unload "unload"))

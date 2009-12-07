@@ -13,32 +13,32 @@
    :model λVnil))
 
 
+(define-event-property
+    (check-box-change "change" :callback-data (list (cons "checked"
+                                                          (js-code-of (attribute-checked-p-of widget))))))
+
+
 (defmethod initialize-instance :before ((check-box check-box) &key)
   (push (cons "type" "checkbox")
         (slot-value check-box 'static-attributes)))
 
 
 (defmethod set-model nconc ((check-box check-box) (model cell))
-  (list λI(with (sw-mvc:value-of model)
+  (list λI(with (value-of model)
             ;; Model → View.
             (when-commit ()
               (unless (eq it (attribute-checked-p-of check-box))
                 (setf (attribute-checked-p-of check-box) it))))
 
-        λI(when-let ((res (on-check-box-change-of check-box)))
-            ;; View → Model.
-            (with (car res)
-              (when-commit ()
-                (setf (attribute-checked-p-of check-box :server-only-p t) it))
-              (setf (sw-mvc:value-of model) it)))))
+        (with-event (new-state) (on-event-check-box-change check-box)
+          ;; View → Model.
+          (with (car new-state)
+            (when-commit ()
+              (setf (attribute-checked-p-of check-box :server-only-p t) it))
+            (setf (value-of model) it)))))
 
 
-(define-event-property
-    (on-check-box-change-of "change" :callback-data (list (cons "checked"
-                                                                (js-code-of (attribute-checked-p-of widget))))))
-
-
-(defmethod initialize-callback-box ((check-box check-box) (lisp-accessor-name (eql 'on-check-box-change-of))
+(defmethod initialize-callback-box ((check-box check-box) (lisp-accessor-name (eql 'check-box-change))
                                     (callback-box callback-box))
   (setf (argument-parser-of callback-box)
         (lambda (args)

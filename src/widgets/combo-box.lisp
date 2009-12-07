@@ -67,23 +67,24 @@ WITH-N-ACTIVE-ITEMS). |#
                     (nilf (attribute-selected-p-of old-item-view :server-only-p t)))
                   (setf (slot-value combo-box 'selected-option) item-view)))))
 
-        λI(when-let* ((item-view (on-combo-box-change-of combo-box))
-                      (item-model (model-of item-view)))
-            ;; View → Model.
-            (when-commit ()
-              (let ((old-item-view (selected-option-of combo-box)))
-                (unless (eq item-view old-item-view)
-                  (tf (attribute-selected-p-of item-view :server-only-p t))
-                  (when old-item-view
-                    (nilf (attribute-selected-p-of (selected-option-of combo-box) :server-only-p t)))
-                  (setf (slot-value combo-box 'selected-option) item-view))))
-            (setf (active-item-of model) item-model))))
+        (with-event (item-view) (on-event-combo-box-change combo-box)
+          (when item-view
+            (let ((item-model (model-of item-view)))
+              ;; View → Model.
+              (when-commit ()
+                (let ((old-item-view (selected-option-of combo-box)))
+                  (unless (eq item-view old-item-view)
+                    (tf (attribute-selected-p-of item-view :server-only-p t))
+                    (when old-item-view
+                      (nilf (attribute-selected-p-of (selected-option-of combo-box) :server-only-p t)))
+                    (setf (slot-value combo-box 'selected-option) item-view))))
+              (setf (active-item-of model) item-model))))))
 
 
 
 (define-event-property
-    (on-combo-box-change-of "change" :callback-data (list (cons "value"
-                                                                (js-code-of (attribute-value-of widget))))))
+    (combo-box-change "change" :callback-data (list (cons "value"
+                                                          (js-code-of (attribute-value-of widget))))))
 
 
 (defmethod initialize-callback-box ((combo-box combo-box) (lisp-accessor-name (eql 'on-combo-box-change-of))

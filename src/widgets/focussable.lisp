@@ -23,8 +23,7 @@ JS variable as done now.
 
 
 (defmethod initialize-instance :after ((focussable focussable) &key)
-  (with-formula focussable
-    (when (and (on-focus-of focussable)
-               (focussable-p-of focussable))
+  (with-event nil (on-event-focus focussable)
+    (when (focussable-p-of focussable)
       (setf (slot-value *app* 'last-focus)
             focussable))))
