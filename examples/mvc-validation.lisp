@@ -57,7 +57,7 @@
 
 
 (defclass mvc-validation-app (application)
-  ((view :initform (make-instance 'mvc-validation-view))))
+  ((model :initform (make-instance 'mvc-validation-model))))
 
 (set-uri 'mvc-validation-app "mvc-validation")
 
@@ -79,7 +79,7 @@
        (:div
          (:h1 "MVC-VALIDATION-APP")
 
-         (:sw ¤view)
+         (:sw (make-instance 'mvc-validation-view :model ¤model))
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/mvc-validation.lisp"
