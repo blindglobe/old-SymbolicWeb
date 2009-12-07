@@ -86,8 +86,8 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 (fflet ((value-marshaller (the function (value-marshaller-of 'attribute-value-of))))
 
+  ;; View → Model
   (defmethod set-model nconc ((text-input text-input) (model cell))
-    ;; View → Model
     (when (sync-on-enterpress-p-of text-input)
       (defmethod on-enterpress ((widget (eql text-input)) &key value)
         (setf ~model value))
@@ -98,13 +98,12 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
         (setf ~model value))
       (activate-event 'text-input-blur text-input))
 
-    (list
-      ;; Model → View
-      λI(let ((value-str (value-marshaller ~model)))
-          (when-commit ()
-            ;; TODO: To do this proper a maybe-update-client type thing + client side merge is needed.
-            (setf (attribute-value-of text-input) value-str)
-            (text-input-update-client-cache value-str text-input))))))
+    ;; Model → View
+    (list λI(let ((value-str (value-marshaller ~model)))
+              (when-commit ()
+                ;; TODO: To do this proper a maybe-update-client type thing + client side merge is needed.
+                (setf (attribute-value-of text-input) value-str)
+                (text-input-update-client-cache value-str text-input))))))
 
 
 
