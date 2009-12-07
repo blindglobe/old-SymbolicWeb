@@ -12,7 +12,8 @@
 
    (root-widget :reader root-widget-of :initarg :root-widget
                 :type (or symbol widget)
-                :initform 'container-st)
+                :initform 'container #|'container-st|#)
+
 
    (address-bar :reader address-bar-of)
 
