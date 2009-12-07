@@ -24,37 +24,19 @@
 
 
 (defmethod set-model nconc ((check-box check-box) (model cell))
-  (list λI(with (value-of model)
-            ;; Model → View.
-            (when-commit ()
-              (unless (eq it (attribute-checked-p-of check-box))
-                (setf (attribute-checked-p-of check-box) it))))
+  ;; View → Model.
+  (defmethod on-check-box-change ((widget (eql check-box)) &key checked-p)
+    (setf ~model checked-p))
+  (activate-event 'check-box-change check-box)
 
-        (with-event (new-state) (on-event-check-box-change check-box)
-          ;; View → Model.
-          (with (car new-state)
+  ;; Model → View.
+  (list λI(with ~model
             (when-commit ()
-              (setf (attribute-checked-p-of check-box :server-only-p t) it))
-            (setf (value-of model) it)))))
+              (setf (attribute-checked-p-of check-box) it)))))
 
 
 (defmethod initialize-callback-box ((check-box check-box) (lisp-accessor-name (eql 'check-box-change))
                                     (callback-box callback-box))
   (setf (argument-parser-of callback-box)
         (lambda (args)
-          #| Wrap it in a LIST since SW-MVC:PULSE will "use NIL already". The recieving end must take care to
-          unpack this (CAR). |#
-          (list (string= "true" (cdr (assoc "checked" args :test #'string=)))))))
-
-
-
-#|(progn
-  (remove-all (root))
-  (insert (make-instance 'check-box) :in (root)))|#
-
-
-#|(progn
-  (defvar *check-box-model* λVnil)
-  (defmethod render-viewport ((viewport viewport) (app empty-page-app))
-    (insert (make-instance 'check-box :model *check-box-model*)
-            :in (root))))|#
+          (list :checked-p (string= "true" (cdr (assoc "checked" args :test #'string=)))))))
