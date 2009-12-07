@@ -5,10 +5,12 @@
 (declaim #.(optimizations :widgets/dom-cache.lisp))
 
 
+;; TODO: I can probably get rid of most of this crap now, and when I have events.lisp can be simplified and cleaned up a great deal.
+
 (defmethod define-dom-property ((lisp-accessor-name symbol)
                                 &key
                                 (lisp-reader-name lisp-accessor-name)
-                                (lisp-writer-name (list 'setf lisp-accessor-name))
+                                (lisp-writer-name `(setf ,lisp-accessor-name))
 
                                 (dom-client-reader
                                  (lambda (%not-used widget)

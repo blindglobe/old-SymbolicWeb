@@ -44,7 +44,7 @@ Has the MAIN method been executed?")
    (widgets :reader widgets-of
             :type hash-table
             :initform (make-hash-table :test #'equal :weakness :value)
-            :documentation "
+            :documentation "((ID STRING) . (WIDGET WIDGET-BASE))
 This contains all widgets currently or recently active or visible in a session.
 It is not 100% accurate; it is a weak hash, and some of these widgets might not
 have been GCed yet even though they are not active or visible anymore.")

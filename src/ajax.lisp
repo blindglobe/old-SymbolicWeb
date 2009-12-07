@@ -14,8 +14,8 @@
   (let ((event (sw-http:get-parameter "_sw_event")))
     (cond
       ((string= "dom-event" event)
-       (let* ((widget-id (sw-http:get-parameter "_sw_widget-id"))
-              (callback-id (sw-http:get-parameter "_sw_callback-id"))
+       (let* ((widget-id (swh:get-parameter "_sw_widget-id"))
+              (callback-id (swh:get-parameter "_sw_callback-id"))
               (callback-box (or (find-callback-box widget-id callback-id app)
                                 (progn
                                   (warn "[SW] HANDLE-AJAX-REQUEST: No callback-box with ID ~S found in  ~S."
@@ -24,14 +24,14 @@
                                   (return-from handle-ajax-request))))
               (arguments (ecase (sw-http:http-method)
                            (:get (remove-if (lambda (str) (char= #\_ (char str 0)))
-                                            sw-http::*get-parameters*
+                                            swh:*get-parameters*
                                             :key #'car))
-                           (:post sw-http::*post-parameters*))))
+                           (:post swh:*post-parameters*))))
          (setf (last-user-activity-time-of app) (get-universal-time))
          (execute-callback callback-box arguments)))
 
       ((string= "url-hash-changed" event)
-       (if-let (new-url-hash (sw-http:post-parameter "new-url-hash"))
+       (if-let (new-url-hash (swh:post-parameter "new-url-hash"))
          ;; SYNC-WIDGETS confirms that the widgets mentioned in the hash is a
          ;; part of the users session (by ways of the WIDGETS slot in APPLICATION).
          ;; So this is safe; no cross-session manipulation is possible.
