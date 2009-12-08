@@ -104,22 +104,16 @@ Instances of this is bound to *CURRENT-EVENT*."))
 
 
 (defgeneric on-event (event widget &rest args)
-  (:method-combination progn))
+  (:method-combination progn :most-specific-last))
 
 
-(defmethod on-event :around (event widget &rest args)
+(defmethod on-event progn (event widget &rest args)
   ;; Forward to something that might want to use another method-combination than the "brute force" PROGN used here.
   (let* ((gf-name (intern (format nil "ON-~A" event) (symbol-package event)))
          (gf (and (fboundp gf-name)
                   (symbol-function gf-name))))
     (when gf
-      (apply gf widget (append args '(:allow-other-keys t)))))
-  (call-next-method))
-
-
-;; So the APPLY in EXECUTE-CALLBACK (below) always finds at least on applicable method.
-(defmethod on-event progn (event widget &rest args)
-  (declare (ignore args)))
+      (apply gf widget (append args '(:allow-other-keys t))))))
 
 
 (defun execute-callback (callback-box args)
