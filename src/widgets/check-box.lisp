@@ -14,8 +14,9 @@
 
 
 (define-event-property
-    (check-box-change "change" :callback-data (list (cons "checked"
-                                                          (js-code-of (attribute-checked-p-of widget))))))
+    (check-box-change "change"
+                      :callback-data (list (cons "checked"
+                                                 (js-code-of (attribute-checked-p-of widget))))))
 
 
 (defmethod initialize-instance :before ((check-box check-box) &key)
@@ -32,7 +33,8 @@
   ;; Model → View.
   (list λI(with ~model
             (when-commit ()
-              (setf (attribute-checked-p-of check-box) it)))))
+              (setf (attribute-checked-p-of check-box)
+                    it)))))
 
 
 (defmethod initialize-callback-box ((check-box check-box) (lisp-accessor-name (eql 'check-box-change))
@@ -40,3 +42,8 @@
   (setf (argument-parser-of callback-box)
         (lambda (args)
           (list :checked-p (string= "true" (cdr (assoc "checked" args :test #'string=)))))))
+
+
+#|(with (make-instance 'check-box)
+  (remove-all (root))
+  (insert it :in (root)))|#

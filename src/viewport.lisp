@@ -70,7 +70,6 @@ Each instance of VIEWPORT represents a browser window or tab."))
       (format stream "(ID ~A)" (id-of viewport)))))
 
 
-#.(maybe-inline 'find-or-create-viewport)
 (defn find-or-create-viewport (((viewport-id string) (app application)))
   "Find an existing or create a new viewport based on the VIEWPORT-ID parameter
  sent from the client.
@@ -91,7 +90,6 @@ Returns two values; a VIEWPORT instance and whether a new one was created or not
        (- (get-universal-time) (last-ping-time-of viewport)))))
 
 
-#.(maybe-inline 'for-each-viewport-in-app)
 (defun for-each-viewport-in-app (fn &optional (app *app*))
   "FN is a function that takes one argument; the viewport.
 Also see FOR-EACH-VIEWPORT-OF-WIDGET."
@@ -155,7 +153,6 @@ refresh."
   (values))
 
 
-#.(maybe-inline 'append-to-response-data-of)
 (defn append-to-response-data-of (null ((viewport viewport) (js-str string)))
   (declare (optimize speed (safety 2)))
   (with-recursive-lock-held ((response-stream-mutex-of viewport))
