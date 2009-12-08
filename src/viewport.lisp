@@ -80,7 +80,8 @@ Returns two values; a VIEWPORT instance and whether a new one was created or not
     (if-let (viewport (gethash viewport-id (viewports-of app)))
       (values viewport nil)
       (values (with-sync (:name 'find-or-create-viewport)
-                (make-instance 'viewport :id viewport-id :application app))
+                (make-instance (viewport-type-of app)
+                               :id viewport-id :application app))
               t))))
 
 

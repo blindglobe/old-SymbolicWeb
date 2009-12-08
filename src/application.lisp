@@ -9,6 +9,9 @@
   ((server :reader server-of
            :type server)
 
+   (viewport-type :accessor viewport-type-of :initarg :viewport-type
+                  :initform 'viewport)
+
    (break-http-connection-limit-p :accessor break-http-connection-limit-p-of
                                   :initarg :break-http-connection-limit-p
                                   :type (member nil t)
