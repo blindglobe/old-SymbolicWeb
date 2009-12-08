@@ -34,6 +34,7 @@ Instances of this is bound to *CURRENT-EVENT*."))
            ,@handler)))))
 
 
+
 (defclass callback-box ()
   ((id :reader id-of :initarg :id
        :type string
