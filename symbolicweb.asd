@@ -51,11 +51,11 @@
        (#|(:file "form")|#
         (:file "dom-cache")
         (:file "widget")
-        (:file "focussable")
         ;;(:file "manipulation")
         (:file "attributes")
         (:file "css")
         (:file "events")
+        (:file "focussable")
         (:file "html-element")
         (:file "abstract-container")
         (:file "container")
