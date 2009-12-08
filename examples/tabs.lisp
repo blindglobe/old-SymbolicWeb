@@ -16,8 +16,8 @@
                 (mk-static-data-url app "jquery-ui/ui/minified/jquery-ui.min.js"))
 
   ;; jQuery UI Tabs widget.
-  (add-resource app "jquery-ui-tabs" :css
-                (mk-static-data-url app "jquery-ui/themes/base/ui.tabs.css"))
+  #|(add-resource app "jquery-ui-tabs" :css
+                (mk-static-data-url app "jquery-ui/themes/base/ui.tabs.css"))|#
   (add-resource app "jquery-ui-tabs" :js
                 (mk-static-data-url app "jquery-ui/ui/minified/ui.tabs.min.js")))
 
