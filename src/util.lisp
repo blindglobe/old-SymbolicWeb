@@ -216,3 +216,24 @@ won't work:
                (when found-p
                  (remhash signature it)
                  (run (js-remove id) viewport))))))))))
+
+
+(defun add-jquery-ui-resources (&key dev-version-p minified-p)
+  (if dev-version-p
+      (progn
+        (add-resource *app* "jquery-ui-css" :css
+                      (mk-static-data-url *app* "jquery-ui-dev/themes/base/jquery-ui.css"))
+        (add-resource *app* "jquery-ui-css-theme" :css
+                      (mk-static-data-url *app* "jquery-ui-dev/themes/base/ui.theme.css"))
+        (add-resource *app* "jquery-ui-js" :js
+                      (mk-static-data-url *app*
+                                          (if minified-p
+                                              "jquery-ui-dev/ui/minified/jquery-ui.min.js"
+                                              "jquery-ui-dev/ui/jquery-ui.js"))))
+      (progn
+        (add-resource *app* "jquery-ui-css" :css
+                      (mk-static-data-url *app* "jquery-ui/themes/base/jquery-ui.css"))
+        (add-resource *app* "jquery-ui-css-theme" :css
+                      (mk-static-data-url *app* "jquery-ui/themes/base/ui.theme.css"))
+        (add-resource *app* "jquery-ui-js" :js
+                      (mk-static-data-url *app* "jquery-ui/ui/minified/jquery-ui.min.js")))))

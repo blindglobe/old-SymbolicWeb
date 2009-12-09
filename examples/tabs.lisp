@@ -9,17 +9,7 @@
 
 
 (defmethod initialize-instance :after ((app tabs-app) &key)
-  ;; jQuery UI core. ;; TODO: This should be some sort of separate helper-function (method?) or something.
-  (add-resource app "jquery-ui-core" :css
-                (mk-static-data-url app "jquery-ui/themes/base/jquery-ui.css"))
-  (add-resource app "jquery-ui-core" :js
-                (mk-static-data-url app "jquery-ui/ui/minified/jquery-ui.min.js"))
-
-  ;; jQuery UI Tabs widget.
-  #|(add-resource app "jquery-ui-tabs" :css
-                (mk-static-data-url app "jquery-ui/themes/base/ui.tabs.css"))|#
-  (add-resource app "jquery-ui-tabs" :js
-                (mk-static-data-url app "jquery-ui/ui/minified/ui.tabs.min.js")))
+  (add-jquery-ui-resources :dev-version-p t :minified-p t))
 
 
 (defmethod render-viewport ((viewport viewport) (app tabs-app))
