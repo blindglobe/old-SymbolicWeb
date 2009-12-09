@@ -25,7 +25,7 @@ WITH-N-ACTIVE-ITEMS). |#
          (container-model (model-of proxy)))
     (when fallback-to-null-p
       (if (empty-p-of container-model)
-          (insert +null-model+ :in combo-box)
+          (insert +null-model+ :in container-model)
           (unless (eq +null-model+ ~(head-of container-model))
             (insert +null-model+ :before (head-of container-model))))
       (setf (fallback-item-of proxy)
