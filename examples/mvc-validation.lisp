@@ -63,7 +63,7 @@
 
 
 (defmethod initialize-instance :after ((app mvc-validation-app) &key)
-  (add-jquery-ui-resources :dev-version-p t :minified-p t))
+  (add-jquery-ui-resources :minified-p t))
 
 
 (defmethod render-viewport ((viewport viewport) (app mvc-validation-app))

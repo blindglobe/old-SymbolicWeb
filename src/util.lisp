@@ -218,18 +218,19 @@ won't work:
                  (run (js-remove id) viewport))))))))))
 
 
-(defun add-jquery-ui-resources (&key dev-version-p minified-p)
-  (if dev-version-p
+(defun add-jquery-ui-resources (&key release-version-p minified-p)
+  (assert (not release-version-p))
+  (if (not release-version-p)
       (progn
         (add-resource *app* "jquery-ui-css" :css
-                      (mk-static-data-url *app* "jquery-ui-dev/themes/base/jquery-ui.css"))
+                      (mk-static-data-url *app* "javascript/jquery-ui/themes/base/jquery-ui.css"))
         (add-resource *app* "jquery-ui-css-theme" :css
-                      (mk-static-data-url *app* "jquery-ui-dev/themes/base/ui.theme.css"))
+                      (mk-static-data-url *app* "javascript/jquery-ui/themes/base/ui.theme.css"))
         (add-resource *app* "jquery-ui-js" :js
                       (mk-static-data-url *app*
                                           (if minified-p
-                                              "jquery-ui-dev/ui/minified/jquery-ui.min.js"
-                                              "jquery-ui-dev/ui/jquery-ui.js"))))
+                                              "javascript/jquery-ui/ui/minified/jquery-ui.min.js"
+                                              "javascript/jquery-ui/ui/jquery-ui.js"))))
       (progn
         (add-resource *app* "jquery-ui-css" :css
                       (mk-static-data-url *app* "jquery-ui/themes/base/jquery-ui.css"))
