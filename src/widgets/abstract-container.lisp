@@ -79,7 +79,7 @@
     (with-each-widget-in-tree (:root widget)
       (with (viewport-of widget)
         (when (and it (not (eq it viewport)))
-          (error "SW:PROPAGATE-FOR-ADD: ~A is already part of ~A. Adding it to ~A." widget viewport it)))
+          (warn "SW:PROPAGATE-FOR-ADD: ~A is already part of ~A. Moving it to ~A." widget viewport it)))
       (setf (gethash (id-of widget) widgets) widget
             (viewport-of widget) viewport))))
 
