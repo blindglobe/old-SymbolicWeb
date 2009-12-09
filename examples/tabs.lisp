@@ -25,6 +25,5 @@
               (:sw it)
 
               (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/tabs.lisp"
-                  "source code") :br
-                  "PS: Hosted on a crummy home ADSL line..."))
+                  "source code")))
       (insert it :in (root)))))

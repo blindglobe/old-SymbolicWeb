@@ -1,8 +1,7 @@
 ;;;; http.//nostdal.org/ ;;;;
 
-(in-package #:sw)
-
-(declaim #.(optimizations :address-bar.lisp))
+(in-package :sw)
+(in-readtable symbolicweb)
 
 
 (defparameter *address-bar-serializing-p* nil
@@ -30,7 +29,6 @@ to server side objects.")
               :initform t)))
 
 
-#.(maybe-inline 'address-bar)
 (defun address-bar ()
   "Returns the ADDRESS-BAR of the current viewport; *VIEWPORT*."
   (address-bar-of *viewport*))
@@ -74,7 +72,6 @@ to server side objects.")
       (remove-from-address-bar object :address-bar address-bar))))
 
 
-#.(maybe-inline 'handle-address-bar)
 (defun handle-address-bar (object)
   ;; TODO: Should probably make this check optional when I'm done debugging widgets.
   (flet ((check ()
@@ -91,7 +88,6 @@ to server side objects.")
         (otherwise (error "Slot URLIZED-P in ~A has invalid value ~A." object urlized-p))))))
 
 
-#.(maybe-inline 'maybe-update-address-bar)
 (defun maybe-update-address-bar (address-bar &key
                                  (replace-p *address-bar-serializing-p*))
   (declare (address-bar address-bar))
@@ -151,7 +147,6 @@ to server side objects.")
    1))
 
 
-#.(maybe-inline 'sync-widgets)
 (defun sync-widgets (hash-string page-load-p)
   "Sync server side widgets with client side URI: client-state -> server-state.
 PAGE-LOAD-P: T, user is currently loading or refreshing the page.

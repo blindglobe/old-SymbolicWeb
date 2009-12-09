@@ -20,6 +20,7 @@ LABEL (in TAB-PANE) needs to do the dataflow thing.
 (defclass tab (abstract-container)
   ()
   (:default-initargs
+   :element-type "div"
    :model (make-instance 'sw-mvc:container-with-1-active-item
                          :model (make-instance 'sw-mvc:dlist))))
 

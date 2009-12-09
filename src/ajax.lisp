@@ -31,7 +31,7 @@
          (execute-callback callback-box arguments)))
 
       ((string= "url-hash-changed" event)
-       (if-let (new-url-hash (swh:post-parameter "new-url-hash"))
+       (if-let (new-url-hash (swh:get-parameter "new-url-hash"))
          ;; SYNC-WIDGETS confirms that the widgets mentioned in the hash is a
          ;; part of the users session (by ways of the WIDGETS slot in APPLICATION).
          ;; So this is safe; no cross-session manipulation is possible.
