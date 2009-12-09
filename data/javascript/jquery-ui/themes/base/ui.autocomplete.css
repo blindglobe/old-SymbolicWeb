@@ -1,0 +1,6 @@
+/* Autocomplete
+----------------------------------*/
+.ui-autocomplete-menu { position: absolute; }
+
+.ui-autocomplete-loading { background: white url('images/ui-anim.basic.16x16.gif') right center no-repeat; }
+.ui-autocomplete-over { background-color: #0A246A; color: white; }

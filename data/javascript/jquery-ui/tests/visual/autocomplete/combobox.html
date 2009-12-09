@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+	<title>Autocomplete Visual Test: Combobox</title>
+	<link rel="stylesheet" href="../visual.css" type="text/css" />
+	<link rel="stylesheet" href="../../../themes/base/ui.base.css" type="text/css" />
+	<link rel="stylesheet" href="../../../themes/base/ui.theme.css" type="text/css" title="ui-theme" />
+	<script type="text/javascript" src="../../../jquery-1.3.2.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.position.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.button.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.menu.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.autocomplete.js"></script>
+	<script type="text/javascript" src="http://jqueryui.com/themeroller/themeswitchertool/"></script>
+	<script type="text/javascript">
+	(function($) {
+		$.widget("ui.selectAutocomplete", {
+			_init: function() {
+				var self = this;
+				var select = this.element.hide();
+				var input = $("<input/>").addClass("ui-widget ui-widget-content ui-corner-left").insertAfter(select).autocomplete({ 
+					source: function(request) {
+						var matcher = new RegExp(request.term, "i");
+						return select.children("option").map(function() {
+							var text = $(this).text();
+							if (!request.term || matcher.test(text))
+								return {
+									id: $(this).val(),
+									label: text.replace(new RegExp("(?![^&;]+;)(?!<[^<>]*)(" + request.term.replace(/([\^\$\(\)\[\]\{\}\*\.\+\?\|\\])/gi, "\\$1") + ")(?![^<>]*>)(?![^&;]+;)", "gi"), "<strong>$1</strong>"),
+									result: text
+								};
+						});
+					},
+					delay: 0,
+					change: function(e, ui) {
+						if (!ui.item) {
+							// remove invalid value, as it didn't match anything
+							$(this).val("");
+							return;
+						}
+						$(this).focus();
+						select.val(ui.item.id);
+						self._trigger("selected", null, {
+							item: select.find("[value='" + ui.item.id + "']")
+						});
+						
+					},
+					minLength: 0
+				});
+				$("<button>&nbsp;</button>")
+				.insertAfter(input)
+				.button({
+					icons: {
+						primary: "ui-icon-triangle-1-s"
+					},
+					text: false
+				}).removeClass("ui-corner-all")
+				.addClass("ui-corner-right ui-button-icon")
+				.position({
+					my: "left center",
+					at: "right center",
+					of: input,
+					offset: "-1 0"
+				}).css("top", "")
+				.click(function() {
+					// close if already visible
+					// TODO but only if shown by button click
+					if (input.autocomplete("widget").is(":visible")) {
+						input.autocomplete("close");
+						return;
+					}
+					// pass empty string as value to search for, displaying all results
+					input.autocomplete("search", "");
+					input.focus();
+				});
+			}
+		});
+
+	})(jQuery);
+		
+	$(function() {
+		$.fn.themeswitcher && $('<div/>').css({
+			position: "absolute",
+			right: 10,
+			top: 10
+		}).appendTo(document.body).themeswitcher();
+		
+		function log(message) {
+			$("<div/>").text(message).prependTo("#log");
+			$("#log").attr("scrollTop", 0);
+		}
+		
+		$("select").selectAutocomplete({
+			selected: function(event, ui) {
+				log("Selected " + ui.item.text() + "(#" + ui.item.val() + ")" );
+			}
+		});
+		$("input");
+	});
+	</script>
+	<style>
+		/* TODO shouldn't be necessary */
+		.ui-button-icon-only .ui-button-text { padding: 0; } 
+	</style>
+</head>
+<body>
+
+<div class="ui-widget">
+	<label>Tags: </label>
+	<select>
+		<option value="a">asp</option>
+        <option value="c">c</option>
+        <option value="cpp">c++</option>
+        <option value="cf">coldfusion</option>
+        <option value="g">groovy</option>
+        <option value="h">haskell</option>
+        <option value="j">java</option>
+        <option value="js">javascript</option>
+        <option value="p1">pearl</option>
+        <option value="p2">php</option>
+        <option value="p3">python</option>
+        <option value="r">ruby</option>
+        <option value="s">scala</option>
+	</select>
+</div>
+
+<div class="ui-widget" style="margin-top:2em; font-family:Arial">
+	Log:
+	<div id="log" style="height: 400px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
+</div>
+
+</body>
+</html>

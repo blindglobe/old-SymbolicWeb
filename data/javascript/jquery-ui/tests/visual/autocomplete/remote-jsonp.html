@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+	<title>Autocomplete Visual Test: Remote JSONP</title>
+	<link rel="stylesheet" href="../visual.css" type="text/css" />
+	<link rel="stylesheet" href="../../../themes/base/ui.base.css" type="text/css" />
+	<link rel="stylesheet" href="../../../themes/base/ui.theme.css" type="text/css" title="ui-theme" />
+	<script type="text/javascript" src="../../../jquery-1.3.2.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.position.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.menu.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.autocomplete.js"></script>
+	<script type="text/javascript" src="http://jqueryui.com/themeroller/themeswitchertool/"></script>
+	<script type="text/javascript">
+	$(function() {
+		$.fn.themeswitcher && $('<div/>').css({
+			position: "absolute",
+			right: 10,
+			top: 10
+		}).appendTo(document.body).themeswitcher();
+		
+		function log(message) {
+			$("<div/>").text(message).prependTo("#log");
+			$("#log").attr("scrollTop", 0);
+		}
+		
+		$("#city").autocomplete({
+			source: function(request, response) {
+				$.ajax({
+					url: "http://ws.geonames.org/searchJSON",
+					dataType: "jsonp",
+					data: {
+						featureClass: "P",
+						style: "full",
+						maxRows: 15,
+						name_startsWith: request.term
+					},
+					success: function(data) {
+						response($.map(data.geonames, function(item) {
+							return {
+								label: item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
+								result: item.name
+							}
+						}))
+					}
+				})
+			},
+			minLength: 2,
+			change: function(event, ui) {
+				log(ui.item ? ("Selected: " + ui.item.label) : "Nothing selected, input was " + this.value);
+			},
+			open: function() {
+				$(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+			},
+			close: function() {
+				$(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+			}
+		});
+	});
+	</script>
+	<style>
+		.ui-autocomplete-loading { background: url(indicator.gif) no-repeat right; }
+		#city { width: 25em; }
+	</style>
+</head>
+<body>
+
+<div class="ui-widget">
+	<label for="city">Your city: </label>
+	<input class="ui-widget ui-widget-content ui-corner-all" id="city" />
+	Powered by <a href="http://geonames.org">geonames.org</a>
+</div>
+
+<div class="ui-widget" style="margin-top:2em; font-family:Arial">
+	Log:
+	<div id="log" style="height: 400px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
+</div>
+
+</body>
+</html>
