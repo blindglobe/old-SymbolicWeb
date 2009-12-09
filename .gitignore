@@ -1,0 +1,8 @@
+data/lighttpd/compress/
+data/lighttpd/log/
+data/lighttpd/lighttpd.pid
+examples/scratch.lisp
+symbolicweb.sbcl
+*.fasl
+*~
+#*#
