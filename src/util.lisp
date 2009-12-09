@@ -30,7 +30,7 @@
                (resources-of application)))
 
     "<script type='text/javascript' src='"
-    (mk-static-data-url *server* "javascript/jquery-debounce/jquery.debounce.js")
+    (mk-static-data-url *server* "javascript/jquery-debounce/jquery.debounce-min.js")
     "'></script>"
 
     ;; It is important that this is done before sw-ajax.js (below) is loaded+evaled.
