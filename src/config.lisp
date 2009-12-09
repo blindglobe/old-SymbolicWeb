@@ -52,14 +52,12 @@
 
 (define-variable -server-default-static-data-subdomain-
     :value nil
-    :type (or null string)
-    :doc "A string like `sw-static' (no slash prefix) or NIL.")
+    :type (or null string))
 
 
 (define-variable -server-default-static-path-
-    :value "sw-static"
-    :type string
-    :doc "A string like `sw-static' (no dot) or NIL.")
+    :value "sw-http-root"
+    :type (or string null))
 
 
 (define-variable -server-default-static-data-fs-path-
