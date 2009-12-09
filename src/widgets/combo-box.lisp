@@ -20,12 +20,15 @@ WITH-N-ACTIVE-ITEMS). |#
 
 
 (defmethod initialize-instance :after ((combo-box combo-box) &key (fallback-to-null-p t))
-  (when fallback-to-null-p
-    (if (empty-p-of ~~combo-box)
-        (insert +null-model+ :in combo-box)
-        (insert +null-model+ :before (head-of ~~combo-box)))
-    (setf (fallback-item-of (model-of combo-box))
-          +null-model+)))
+  (check-type (model-of combo-box) container-proxy)
+  (let* ((proxy (model-of combo-box))
+         (container-model (model-of proxy)))
+    (when fallback-to-null-p
+      (if (empty-p-of container-model)
+          (insert +null-model+ :in combo-box)
+          (insert +null-model+ :before (head-of container-model)))
+      (setf (fallback-item-of proxy)
+            +null-model+))))
 
 
 
@@ -64,7 +67,7 @@ WITH-N-ACTIVE-ITEMS). |#
                   (when item-view
                     (tf (attribute-selected-p-of item-view)))
                   (when old-item-view
-                    (nilf (attribute-selected-p-of old-item-view :server-only-p t)))
+                    (nilf (attribute-selected-p-of old-item-view)))
                   (setf (slot-value combo-box 'selected-option) item-view)))))
 
         (with-event (item-view) (on-event-combo-box-change combo-box)
@@ -74,9 +77,9 @@ WITH-N-ACTIVE-ITEMS). |#
               (when-commit ()
                 (let ((old-item-view (selected-option-of combo-box)))
                   (unless (eq item-view old-item-view)
-                    (tf (attribute-selected-p-of item-view :server-only-p t))
+                    (tf (attribute-selected-p-of item-view))
                     (when old-item-view
-                      (nilf (attribute-selected-p-of (selected-option-of combo-box) :server-only-p t)))
+                      (nilf (attribute-selected-p-of (selected-option-of combo-box))))
                     (setf (slot-value combo-box 'selected-option) item-view))))
               (setf (active-item-of model) item-model))))))
 
@@ -87,11 +90,11 @@ WITH-N-ACTIVE-ITEMS). |#
                                                           (js-code-of (attribute-value-of widget))))))
 
 
-(defmethod initialize-callback-box ((combo-box combo-box) (lisp-accessor-name (eql 'on-combo-box-change-of))
+(defmethod initialize-callback-box ((combo-box combo-box) (lisp-accessor-name (eql 'combo-box-change))
                                     (callback-box callback-box))
   (setf (argument-parser-of callback-box)
         (lambda (args)
-          (get-widget (cdr (assoc "value" args :test #'string=))))))
+          (list :item-view (get-widget (cdr (assoc "value" args :test #'string=)))))))
 
 
 
