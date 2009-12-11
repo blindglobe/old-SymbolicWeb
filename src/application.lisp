@@ -188,6 +188,7 @@ include the JS libraries required for SW in general."
              :src (mk-static-data-url (server-of app) "gfx/sw-loader.gif"))
 
         (:a :accesskey 1 :href "javascript:swTerminateSession();")
+        (:a :accesskey "x" :href "javascript:swTerminateSession();")
         #|(:a :accesskey 2 :href "javascript:swDisplaySessionInfo();")|#
 
         (:noscript
