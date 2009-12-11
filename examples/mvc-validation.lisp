@@ -12,11 +12,13 @@
       :initform (random 100))
 
    (sum :reader sum-of
-        :initform (with ↑λI(+ ¤x ¤y)
-                    (setf (accepts-conditions-p-of it) t)
-                    (as-formula it))))
+        :initform ↑λF(+ ¤x ¤y)))
 
   (:metaclass mvc-class))
+
+
+(defmethod initialize-instance :after ((model mvc-validation-model) &key)
+  (tf (accepts-conditions-p-of (cell-of (sum-of model)))))
 
 
 

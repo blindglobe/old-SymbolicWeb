@@ -20,6 +20,11 @@
   (:metaclass mvc-class))
 
 
+(defmethod initialize-instance :after ((model text-input-widget-model) &key)
+  (tf (accepts-conditions-p-of (cell-of (square-of-x-of model)))
+      (accepts-conditions-p-of (cell-of (sum-of model)))))
+
+
 
 (defclass text-input-widget-view (html-container)
   ((x :initform ↑(text-input (:model (cell-of (x-of ¤model)))))
@@ -34,7 +39,7 @@
    :model (make-instance 'text-input-widget-model)))
 
 
-(defmethod (setf model-of) ((model text-input-widget-model) (view text-input-widget-view))
+(defmethod set-model nconc ((view text-input-widget-view) (model text-input-widget-model))
   (with-object view
     (list (add-input-handler ¤x #'mk-number-parser)
           (add-input-handler ¤y #'mk-number-parser))))
