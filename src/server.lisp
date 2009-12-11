@@ -175,9 +175,7 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
       (setf (gethash path (path->app-class-of server)) app-class-sym)
       (if server-supplied-p
           (error "This does not make sense:~%(SET-URI ~A ~S ~A)" app-class-sym path server)
-          #| TODO: Here we can add entries to a shared (more than usual; before any servers might even exist) global
-          variable and let server instances fall back on it. |#
-          (warn "SW: (SET-URI ~A ~S) had no effect because *SERVER* was NIL." app-class-sym path))))
+          (setf (gethash path *path->app-class*) app-class-sym))))
 
 
 (defmethod remove-application ((app (eql t)) &optional (server *server*))
@@ -190,7 +188,8 @@ A \"hard link\" to APPLICATION instances is stored in the ID->APP slot.")
 
 
 (defmethod create-new-session ((server server))
-  (when-let (app-class (gethash (sw-http:path) (path->app-class-of server)))
+  (when-let (app-class (or (gethash (sw-http:path) (path->app-class-of server))
+                           (gethash (sw-http:path) *path->app-class*)))
     (let* ((cookie-value (generate-random-cookie-value server))
            (app (with-sync (:name 'create-new-session)
                   (make-instance app-class

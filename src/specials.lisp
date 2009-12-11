@@ -4,6 +4,11 @@
 (in-readtable symbolicweb)
 
 
+(define-variable *path->app-class*
+    :value (make-hash-table :test #'equal)
+    :type hash-table)
+
+
 (define-variable *request-time*
     :value nil
     :type (or null unsigned-byte))
