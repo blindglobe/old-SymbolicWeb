@@ -9,6 +9,14 @@
   ((server :reader server-of
            :type server)
 
+   (context :reader context-of :initarg :context
+            :type context
+            :initform (with1 (make-instance 'context)
+                        (push (lambda (cnt)
+                                (with-sync ()
+                                  (funcall cnt)))
+                              (bindings-of it))))
+
    (viewport-type :accessor viewport-type-of :initarg :viewport-type
                   :initform 'viewport)
 

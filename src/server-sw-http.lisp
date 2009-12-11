@@ -161,7 +161,7 @@ fixing this.
      (sw-http:mk-response-header-field (catstr "Last-Modified: " (rfc-1123-date))))
     (sw-http:response-add-chunk
      (sw-http:mk-response-message-body
-      (with-common-context
+      (with-context (context-of app)
         (render app))))
     (sw-http:done-generating-response)))
 
@@ -188,7 +188,7 @@ fixing this.
 
         (:ajax
          (setf (last-user-activity-time-of viewport) *request-time*)
-         (with-common-context
+         (with-context (context-of app)
            (handle-ajax-request server app viewport))
 
          (sw-http:response-add-chunk

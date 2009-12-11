@@ -5,14 +5,6 @@
 (declaim #.(optimizations :util.lisp))
 
 
-(defmacro with-common-context (&body body)
-  `(sw-db:with-db-connection
-     (sw-stm:with-sync ()
-       (sw-db:with-db-transaction
-         (sw-db:with-lazy-db-operations
-           ,@body)))))
-
-
 (defun js-sw-headers (application)
   (declare (application application)
            (optimize speed))
