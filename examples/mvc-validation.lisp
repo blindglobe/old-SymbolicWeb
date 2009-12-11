@@ -39,7 +39,7 @@
                    (tooltip-of text-input) nil))))
 
 
-  (defmethod (setf model-of) ((model mvc-validation-model) (view mvc-validation-view))
+  (defmethod set-model nconc ((view mvc-validation-view) (model mvc-validation-model))
     (with-object view
       (list (add-input-handler ¤x #'mk-number-parser)
             (add-input-handler ¤y #'mk-number-parser)
