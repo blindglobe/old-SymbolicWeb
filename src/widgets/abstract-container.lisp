@@ -18,7 +18,8 @@
   (prog1
       (list λI(when-let (event (event-of model))
                 (when (eq model (container-of event))
-                  (handle-model-event container event))))
+                  (dolist (object (objects-of event))
+                    (handle-model-event object container event)))))
 
     ;; TODO: Uh. Is this right? (switching models..)
     (unless (null (children-of container))
@@ -29,39 +30,37 @@
       (container-insert container (view-in-context-of container ~dlist-node t)))))
 
 
-(defmethod handle-model-event ((container abstract-container) (event sw-mvc:container-insert))
+(defmethod handle-model-event (object (container abstract-container) (event sw-mvc:container-insert))
   (let ((relative-node (relative-node-of event)))
     (if relative-node
-        (let ((relative-widget (view-in-context-of container ~relative-node))
+        (let ((relative-view (view-in-context-of container (deref relative-node)))
               (relative-position (relative-position-of event)))
-          (dolist (object (objects-of event))
-            (ecase relative-position
-              (:before
-               (let ((new-widget (view-in-context-of container object t)))
-                 (container-insert container new-widget :before relative-widget)
-                 (setf relative-widget new-widget
-                       relative-position :after)))
-
-              (:after
-               (let ((new-widget (view-in-context-of container object t)))
-                 (container-insert container new-widget :after relative-widget)
-                 (setf relative-widget new-widget))))))
-        (dolist (object (objects-of event))
-          (container-insert container (view-in-context-of container object t))))))
-
-
-(defmethod handle-model-event ((container abstract-container) (event sw-mvc:container-remove))
-  (dolist (object (objects-of event))
-    (container-remove container (view-in-context-of container object))))
+          (ecase relative-position
+            (:before
+             (let ((new-view (view-in-context-of container object t)))
+               (container-insert container new-view :before relative-view)
+               ;; This is sort of nasty, but I can't think of a better way to do this at the moment.
+               (setf (slot-value event 'relative-node) (right-of relative-node)
+                     (slot-value event 'relative-position) :after)))
+            (:after
+             (let ((new-view (view-in-context-of container object t)))
+               (container-insert container new-view :after relative-view)
+               ;; This is sort of nasty, but I can't think of a better way to do this at the moment.
+               (setf (slot-value event 'relative-node) (right-of relative-node))))))
+        (container-insert container (view-in-context-of container object t)))))
 
 
-(defmethod handle-model-event ((container abstract-container) (event sw-mvc:container-remove-all))
+(defmethod handle-model-event (object (container abstract-container) (event sw-mvc:container-remove))
+  (container-remove container (view-in-context-of container object)))
+
+
+(defmethod handle-model-event (object (container abstract-container) (event sw-mvc:container-remove-all))
   (container-remove-all container))
 
 
-(defmethod handle-model-event ((container abstract-container) (event sw-mvc:container-exchange))
+(defmethod handle-model-event (object (container abstract-container) (event sw-mvc:container-exchange))
   (container-exchange container
-                      (view-in-context-of container (object-of event))
+                      (view-in-context-of container object)
                       (view-in-context-of container (target-position-of event))))
 
 
