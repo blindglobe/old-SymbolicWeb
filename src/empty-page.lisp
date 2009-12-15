@@ -11,8 +11,8 @@
 
 
 
-(defmethod render-viewport ((viewport viewport) (app empty-page-app))
-  (insert λV"Hello World!" :in (root)))
+#|(defmethod render-viewport ((viewport viewport) (app empty-page-app))
+  (insert λV"Hello World!" :in (root)))|#
 
 
 (defmethod generate-dynamic-subdomain ((app empty-page-app))
