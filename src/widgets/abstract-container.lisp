@@ -84,9 +84,10 @@
 
 
 (defn propagate-for-remove (null ((widget widget)))
+  ;; TODO: What about the CHILDREN and PARENT slots for the sub-nodes?
+  (deletef (slot-value (parent-of widget) 'children) widget)
   (nilf (slot-value widget 'parent))
-  (let* ((viewport (viewport-of widget))
-         (widgets (widgets-of (application-of viewport))))
+  (let ((widgets (widgets-of (application-of (viewport-of widget)))))
     (with-each-widget-in-tree (:root widget)
       (remhash (id-of widget) widgets)
       (nilf (viewport-of widget)))))
@@ -148,7 +149,6 @@
       (defmethod container-remove ((container abstract-container) (widget widget))
         "Implements SW-MVC:REMOVE for SW:CONTAINER."
         (when-commit ()
-          (deletef (slot-value container 'children) widget)
           (when (visible-p-of container)
             (run (js-iappend tmp-node "sw-recycler") container)
             (replace-tmp-node widget container)
@@ -162,9 +162,7 @@
             (dolist (child (children-of container))
               (run (js-iappend tmp-node "sw-recycler") container)
               (replace-tmp-node child container)
-              (propagate-for-remove child)))
-          ;; TODO: Hm, the order here is different from CONTAINER-REMOVE, above. Does this matter?
-          (nilf (slot-value container 'children)))))))
+              (propagate-for-remove child))))))))
 
 
 (defmethod container-exchange ((container abstract-container) (widget-a widget) (widget-b widget))
