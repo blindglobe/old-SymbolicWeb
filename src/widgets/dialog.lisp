@@ -35,11 +35,13 @@
 
 
 (defmethod render :after ((dialog dialog))
-  (run (fmtn "$('#~A').data('gc-fn', function(){ $('#~A').dialog('destroy').remove(); });~%"
-             #1=(id-of dialog) #1#)
-       dialog)
-  (run (fmtn "$('#~A').dialog({ autoOpen: false });~%" (id-of dialog))
-       dialog))
+  (let ((id (id-of dialog)))
+    (run (fmtn "$('#~A').data('gc-fn', function(){ $('#~A').dialog('destroy').remove(); });~%" id id)
+         dialog)
+    (run (fmtn "$('#~A').dialog({ autoOpen: false });~%" id)
+         dialog)
+    (run (fmtn "$('#~A').parent().css('position', 'fixed');~%" id)
+         dialog)))
 
 
 (flet ((set-option (dialog option-name value)
