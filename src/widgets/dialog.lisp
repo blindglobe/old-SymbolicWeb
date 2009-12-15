@@ -35,6 +35,9 @@
 
 
 (defmethod render :after ((dialog dialog))
+  (run (fmtn "$('#~A').data('gc-fn', function(){ $('#~A').dialog('destroy').remove(); });~%"
+             #1=(id-of dialog) #1#)
+       dialog)
   (run (fmtn "$('#~A').dialog({ autoOpen: false });~%" (id-of dialog))
        dialog))
 
@@ -74,7 +77,6 @@
   (let ((dialog-view (view-in-context-of container dialog-model)))
     (check-type dialog-view dialog)
     (when-commit ()
-      (deletef (slot-value container 'children) dialog-view)
       (when (visible-p-of container)
         (run (fmtn "$('#~A').data('dialog-close-event-p', false).dialog('close');~%" (id-of dialog-view))
              dialog-view)
