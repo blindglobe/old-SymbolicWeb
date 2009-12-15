@@ -50,7 +50,9 @@ possible and be able to optimize type-checking code based on this. |#
         (check-type id string) (check-type viewport viewport)
         (sb-ext:finalize widget
                          (lambda ()
-                           (run (js-remove id) viewport)))))))
+                           (run (fmtn "(function(){ var gc_fn = $('#~A').data('gc-fn');
+                                       if(gc_fn) gc_fn(); else $('#~A').remove();  })();~%" id id)
+                                viewport)))))))
 
 
 (defun add-delayed-operation (widget lisp-accessor-name operation)
