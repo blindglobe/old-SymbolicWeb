@@ -84,11 +84,10 @@
 
 
 (defn propagate-for-remove (null ((widget widget)))
-  ;; TODO: What about the CHILDREN and PARENT slots for the sub-nodes?
-  (deletef (slot-value (parent-of widget) 'children) widget)
-  (nilf (slot-value widget 'parent))
   (let ((widgets (widgets-of (application-of (viewport-of widget)))))
     (with-each-widget-in-tree (:root widget)
+      (deletef (slot-value (the widget-base (parent-of widget)) 'children) widget)
+      (nilf (slot-value widget 'parent))
       (remhash (id-of widget) widgets)
       (nilf (viewport-of widget)))))
 
@@ -105,6 +104,8 @@
       (when-let (it (or before after))
         (check-type it widget))
       (when-commit ()
+        (assert (not (parent-of widget)))
+        (setf (slot-value widget 'parent) container)
         (cond
           (after
            (amx:insert widget ↺(slot-value container 'children) :after after)
