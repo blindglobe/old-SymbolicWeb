@@ -85,7 +85,6 @@ won't work:
 
 
 ;; NOTE/TODO: Placed here because of bootstrapping issues.. move to some bootstrap*.lisp file?
-#.(maybe-inline 'for-each-widget-in-tree)
 (defun for-each-widget-in-tree (widget func)
   (declare ((function (widget-base)) func)
            (widget-base widget)

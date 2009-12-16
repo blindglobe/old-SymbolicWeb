@@ -40,6 +40,7 @@
          dialog)
     (run (fmtn "$('#~A').dialog({ autoOpen: false });~%" id)
          dialog)
+    ;; So DIALOGs don't "jump around" when the DOM tree is manipulated. TODO: This should probably be removed later.
     (run (fmtn "$('#~A').parent().css('position', 'fixed');~%" id)
          dialog)))
 
@@ -60,6 +61,7 @@
                 (set-option dialog "title" title))))))
 
 
+;; TODO: It sucks having to repeat some of the tricky code from ABSTRACT-CONTAINER here.
 (defmethod handle-model-event ((dialog-model dialog-model) container (event sw-mvc:container-insert))
   (let ((dialog-view (view-in-context-of container dialog-model t)))
     (check-type dialog-view dialog)
