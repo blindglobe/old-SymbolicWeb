@@ -9,6 +9,7 @@
  *
  * Depends:
  *	jquery.ui.core.js
+ *	jquery.ui.widget.js
  *  jquery.ui.position.js
  */
 (function($) {
@@ -16,6 +17,17 @@
 var increments = 0;
 
 $.widget("ui.tooltip", {
+        options: {
+                tooltipClass: "ui-widget-content",
+                content: function() {
+                        return $(this).attr("title");
+                },
+                position: {
+                        my: "left center",
+                        at: "right center",
+                        offset: "15 0"
+                }
+        },
         _init: function() {
                 var self = this;
                 this.tooltip = $("<div/>").attr("id", "ui-tooltip-" + increments++).attr("role", "tooltip").attr("aria-hidden", "true").addClass("ui-tooltip ui-widget ui-corner-all").addClass(this.options.tooltipClass).appendTo(document.body).hide();
@@ -41,7 +53,7 @@ $.widget("ui.tooltip", {
         destroy: function() {
                 this.element.unbind(".tooltip");
                 this.tooltip.remove();
-                $.widget.prototype.destroy.apply(this, arguments);
+                $.Widget.prototype.destroy.apply(this, arguments);
         },
 
         widget: function() {
@@ -108,17 +120,5 @@ $.widget("ui.tooltip", {
         }
 
 });
-
-$.ui.tooltip.defaults = {
-        tooltipClass: "ui-widget-content",
-        content: function() {
-                return $(this).attr("title");
-        },
-        position: {
-                my: "left center",
-                at: "right center",
-                offset: "15 0"
-        }
-}
 
 })(jQuery);

@@ -6,6 +6,7 @@
 	<link rel="stylesheet" href="../../../themes/base/ui.all.css" type="text/css">
 	<script type="text/javascript" src="../../../jquery-1.3.2.js"></script>
 	<script type="text/javascript" src="../../../ui/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="../../../ui/jquery.ui.widget.js"></script>
 	<script type="text/javascript" src="../../../ui/jquery.ui.position.js"></script>
 	<script type="text/javascript" src="../../../ui/jquery.ui.tooltip.js"></script>
 	<script type="text/javascript">
@@ -55,7 +56,7 @@
 	});
 		
 	$(function() {
-		$.ui.tooltip.defaults.show = function(event, ui) {
+		$.ui.tooltip.prototype.options.show = function(event, ui) {
 			$(this).tooltip("widget").callout("pointAt", ui.target);
 		}
 		

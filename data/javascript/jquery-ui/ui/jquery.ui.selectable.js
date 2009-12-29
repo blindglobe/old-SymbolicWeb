@@ -9,11 +9,19 @@
  *
  * Depends:
  *	jquery.ui.core.js
+ *	jquery.ui.mouse.js
+ *	jquery.ui.widget.js
  */
 (function($) {
 
-$.widget("ui.selectable", $.extend({}, $.ui.mouse, {
-
+$.widget("ui.selectable", $.ui.mouse, {
+	options: {
+		appendTo: 'body',
+		autoRefresh: true,
+		distance: 0,
+		filter: '*',
+		tolerance: 'touch'
+	},
 	_init: function() {
 		var self = this;
 
@@ -241,17 +249,10 @@ $.widget("ui.selectable", $.extend({}, $.ui.mouse, {
 		return false;
 	}
 
-}));
+});
 
 $.extend($.ui.selectable, {
-	version: "1.8pre",
-	defaults: $.extend({}, $.ui.mouse.defaults, {
-		appendTo: 'body',
-		autoRefresh: true,
-		distance: 0,
-		filter: '*',
-		tolerance: 'touch'
-	})
+	version: "1.8pre"
 });
 
 })(jQuery);

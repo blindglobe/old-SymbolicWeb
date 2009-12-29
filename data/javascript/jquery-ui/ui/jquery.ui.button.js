@@ -9,15 +9,39 @@
  *
  * Depends:
  *	jquery.ui.core.js
+ *	jquery.ui.widget.js
  */
 (function($) {
 
+/*
+Plan:
+- button plugin
+  - button - full support
+  - input - only text support
+  - radio - full support via label
+  - checkbox - full support via label
+- buttonSet plugin
+:button,:submit,:reset,:checkbox,:radio
+  - groups buttons together
+  - auto-instantiate children as buttons
+  
+  -> start by rewriting toggleButton and radioButton to use the label as the button element, instead of creating button elements
+*/
+
 var lastActive,
 	baseClasses = "ui-button ui-widget ui-state-default ui-corner-all",
-	otherClasses = "ui-state-hover ui-state-focus " +
+	otherClasses = "ui-state-hover ui-state-active " +
 		"ui-button-icons-only ui-button-icon-only ui-button-text-icons ui-button-text-icon";
 
 $.widget("ui.button", {
+	options: {
+		text: true,
+		label: null,
+		icons: {
+			primary: null,
+			secondary: null
+		}
+	},
 	_init: function() {
 		var options = this.options;
 
@@ -59,11 +83,11 @@ $.widget("ui.button", {
 		this.element
 			.removeClass(baseClasses + " " + otherClasses)
 			.unbind(".button");
-		$.widget.prototype.destroy.call(this);
+		$.Widget.prototype.destroy.call(this);
 	},
 
-	_setData: function(key, value) {
-		$.widget.prototype._setData.apply(this, arguments);
+	_setOption: function(key, value) {
+		$.Widget.prototype._setOption.apply(this, arguments);
 		this._resetButton();
 	},
 
@@ -98,49 +122,36 @@ $.widget("ui.button", {
 	}
 });
 
-$.ui.button.defaults = {
-	text: true,
-	label: null,
-	icons: {
-		primary: null,
-		secondary: null
-	}
-};
-
 // TODO merge with button-widget
 $.widget("ui.toggleButton", {
 	_init: function() {
+		this.element.hide();
 		var self = this,
 			label = (this.label = $("[for='" + this.element.attr("id") + "']"));
-
-		label.add(this.element).hide();
-		this.button = $("<button/>")
-			.html("" + label.html())
-			.insertAfter(this.element)
-			.button()
+		label.button()
 			.unbind("mousedown.button mouseup.button mouseleave.button")
-			.bind("click", function() {
+			.bind("click.button", function() {
 				if (self.options.disabled) { return; }
 				$(this).toggleClass("ui-state-active");
 				self.element.attr("checked", function() {
-					return !!this.checked;
+					return !this.checked;
 				})
 				.click();
 			})
-			.bind("mouseleave", function() {
+			.bind("mouseleave.button", function() {
 				if (self.options.disabled) { return; }
 				$(this).removeClass("ui-state-hover");
 			});
-
+			
 		if (this.element.attr("checked")) {
-			this.button.addClass("ui-state-active");
+			label.addClass("ui-state-active");
 		}
 	},
 
 	destroy: function() {
-		this.element.add(this.label).show();
-		this.button.remove();
-		$.widget.prototype.destroy.call(this);
+		this.element.show();
+		this.label.button("destroy");
+		$.Widget.prototype.destroy.call(this);
 	},
 	
 	widget: function() {
@@ -153,25 +164,21 @@ $.widget("ui.radioButton", {
 	_init: function() {
 		var self = this,
 			radios = (this.radios = this.element.find(":radio"));
-		self.buttons = $([]);
 		self.labels = $([]);
 		self.element.addClass("ui-button-set");
-		radios.each(function(index) {
+		radios.hide().each(function(index) {
 			var radio = $(this),
 				label = $("[for='" + this.id + "']");
-			label.add(radio).hide();
-			var button = $("<button/>")
-				.html("" + label.html())
-				.insertAfter(this)
+			var button = label
 				.button()
 				.unbind("mousedown.button mouseup.button mouseleave.button")
-				.bind("click", function() {
+				.bind("click.button", function() {
 					if (self.options.disabled) { return; }
-					self.buttons.removeClass("ui-state-active");
+					self.labels.removeClass("ui-state-active");
 					$(this).addClass("ui-state-active");
 					radio.attr("checked", true).click();
 				})
-				.bind("mouseleave", function() {
+				.bind("mouseleave.button", function() {
 					if (self.options.disabled) { return; }
 					$(this).removeClass("ui-state-hover");
 				});
@@ -180,15 +187,14 @@ $.widget("ui.radioButton", {
 				button.addClass("ui-state-active");
 			}
 			
-			self.buttons = self.buttons.add(button);
 			self.labels = self.labels.add(label);
 		});
 	},
 
 	destroy: function() {
-		this.buttons.remove();
-		this.labels.add(this.radios).show();
-		$.widget.prototype.destroy.call(this);
+		this.radios.show();
+		this.labels.button("destroy");
+		$.Widget.prototype.destroy.call(this);
 	},
 	
 	widget: function() {
@@ -199,14 +205,14 @@ $.widget("ui.radioButton", {
 
 $.widget("ui.buttons", {
 	_init: function() {
-		var buttons = this.buttons = this.element.find("button").button();
+		var buttons = (this.buttons = this.element.find("button, :submit, :reset, a").button());
 		if (!buttons.length) {
 			this.toggle = this.element.find(":checkbox").toggleButton();
 			buttons = this.toggle.next();
 		}
 		if (!buttons.length && this.element.is(":has(:radio)")) {
 			this.radio = this.element.radioButton();
-			buttons = this.radio.find("button");
+			buttons = this.radio.find(".ui-button");
 		}
 		if (buttons.length) {
 			this.element.addClass("ui-button-set");
@@ -226,7 +232,7 @@ $.widget("ui.buttons", {
 			this.radio.radioButton("destroy");
 		}
 		this.buttons.button("destroy").removeClass("ui-corner-left ui-corner-right");
-		$.widget.prototype.destroy.call(this);
+		$.Widget.prototype.destroy.call(this);
 	},
 	
 	widget: function() {

@@ -9,6 +9,8 @@
  *
  * Depends:
  *	jquery.ui.core.js
+ *	jquery.ui.mouse.js
+ *	jquery.ui.widget.js
  */
 
 (function($) {
@@ -17,8 +19,18 @@
 // (how many times can you page up/down to go through the whole range)
 var numPages = 5;
 
-$.widget("ui.slider", $.extend({}, $.ui.mouse, {
-
+$.widget("ui.slider", $.ui.mouse, {
+	options: {
+		animate: false,
+		distance: 0,
+		max: 100,
+		min: 0,
+		orientation: 'horizontal',
+		range: false,
+		step: 1,
+		value: 0,
+		values: null
+	},
 	_init: function() {
 
 		var self = this, o = this.options;
@@ -460,9 +472,9 @@ $.widget("ui.slider", $.extend({}, $.ui.mouse, {
 
 	},
 
-	_setData: function(key, value) {
+	_setOption: function(key, value) {
 
-		$.widget.prototype._setData.apply(this, arguments);
+		$.Widget.prototype._setOption.apply(this, arguments);
 
 		switch (key) {
 			case 'disabled':
@@ -592,22 +604,11 @@ $.widget("ui.slider", $.extend({}, $.ui.mouse, {
 
 	}
 	
-}));
+});
 
 $.extend($.ui.slider, {
 	version: "1.8pre",
-	eventPrefix: "slide",
-	defaults: $.extend({}, $.ui.mouse.defaults, {
-		animate: false,
-		distance: 0,
-		max: 100,
-		min: 0,
-		orientation: 'horizontal',
-		range: false,
-		step: 1,
-		value: 0,
-		values: null
-	})
+	eventPrefix: "slide"
 });
 
 })(jQuery);

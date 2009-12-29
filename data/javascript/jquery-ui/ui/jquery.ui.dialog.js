@@ -9,33 +9,52 @@
  *
  * Depends:
  *	jquery.ui.core.js
+ *	jquery.ui.widget.js
  *	jquery.ui.draggable.js
+ *	jquery.ui.mouse.js
  *	jquery.ui.position.js
  *	jquery.ui.resizable.js
+ *	jquery.ui.widget.js
  */
 (function($) {
 
-var setDataSwitch = {
-		maxHeight: "maxHeight.resizable",
-		maxWidth: "maxWidth.resizable",
-		minWidth: "minWidth.resizable"
-	},
-	
-	uiDialogClasses =
-		'ui-dialog ' +
-		'ui-widget ' +
-		'ui-widget-content ' +
-		'ui-corner-all ';
+var uiDialogClasses =
+	'ui-dialog ' +
+	'ui-widget ' +
+	'ui-widget-content ' +
+	'ui-corner-all ';
 
 $.widget("ui.dialog", {
-
+	options: {
+		autoOpen: true,
+		stackfix: false,
+		buttons: {},
+		closeOnEscape: true,
+		closeText: 'close',
+		dialogClass: '',
+		draggable: true,
+		hide: null,
+		height: 'auto',
+		maxHeight: false,
+		maxWidth: false,
+		minHeight: 150,
+		minWidth: 150,
+		modal: false,
+		position: 'center',
+		resizable: true,
+		show: null,
+		stack: true,
+		title: '',
+		width: 300,
+		zIndex: 1000
+	},
 	_init: function() {
 		this.originalTitle = this.element.attr('title');
 
 		var self = this,
 			options = self.options,
 
-			title = options.title || self.originalTitle || '&nbsp;',
+			title = options.title || self.originalTitle || '&#160;',
 			titleId = $.ui.dialog.getTitleId(self.element),
 
 			uiDialog = (self.uiDialog = $('<div></div>'))
@@ -366,7 +385,7 @@ $.widget("ui.dialog", {
 		var myAt = [],
 			offset = [0, 0];
 
-		position = position || $.ui.dialog.defaults.position;
+		position = position || $.ui.dialog.prototype.options.position;
 
 		// deep extending converts arrays to objects in jQuery <= 1.3.2 :-(
 //		if (typeof position == 'string' || $.isArray(position)) {
@@ -411,18 +430,18 @@ $.widget("ui.dialog", {
 		});
 	},
 
-	_setData: function(key, value){
+	_setOption: function(key, value){
 		var self = this,
 			uiDialog = self.uiDialog,
+			isResizable = uiDialog.is(':data(resizable)'),
 			resize = false;
 		
-		(setDataSwitch[key] && uiDialog.data(setDataSwitch[key], value));
 		switch (key) {
 			case "buttons":
 				self._createButtons(value);
 				break;
 			case "closeText":
-				// convert whatever was passed in o a string, for text() to not throw up
+				// convert whatever was passed in to a string, for text() to not throw up
 				self.uiDialogTitlebarCloseText.text("" + value);
 				break;
 			case "dialogClass":
@@ -443,15 +462,26 @@ $.widget("ui.dialog", {
 			case "height":
 				resize = true;
 				break;
+			case "maxHeight":
+				(isResizable && uiDialog.resizable('option', 'maxHeight', value));
+				resize = true;
+				break;
+			case "maxWidth":
+				(isResizable && uiDialog.resizable('option', 'maxWidth', value));
+				resize = true;
+				break;
 			case "minHeight":
+				(isResizable && uiDialog.resizable('option', 'minHeight', value));
+				resize = true;
+				break;
+			case "minWidth":
+				(isResizable && uiDialog.resizable('option', 'minWidth', value));
 				resize = true;
 				break;
 			case "position":
 				self._position(value);
 				break;
 			case "resizable":
-				var isResizable = uiDialog.is(':data(resizable)');
-
 				// currently resizable, becoming non-resizable
 				(isResizable && !value && uiDialog.resizable('destroy'));
 
@@ -464,14 +494,14 @@ $.widget("ui.dialog", {
 				break;
 			case "title":
 				// convert whatever was passed in o a string, for html() to not throw up
-				$(".ui-dialog-title", self.uiDialogTitlebar).html("" + (value || '&nbsp;'));
+				$(".ui-dialog-title", self.uiDialogTitlebar).html("" + (value || '&#160;'));
 				break;
 			case "width":
 				resize = true;
 				break;
 		}
 
-		$.widget.prototype._setData.apply(self, arguments);
+		$.Widget.prototype._setOption.apply(self, arguments);
 		(resize && self._size());
 	},
 
@@ -512,29 +542,6 @@ $.widget("ui.dialog", {
 
 $.extend($.ui.dialog, {
 	version: "1.8pre",
-	defaults: {
-		autoOpen: true,
-		stackfix: false,
-		buttons: {},
-		closeOnEscape: true,
-		closeText: 'close',
-		dialogClass: '',
-		draggable: true,
-		hide: null,
-		height: 'auto',
-		maxHeight: false,
-		maxWidth: false,
-		minHeight: 150,
-		minWidth: 150,
-		modal: false,
-		position: 'center',
-		resizable: true,
-		show: null,
-		stack: true,
-		title: '',
-		width: 300,
-		zIndex: 1000
-	},
 
 	uuid: 0,
 	maxZ: 0,

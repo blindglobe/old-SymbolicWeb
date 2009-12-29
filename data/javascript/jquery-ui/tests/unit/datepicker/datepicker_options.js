@@ -46,7 +46,7 @@ test('option', function() {
 	equals(inp.datepicker('option', 'showOn'), 'button', 'Change instance showOn');
 	inp.datepicker('option', 'showOn', undefined);
 	equals(inp.datepicker('option', 'showOn'), 'focus', 'Reset instance showOn');
-	same(inp.datepicker('option', 'all'), {duration: ''}, 'Get instance settings');
+	same(inp.datepicker('option', 'all'), {showAnim: ''}, 'Get instance settings');
 	same(inp.datepicker('option', 'defaults'), $.datepicker._defaults,
 		'Get default settings');
 });
@@ -267,14 +267,21 @@ test('miscellaneous', function() {
 		}
 		return range;
 	};
+	var curYear = new Date().getFullYear();
 	inp.val('02/04/2008').datepicker('show');
 	equals(dp.find('.ui-datepicker-year').text(), '2008', 'Year range - read-only default');
 	inp.datepicker('hide').datepicker('option', {changeYear: true}).datepicker('show');		
 	equals(dp.find('.ui-datepicker-year').text(), genRange(2008 - 10, 21), 'Year range - changeable default');
-	inp.datepicker('hide').datepicker('option', {yearRange: '-6:+2', changeYear: true}).datepicker('show');
-	equals(dp.find('.ui-datepicker-year').text(), genRange(2008 - 6, 9), 'Year range - -6:+2');
+	inp.datepicker('hide').datepicker('option', {yearRange: 'c-6:c+2', changeYear: true}).datepicker('show');
+	equals(dp.find('.ui-datepicker-year').text(), genRange(2008 - 6, 9), 'Year range - c-6:c+2');
 	inp.datepicker('hide').datepicker('option', {yearRange: '2000:2010', changeYear: true}).datepicker('show');
 	equals(dp.find('.ui-datepicker-year').text(), genRange(2000, 11), 'Year range - 2000:2010');
+	inp.datepicker('hide').datepicker('option', {yearRange: '-5:+3', changeYear: true}).datepicker('show');
+	equals(dp.find('.ui-datepicker-year').text(), genRange(curYear - 5, 9), 'Year range - -5:+3');
+	inp.datepicker('hide').datepicker('option', {yearRange: '2000:-5', changeYear: true}).datepicker('show');
+	equals(dp.find('.ui-datepicker-year').text(), genRange(2000, curYear - 2004), 'Year range - 2000:-5');
+	inp.datepicker('hide').datepicker('option', {yearRange: '', changeYear: true}).datepicker('show');
+	equals(dp.find('.ui-datepicker-year').text(), genRange(curYear, 1), 'Year range - -6:+2');
 
 	// Navigation as date format
 	inp.datepicker('option', {showButtonPanel: true});
@@ -503,13 +510,17 @@ test('altField', function() {
 	equals(alt.val(), '', 'Alt field - alt - ctrl+end');
 	// Verify alt field is updated on keyup
 	alt.val('');
-	inp.val('06/04/2008').datepicker('show');
-	inp.simulate('keyup', {keyCode: $.simulate.VK_ENTER});
+	inp.val('06/04/200').datepicker('show');
+	inp.simulate('keydown', {charCode: '8'.charCodeAt(0)});
+	inp.simulate('keypress', {charCode: '8'.charCodeAt(0)});
+	inp.simulate('keyup', {charCode: '8'.charCodeAt(0)});
 	equals(inp.val(), '06/04/2008', 'Alt field - dp - manual entry');
 	equals(alt.val(), '2008-06-04', 'Alt field - manual entry');
 	// Verify alt field is not updated on keyup if date is invalid
-	inp.val('12/04/');
-	inp.simulate('keyup', {keyCode: $.simulate.VK_ENTER});
+	inp.val('12/04');
+	inp.simulate('keydown', {charCode: '/'.charCodeAt(0)});
+	inp.simulate('keypress', {charCode: '/'.charCodeAt(0)});
+	inp.simulate('keyup', {charCode: '/'.charCodeAt(0)});
 	equals(inp.val(), '12/04/', 'Alt field - dp - manual entry incomplete');
 	equals(alt.val(), '2008-06-04', 'Alt field - manual entry - not updated');
 });

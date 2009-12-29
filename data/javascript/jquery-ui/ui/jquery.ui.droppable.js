@@ -9,12 +9,23 @@
  *
  * Depends:
  *	jquery.ui.core.js
+ *	jquery.ui.widget.js
  *	jquery.ui.draggable.js
+ *	jquery.ui.mouse.js
+ *	jquery.ui.widget.js
  */
 (function($) {
 
 $.widget("ui.droppable", {
-
+	options: {
+		accept: '*',
+		activeClass: false,
+		addClasses: true,
+		greedy: false,
+		hoverClass: false,
+		scope: 'default',
+		tolerance: 'intersect'
+	},
 	_init: function() {
 
 		var o = this.options, accept = o.accept;
@@ -49,14 +60,14 @@ $.widget("ui.droppable", {
 		return this;
 	},
 
-	_setData: function(key, value) {
+	_setOption: function(key, value) {
 
 		if(key == 'accept') {
 			this.accept = $.isFunction(value) ? value : function(d) {
 				return d.is(value);
 			};
 		}
-		$.widget.prototype._setData.apply(this, arguments);
+		$.Widget.prototype._setOption.apply(this, arguments);
 	},
 
 	_activate: function(event) {
@@ -137,16 +148,7 @@ $.widget("ui.droppable", {
 
 $.extend($.ui.droppable, {
 	version: "1.8pre",
-	eventPrefix: 'drop',
-	defaults: {
-		accept: '*',
-		activeClass: false,
-		addClasses: true,
-		greedy: false,
-		hoverClass: false,
-		scope: 'default',
-		tolerance: 'intersect'
-	}
+	eventPrefix: 'drop'
 });
 
 $.ui.intersect = function(draggable, droppable, toleranceMode) {
