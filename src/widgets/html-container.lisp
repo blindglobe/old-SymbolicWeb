@@ -27,18 +27,14 @@
   )
 
 
-(defmethod update-client ((html-container html-container))
-  (run (setf (js-html-of (id-of html-container)) (html-content-of html-container))
-       html-container)
-  (dolist (child (children-of html-container))
-    (render child)))
+(flet ((update-client (html-container)
+         (declare (html-container html-container))
+         (run (setf (js-html-of (id-of html-container)) (html-content-of html-container))
+              html-container)
+         (dolist (child (children-of html-container))
+           (render child)))
 
-
-(defmethod render ((html-container html-container))
-  (update-client html-container))
-
-
-(flet ((generate-html-wrapper (html-container fn)
+       (generate-html-wrapper (html-container fn)
          (declare (html-container html-container)
                   (function fn)
                   (optimize (safety 2)))
@@ -63,7 +59,10 @@
                (when (visible-p-of html-container)
                  (dolist (child removed-children)
                    (propagate-for-remove child))))))))
-  (declare (inline generate-html-wrapper))
+
+
+  (defmethod render ((html-container html-container))
+    (update-client html-container))
 
 
   (defmethod generate-html :around ((html-container html-container))
@@ -75,11 +74,11 @@
       (with-object html-container
         (setf ¤closure html-content)
         ;; We assure that no user-defined GENERATE-HTML method is called.
-        (generate-html-wrapper html-container html-content)))))
+        (generate-html-wrapper html-container html-content))))
 
 
-(defmethod (setf html-content-of) :after (html-content (html-container html-container))
-  (update-client html-container))
+  (defmethod (setf html-content-of) :after (html-content (html-container html-container))
+    (update-client html-container)))
 
 
 (defmethod generate-html ((html-container html-container))
