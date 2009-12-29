@@ -79,6 +79,5 @@
 
          :hr
          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/ex-text-input.lisp"
-             "source code") :br
-         "Hosted on a crummy ADSL line..."))
+             "source code") :br))
      :in (root))))
