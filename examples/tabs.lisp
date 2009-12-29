@@ -9,7 +9,7 @@
 
 
 (defmethod initialize-instance :after ((app tabs-app) &key)
-  (add-jquery-ui-resources :minified-p t))
+  (add-jquery-ui-resources :ui-tabs :minified-p t))
 
 
 (defmethod render-viewport ((viewport viewport) (app tabs-app))

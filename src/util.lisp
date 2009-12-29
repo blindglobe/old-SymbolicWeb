@@ -209,23 +209,40 @@ won't work:
                  (run (js-remove id) viewport))))))))))
 
 
-(defun add-jquery-ui-resources (&key release-version-p minified-p)
-  (assert (not release-version-p))
-  (if (not release-version-p)
-      (progn
-        (add-resource *app* "jquery-ui-css" :css
-                      (mk-static-data-url *app* "javascript/jquery-ui/themes/base/jquery-ui.css"))
-        (add-resource *app* "jquery-ui-css-theme" :css
-                      (mk-static-data-url *app* "javascript/jquery-ui/themes/base/ui.theme.css"))
-        (add-resource *app* "jquery-ui-js" :js
-                      (mk-static-data-url *app*
-                                          (if minified-p
-                                              "javascript/jquery-ui/ui/minified/jquery-ui.min.js"
-                                              "javascript/jquery-ui/ui/jquery-ui.js"))))
-      (progn
-        (add-resource *app* "jquery-ui-css" :css
-                      (mk-static-data-url *app* "jquery-ui/themes/base/jquery-ui.css"))
-        (add-resource *app* "jquery-ui-css-theme" :css
-                      (mk-static-data-url *app* "jquery-ui/themes/base/ui.theme.css"))
-        (add-resource *app* "jquery-ui-js" :js
-                      (mk-static-data-url *app* "jquery-ui/ui/minified/jquery-ui.min.js")))))
+(flet ((add-resource (name type sub-path)
+         (add-resource *app* name type
+                       (mk-static-data-url *app* (catstr "javascript/jquery-ui-dev/" sub-path)))))
+
+
+  (defmethod add-jquery-ui-resources ((widget-name (eql :common)) &key minified-p)
+    (add-resource "jquery-ui-css" :css "themes/base/jquery-ui.css")
+    (if minified-p
+        (add-resource "jquery-ui-js" :js "ui/minified/jquery-ui.min.js")
+        (add-resource "jquery-ui-js" :js "ui/jquery-ui.js")))
+
+
+  #|(defmethod add-jquery-ui-resources ((widget-name (eql :ui-widget)) &rest args &key minified-p)
+    (declare (ignore minified-p))
+    (apply #'add-jquery-ui-resources :common args)
+    (add-resource "jquery-ui-widget" :js "ui/jquery.ui.widget.js"))|#
+
+
+  #|(defmethod add-jquery-ui-resources ((widget-name (eql :ui-position)) &rest args &key minified-p)
+    (declare (ignore minified-p))
+    (apply #'add-jquery-ui-resources :common args)
+    (add-resource "jquery-ui-position" :js "ui/jquery.ui.position.js"))|#
+
+
+  (defmethod add-jquery-ui-resources ((widget-name (eql :ui-tabs)) &rest args &key minified-p)
+    (declare (ignore minified-p))
+    (apply #'add-jquery-ui-resources :common args)
+    #|(apply #'add-jquery-ui-resources :ui-widget args)|#
+    #|(add-resource "jquery-ui-tabs" :js "ui/jquery.ui.tabs.js")|#)
+
+
+  (defmethod add-jquery-ui-resources ((widget-name (eql :ui-tooltip)) &rest args &key minified-p)
+    (declare (ignore minified-p))
+    (apply #'add-jquery-ui-resources :common args)
+    #|(apply #'add-jquery-ui-resources :ui-widget args)|#
+    #|(apply #'add-jquery-ui-resources :ui-position args)|#
+    #|(add-resource "jquery-ui-tooltip" :js "ui/jquery.ui.tooltip.js")|#))
