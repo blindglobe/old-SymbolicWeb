@@ -18,7 +18,7 @@
     (prog1 container-view
       (etypecase content
         (string
-         (sw-mvc:insert #~content :in container-model))
+         (sw-mvc:insert λVcontent :in container-model))
 
         ((or single-value-model sw-mvc:container)
          (sw-mvc:insert content :in container-model))))))

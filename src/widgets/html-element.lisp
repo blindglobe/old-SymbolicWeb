@@ -68,7 +68,7 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
                     ,@(rest args)
                     ,@(when (and (not (member :model args))
                                  html-content)
-                     `(:model #λ,@html-content)))))
+                     `(:model λI,@html-content)))))
 
 
 (defmacro def-elt (element-type &key (xml-p t))
@@ -81,7 +81,7 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
                 (list args))))))
 
 
-;; *GRR* the syntax is (DIV (:MODEL #λ42))
+;; *GRR* the syntax is (DIV (:MODEL λI42))
 (def-elt div)
 (def-elt span)
 (def-elt b)
