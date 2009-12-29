@@ -211,7 +211,7 @@ won't work:
 
 (flet ((add-resource (name type sub-path)
          (add-resource *app* name type
-                       (mk-static-data-url *app* (catstr "javascript/jquery-ui-dev/" sub-path)))))
+                       (mk-static-data-url *app* (catstr "javascript/jquery-ui/" sub-path)))))
 
 
   (defmethod add-jquery-ui-resources ((widget-name (eql :common)) &key minified-p)
