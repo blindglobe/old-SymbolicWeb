@@ -35,6 +35,11 @@
 * Lighttpd-1.5.x: this can be NIL.")
 
 
+(define-variable -sw-request-timeout-
+    :value 10
+    :type (or integer null))
+
+
 (define-variable -sw-comet-timeout-
     :value 30
     :type fixnum)
