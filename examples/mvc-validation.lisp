@@ -4,7 +4,7 @@
 (in-readtable symbolicweb)
 
 
-(defclass mvc-validation-model (self-ref)
+(defclass mvc-validation-model (self-ref model)
   ((x :accessor x-of
       :initform (random 100))
 

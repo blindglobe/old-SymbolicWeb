@@ -4,7 +4,7 @@
 (in-readtable symbolicweb)
 
 
-(defclass text-input-widget-model (self-ref)
+(defclass text-input-widget-model (self-ref model)
   ((x :accessor x-of
       :initform (random 100))
 
