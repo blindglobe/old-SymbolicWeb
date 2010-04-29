@@ -53,48 +53,56 @@ fixing this.
 
 
 (defn sw-http-server-request-handler (((server sw-http-server) (connection sw-http:connection)))
-  (with-thread ((cons server (sw-http::cn-socket connection)))
-    (with-timeout (10 (warn "SW-HTTP-SERVER-REQUEST-HANDLER: Timeout!")
-                      (invoke-restart 'skip-body))
-      (swh:with-swh-context connection (:parse-get-parameters-p t
-                                        :get-parameters-url-decode-p t
-                                        :parse-post-parameters-p t
-                                        :post-parameters-url-decode-p t
-                                        :parse-cookies-p t)
-        (setf (sw-http:close-connection-p) -server-close-connection-p-)
-        (let ((*server* server)
-              (*request-time* (get-universal-time)))
-          (setf (last-ping-time-of server) *request-time*)
-          (muffle-compiler-note
-            (incf (request-counter-of server)))
-          (if-let (app (with-locked-object server
-                         (if-let ((cookie-value (sw-http:get-cookie (cookie-name-of server))))
-                           (if-let ((app (gethash cookie-value (cookie-value->app-of server))))
-                             app
-                             (progn
-                               (warn "User is trying to fetch a session that no longer exists.")
-                               (session-expired-response)
-                               (invoke-restart 'skip-body)))
-                           (create-new-session server))))
-            (let ((viewport (when-let* ((viewport-id (sw-http:get-parameter "_sw_viewport-id"))
-                                        (viewport (find-or-create-viewport viewport-id app)))
-                              (setf (last-ping-time-of viewport) *request-time*)
-                              (when (and +auto-set-viewport-support-p+ -auto-set-viewport-p-)
-                                (setf *viewport* viewport))
-                              viewport)))
-              (setf (last-ping-time-of app) *request-time*)
-              (when (and +auto-set-app-support-p+ -auto-set-app-p-)
-                (setf *app* app))
-              (let ((*app* app))
-                (or (handle-request server app viewport)
-                    (handle-request app server viewport)
-                    (progn
-                      (warn "404 @ viewport ~A and app ~A for ~S" viewport app (sw-http:path))
-                      ;; FIXME: Slot 404-FN is missing from VIEWPORT and APPLICATION.
-                      (funcall (the function (404-fn-of (or viewport app))))))))
-            (let ((*app* nil)) ;; Dodge stale *APP* bound by -AUTO-SET-APP-P-.
-              #|(warn "Server (global) HTTP-404 for (SW-HTTP:PATH): ~S" (sw-http:path))|#
-              (funcall (the function (404-fn-of server))))))))))
+  (with-thread ((prin1-to-string (cons server (sw-http::cn-socket connection))))
+    (flet ((body ()
+             (swh:with-swh-context connection (:parse-get-parameters-p t
+                                               :get-parameters-url-decode-p t
+                                               :parse-post-parameters-p t
+                                               :post-parameters-url-decode-p t
+                                               :parse-cookies-p t)
+               (setf (sw-http:close-connection-p) -server-close-connection-p-)
+               (let ((*server* server)
+                     (*request-time* (get-universal-time)))
+                 (setf (last-ping-time-of server) *request-time*)
+                 (muffle-compiler-note
+                   (incf (request-counter-of server)))
+                 (if-let (app (with-locked-object server
+                                (if-let ((cookie-value (sw-http:get-cookie (cookie-name-of server))))
+                                  (if-let ((app (gethash cookie-value (cookie-value->app-of server))))
+                                    app
+                                    (progn
+                                      (warn "User is trying to fetch a session that no longer exists.")
+                                      (session-expired-response)
+                                      (invoke-restart 'skip-body)))
+                                  (create-new-session server))))
+                   (let ((viewport (when-let* ((viewport-id (sw-http:get-parameter "_sw_viewport-id"))
+                                               (viewport (find-or-create-viewport viewport-id app)))
+                                     (setf (last-ping-time-of viewport) *request-time*)
+                                     (when (and +auto-set-viewport-support-p+ -auto-set-viewport-p-)
+                                       (setf *viewport* viewport))
+                                     viewport)))
+                     (setf (last-ping-time-of app) *request-time*)
+                     (when (and +auto-set-app-support-p+ -auto-set-app-p-)
+                       (setf *app* app))
+                     (let ((*app* app))
+                       (or (handle-request server app viewport)
+                           (handle-request app server viewport)
+                           (progn
+                             (warn "404 @ viewport ~A and app ~A for ~S" viewport app (sw-http:path))
+                             ;; FIXME: Slot 404-FN is missing from VIEWPORT and APPLICATION.
+                             (funcall (the function (404-fn-of (or viewport app))))))))
+                   (let ((*app* nil)) ;; Dodge stale *APP* bound by -AUTO-SET-APP-P-.
+                     #|(warn "Server (global) HTTP-404 for (SW-HTTP:PATH): ~S" (sw-http:path))|#
+                     (funcall (the function (404-fn-of server)))))))))
+      (if (and (not (debug-p-of server)) ;; We do not want timeouts and roll-back
+               -sw-request-timeout-)     ;; of state while browsing a stack-trace.
+          (with-timeout (-sw-request-timeout-
+                         (warn "SW-HTTP-SERVER-REQUEST-HANDLER: Timeout!")
+                         (invoke-restart 'skip-body))
+            (body))
+          (with-simple-restart (skip-body "Skip handling of HTTP request. [SW-HTTP-SERVER-REQUEST-HANDLER]")
+            (body))))))
+
 
 
 (defmethod session-expired-response ()
