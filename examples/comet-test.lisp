@@ -27,17 +27,16 @@
 
 
 (defmethod render-viewport ((viewport viewport) (app comet-test-app))
-  (with-object app
-    (insert
-      (mk-html ()
-        (:div
-         (:h1 "COMET-TEST-APP")
+  (insert
+   (mk-html ()
+     (:div
+       (:h1 "COMET-TEST-APP")
 
-          (:b "X: ") (:sw x) :br
-          (:b "SQUARE: ") (:sw square)
+       (:b "X: ") (:sw x) :br
+       (:b "SQUARE: ") (:sw square)
 
-          :hr
-          (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/comet-test.lisp"
-              "source code") :br
-          "PS: Hosted on a crummy home ADSL line..."))
-      :in (root))))
+       :hr
+       (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/comet-test.lisp"
+           "source code") :br
+           "PS: Hosted on a crummy home ADSL line..."))
+   :in (root)))
