@@ -1,5 +1,14 @@
+Methods like ON-ENTERPRESS and ON-TEXT-INPUT-BLUR in src/widgets/text-input.lisp,
+which are triggered by ON-EVENT in src/widgets/events.lisp -- are never GCed by
+SBCLs CLOS machinery. It seems _any_ method with EQL-specialization hangs around
+forever actually. (..I have a bug posted wrt. this somewhere; find the bug# ..)
+
+
+
+
 Merge the SW-MVC:CONTAINER APIs with the SW:EVENT APIs (or the other way
 around), somehow, perhaps.
+
 
 
 
@@ -15,6 +24,7 @@ Consider sending response-data for AJAX-requests also; not only COMET-requests
 ==============================================================================
 
 Title speaks for itself.
+
 
 
 

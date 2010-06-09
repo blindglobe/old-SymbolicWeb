@@ -11,25 +11,15 @@ WITH-N-ACTIVE-ITEMS). |#
 
 (defclass combo-box (container)
   ((selected-option :reader selected-option-of
-                    :initform nil))
+                    :initform nil)
+
+   (model :type container-proxy))
 
   (:default-initargs
    :element-type "select"
    :model (make-instance 'sw-mvc:container-with-1-active-item
-                         :model (make-instance 'sw-mvc:dlist))))
-
-
-(defmethod initialize-instance :after ((combo-box combo-box) &key (fallback-to-null-p t))
-  (check-type (model-of combo-box) container-proxy)
-  (let* ((proxy (model-of combo-box))
-         (container-model (model-of proxy)))
-    (when fallback-to-null-p
-      (if (empty-p-of container-model)
-          (insert +null-model+ :in container-model)
-          (unless (eq +null-model+ ~(head-of container-model))
-            (insert +null-model+ :before (head-of container-model))))
-      (setf (fallback-item-of proxy)
-            +null-model+))))
+                         :fallback-item +null-model+
+                         :model (dlist))))
 
 
 
@@ -59,6 +49,7 @@ WITH-N-ACTIVE-ITEMS). |#
 
 
 (defmethod set-model nconc ((combo-box combo-box) (model container-with-1-active-item))
+  (dbg-prin1 model "(SET-MODEL COMBO-BOX CONTAINER-WITH-1-ACTIVE-ITEM)")
   (list λI(let* ((item-model (active-item-of model))
                  (item-view (when item-model (view-in-context-of combo-box item-model))))
             ;; Model → View.
