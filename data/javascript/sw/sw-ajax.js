@@ -127,6 +127,7 @@ swComet =
               type: "GET",
               url: [swURL(), "?_sw_request-type=comet", "&_sw_viewport-id=", sw_viewport_id, params].join(''),
               dataType: "script",
+              cache: false,
               complete: callback});
    }
 
