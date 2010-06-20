@@ -131,6 +131,7 @@ swComet =
               complete: callback});
    }
 
+   // This returns what is assigned to the "swComet = ..." part above.
    if(!$.browser.mozilla)
      return doIt;
    else
