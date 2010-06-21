@@ -1,4 +1,5 @@
-// NOTE: java -jar /home/lnostdal/programming/javascript/jquery-ui-dev/build/build/yuicompressor-2.4.2.jar sw-ajax.js -o sw-ajax.min.js
+// lnostdal@blackbox:~/symbolicweb$ java -jar /home/lnostdal/javascript/jquery/build/google-compiler-20091218.jar --js data/javascript/sw/sw-ajax.js >> sw-ajax.min.js.new
+
 
 /*
 For this file to bootstrap correctly the following variables must be bound:
@@ -111,6 +112,7 @@ swAjax =
 
 sw_comet_response = false;
 
+
 swComet =
 (function(){
    function callback(){
@@ -119,7 +121,7 @@ swComet =
      else
        // FIXME: This stuff never happen for Webkit (it doesn't seem to be a big problem atm. though),
        // or Opera (when random subdomains are used).
-       setTimeout("swComet('');", 500);
+       setTimeout("swComet('');", 1000);
    }
 
    function doIt(params){
@@ -132,11 +134,11 @@ swComet =
    }
 
    // This returns what is assigned to the "swComet = ..." part above.
-   if(!$.browser.mozilla)
-     return doIt;
-   else
-     // NOTE: This gets rid of the "always loading" thing in FF for the mouse pointer and the tab icon/favicon.
+   if($.browser.mozilla)
+     // Stop "throbbing of doom".
      return function(params){ setTimeout(function(){ doIt(params); }, 0); };
+   else
+     return doIt;
  })();
 
 

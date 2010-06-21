@@ -11,7 +11,7 @@
   (catstr
     ;; NOTE: This is a patched version of jQuery!
     "<script type='text/javascript' src='"
-    (mk-static-data-url *server* "javascript/jquery-1.4.2.min.js")
+    (mk-static-data-url *server* "javascript/jquery.min.js")
     "'></script>"
 
     ;; User-specified static JavaScript files.
