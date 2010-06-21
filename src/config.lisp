@@ -56,7 +56,7 @@
 
 
 (define-variable -server-default-static-data-subdomain-
-    :value nil
+    :value "sw"
     :type (or null string))
 
 
