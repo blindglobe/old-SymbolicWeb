@@ -20,18 +20,23 @@ fixing this.
    :404-fn
    (lambda ()
      (sw-http:response-add-chunk
-      (sw-http:combine-buffers
-       #.(sw-http:mk-response-status-code 200)
-       (sw-http:mk-response-header-field (catstr "X-Sendfile: "
-                                                 (static-data-fs-path-of (or *app* *server*))
-                                                 (sw-http:path)))
-       (sw-http:mk-response-message-body
-        #.(who (:html (:body (:h1 "SymbolicWeb: X-Sendfile!")))))))
+      (let ((header (catstr "X-Sendfile: "
+                            (static-data-fs-path-of (or *app* *server*))
+                            (sw-http:path))))
+        (sw-http:combine-buffers
+         #.(sw-http:mk-response-status-code 200)
+         (sw-http:mk-response-header-field header)
+         (sw-http:mk-response-message-body
+          (who (:html
+                (:body
+                 (:h1 "SymbolicWeb")
+                 (:p (str header)))))))))
+
      (sw-http:done-generating-response))
 
-    :application-finder-fn
-    (lambda (sw-http-server connection)
-      (sw-http-server-request-handler sw-http-server connection))))
+   :application-finder-fn
+   (lambda (sw-http-server connection)
+     (sw-http-server-request-handler sw-http-server connection))))
 
 
 ;; TODO: Move to SW-HTTP?
