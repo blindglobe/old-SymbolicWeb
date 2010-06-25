@@ -8,6 +8,7 @@ Status
 Alpha, and pretty much only interesting for developers of SW itself.
 
 
+
 Notes
 =====
 
@@ -27,3 +28,11 @@ DNS entries would look like;
 
 The reverse proxy on each server will dispatch based on the "sw-server-x" part
 of the URL.
+
+
+
+/etc/rc.local
+=============
+
+sudo -i -u <username> "/usr/local/sbin/lighttpd -f ~/symbolicweb/data/lighttpd/lighttpd.conf"
+sudo -i -u <username> "screen -d -m ~/symbolicweb/symbolicweb.sbcl --no-userinit --load ~/symbolicweb/start.lisp"
