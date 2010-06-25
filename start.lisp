@@ -3,8 +3,7 @@
 (in-package #:sw)
 
 
-(start-sw :port 6001
-          :static-data-fs-path (catstr (sb-posix:getcwd) "/data/"))
+(start-sw :port 6001)
 
 
 (nilf (debug-p-of *server*))
