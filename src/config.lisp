@@ -56,12 +56,12 @@
 
 
 (define-variable -server-default-static-data-subdomain-
-    :value "sw"
+    :value "static"
     :type (or null string))
 
 
 (define-variable -server-default-static-path-
-    :value nil
+    :value "sw-http-root"
     :type (or string null))
 
 
