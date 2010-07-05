@@ -52,7 +52,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 
 (defmethod js-before-check ((text-input text-input) (lisp-accessor-name (eql 'text-input-blur)))
-  ;; Check if client-side content of TEXT-INPUT really has changed before sending update to the server.
+  ;; Check if client-side content of TEXT-INPUT really has changed before sending update/event to the server.
   (catstr "if(event.currentTarget.sw_text_input_value == encodeURIComponent(event.currentTarget.value)){"
           "return false;"
           "}else{"
@@ -90,7 +90,9 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
   (defmethod set-model nconc ((text-input text-input) (model cell))
     (when (sync-on-enterpress-p-of text-input)
       (defmethod on-enterpress ((widget (eql text-input)) &key value)
-        (setf ~model value))
+        (if (clear-on-enterpress-p-of text-input)
+            (pulse ~model value)
+            (setf ~model value)))
       (activate-event 'enterpress text-input))
 
     (when (sync-on-blur-p-of text-input)

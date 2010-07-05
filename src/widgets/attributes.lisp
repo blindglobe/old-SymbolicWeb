@@ -140,3 +140,13 @@
 
 
 (define-attribute-property tabindex-of "tabindex")
+
+
+
+;;; Default value marshallers for various attributes.
+
+(setf (get 'attribute-value-of 'value-marshaller)
+      (lambda (input)
+        (if input
+            (princ-to-string input)
+            "")))
