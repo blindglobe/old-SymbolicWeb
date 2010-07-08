@@ -85,5 +85,5 @@ to URL type string; \"key=value&other-key=other-value\""
 (declaim (inline js-scroll-to-bottom))
 (defun js-scroll-to-bottom (widget-id)
   (declare (string widget-id))
-  (catstr "$(\"#" widget-id "\").get(0).scrollTop = $(\"" widget-id "\").get(0).scrollHeight + 1000;" +lf+))
+  (catstr "$(\"#" widget-id "\").get(0).scrollTop = $(\"#" widget-id "\").get(0).scrollHeight + 1000;" +lf+))
 (export 'js-scroll-to-bottom)
