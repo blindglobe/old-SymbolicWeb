@@ -127,7 +127,8 @@ VIEW). These methods might be called from within the dynamic scope of a WHEN-COM
 (defmethod scroll-to-bottom ((widget widget))
   (if *js-code-only-p*
       (js-scroll-to-bottom (id-of widget))
-      (run (js-scroll-to-bottom (id-of widget)) widget)))
+      (when-commit ()
+        (run (js-scroll-to-bottom (id-of widget)) widget))))
 
 
 (defmethod remove-widget-from-viewport ((widget widget) (viewport viewport))
