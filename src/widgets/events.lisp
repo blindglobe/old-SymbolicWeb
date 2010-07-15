@@ -126,6 +126,8 @@ Instances of this is bound to *CURRENT-EVENT*."))
                       ;; (&KEY &ALLOW-OTHER-KEYS) in WITH-EVENT needs this as a default fallback.
                       '(:dummy t))
              (setf (slot-value *current-event* 'parsed-args) it)
+             #| The first ON-EVENT effective method will call the ON-CLICK etc. GF before calling any user-defined ON-EVENT
+             effective methods. |#
              (apply #'on-event (event-name-of callback-box) (widget-of callback-box)
                     it)))))
 

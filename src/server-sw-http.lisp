@@ -58,7 +58,7 @@ fixing this.
 
 
 (defn sw-http-server-request-handler (((server sw-http-server) (connection sw-http:connection)))
-  ;; TODO: This spawns a thread before the 404-fn is called; so even static content will spawn a (short-lived) thread for no reason.
+  ;; TODO: This spawns a thread before the 404-fn (X-Sendfile) is called; so even static content will spawn a (short-lived) thread for no reason. Though, this is generally not a problem as normally Lighttpd will handle requests for static content before we end up here.
   (with-thread ((prin1-to-string (cons server (sw-http::cn-socket connection))))
     (flet ((body ()
              (swh:with-swh-context connection (:parse-get-parameters-p t
