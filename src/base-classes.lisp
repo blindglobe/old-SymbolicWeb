@@ -40,7 +40,7 @@ possible and be able to optimize type-checking code based on this. |#
   (with-each-widget-in-tree (:root widget)
     (unless (in-dom-p-of widget)
       (tf (in-dom-p-of widget))
-      (dolist (operation (nreverse (delayed-operations-of widget)))
+      (dolist (operation (reverse (delayed-operations-of widget)))
         (funcall (cdr operation)))
       (nilf (delayed-operations-of widget))
       ;; Doing a "back-flip" here to ensure that the finalization-closure doesn't refer to WIDGET-BASE (which would
@@ -56,13 +56,14 @@ possible and be able to optimize type-checking code based on this. |#
 
 
 (defun add-delayed-operation (widget lisp-accessor-name operation)
+  "OPERATION is a closure to be executed as the IN-DOM-P slot of WIDGET transits from NIL to T."
   (declare (widget-base widget)
            (symbol lisp-accessor-name)
            (function operation)
            (optimize speed))
   (let ((existing-entry (assoc lisp-accessor-name (truly-the list (delayed-operations-of widget)) :test #'eq)))
     (if existing-entry
-        (setf (cdr existing-entry) operation) ;; Overwrite existing operation based on SIGNATURE being equal.
+        (setf (cdr existing-entry) operation) ;; Overwrite existing operation based on LISP-ACCESSOR-NAME being EQ.
         (push (cons lisp-accessor-name operation)
               (delayed-operations-of widget)))))
 
