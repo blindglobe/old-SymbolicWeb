@@ -32,4 +32,5 @@
      #|(:file "vecto-3")|#
      (:file "tabs")
      (:file "mvc-validation")
+     (:file "chat")
      ))))
