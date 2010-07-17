@@ -28,17 +28,21 @@
 
 
 (defmethod render-viewport ((viewport viewport) (app chat-app))
-  (insert
-   (mk-html ()
-     (:div
-       (:h1 "CHAT-APP")
-       (:sw (with1 (make-instance 'conversation-area :model (conversation-area-of app))
-              (setf (css-height-of it) "300px")
-              (scroll-to-bottom it)))
-       (:sw (with1 (make-instance 'text-input :clear-on-enterpress-p t)
-              (setf (css-width-of it) "100%")
-              (with-event (value) (on-event-enterpress it)
-                (insert λVvalue :in (conversation-area-of app)))))
-       (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/chat.lisp"
-           "source code")))
-   :in (root)))
+  (let ((conversation-area-view (with1 (make-instance 'conversation-area :model (conversation-area-of app))
+                                  (setf (css-height-of it) "300px")))
+
+        (text-input-view (with1 (make-instance 'text-input :clear-on-enterpress-p t)
+                           (setf (css-width-of it) "100%")
+                           (with-event (value) (on-event-enterpress it)
+                             (insert λVvalue :in (conversation-area-of app))))))
+    (insert
+     (mk-html ()
+       (:div
+         (:h1 "CHAT-APP")
+         (:sw conversation-area-view)
+         (:sw text-input-view)
+         (:a :href "http://github.com/lnostdal/SymbolicWeb/blob/master/examples/chat.lisp"
+             "source code")))
+     :in (root))
+
+    (scroll-to-bottom conversation-area-view)))
