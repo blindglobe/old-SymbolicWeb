@@ -29,20 +29,30 @@
 
 (defmethod render-viewport ((viewport viewport) (app chat-app))
   (let ((conversation-area-view (with1 (make-instance 'conversation-area :model (conversation-area-of app))
-                                  (setf (css-height-of it) "300px")))
+                                  (setf (css-height-of it) "90%")))
 
         (text-input-view (with1 (make-instance 'text-input :clear-on-enterpress-p t)
-                           (setf (css-width-of it) "100%")
+                           (setf (css-width-of it) "90%"
+                                 ;;(css-height-of it) "10%"
+                                 (css-border-of it) "4px solid red"
+                                 (css-position-of it) "absolute"
+                                 (css-bottom-of it) "0"
+                                 )
+
                            (with-event (value) (on-event-enterpress it)
                              (insert λVvalue :in (conversation-area-of app))))))
     (insert
-     (mk-html ()
-       (:div
-         (:h1 "CHAT-APP")
-         (:sw conversation-area-view)
-         (:sw text-input-view)
-         (:a :href "http://github.com/lnostdal/SymbolicWeb/blob/master/examples/chat.lisp"
-             "source code")))
+     (with1 (mk-html ()
+              (:div
+                (:h1 "CHAT-APP")
+                (:sw conversation-area-view)
+                (:sw text-input-view)
+                (:a :href "http://github.com/lnostdal/SymbolicWeb/blob/master/examples/chat.lisp"
+                    "source code")))
+       (setf (css-position-of it) "absolute"
+             (css-width-of it) "100%"
+             (css-height-of it) "100%"))
+
      :in (root))
 
     (scroll-to-bottom conversation-area-view)))
