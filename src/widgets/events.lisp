@@ -30,8 +30,11 @@ Instances of this is bound to *CURRENT-EVENT*."))
   (with-gensyms (args)
     `(with-observer ((,args ,event-extr))
        (when ,args
-         (destructuring-bind (&key ,@bindings &allow-other-keys) ,args
-           ,@handler)))))
+         ,@(if (plusp (length bindings))
+               `((destructuring-bind (&key ,@bindings &allow-other-keys) ,args
+                   ,@handler))
+               handler)))))
+
 
 
 
