@@ -86,27 +86,30 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
 (fflet ((value-marshaller (the function (value-marshaller-of 'attribute-value-of))))
 
-  ;; View → Model
   (defmethod set-model nconc ((text-input text-input) (model cell))
-    (when (sync-on-enterpress-p-of text-input)
-      (defmethod on-enterpress ((widget (eql text-input)) &key value)
-        (if (clear-on-enterpress-p-of text-input)
-            (pulse ~model value)
-            (setf ~model value)))
-      (activate-event 'enterpress text-input))
+    (collecting
+      ;; View → Model
+      (when (sync-on-enterpress-p-of text-input)
+        (collect
+            (with-event (value) (on-event-enterpress text-input)
+              (if (clear-on-enterpress-p-of text-input)
+                  (pulse ~model value)
+                  (setf ~model value)))))
 
-    (when (sync-on-blur-p-of text-input)
-      (defmethod on-text-input-blur ((widget (eql text-input)) &key value)
-        (setf ~model value))
-      (activate-event 'text-input-blur text-input))
+      (when (sync-on-blur-p-of text-input)
+        (collect
+            (with-event (value) (on-event-enterpress text-input)
+              (if (clear-on-enterpress-p-of text-input)
+                  (pulse ~model value)
+                  (setf ~model value)))))
 
-    ;; Model → View
-    (list λI(let ((value-str (value-marshaller ~model)))
+      ;; Model → View
+      (collect
+          λI(let ((value-str (value-marshaller ~model)))
               (when-commit ()
                 ;; TODO: To do this proper a maybe-update-client type thing + client side merge is needed.
                 (setf (attribute-value-of text-input) value-str)
-                (text-input-update-client-cache value-str text-input))))))
-
+                (text-input-update-client-cache value-str text-input)))))))
 
 
 (defmacro text-input (args &optional (value nil value-supplied-p))

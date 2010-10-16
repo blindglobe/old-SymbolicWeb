@@ -20,12 +20,6 @@
   (:metaclass mvc-class))
 
 
-(defmethod initialize-instance :after ((model text-input-widget-model) &key)
-  (tf (accepts-conditions-p-of (cell-of (square-of-x-of model)))
-      (accepts-conditions-p-of (cell-of (sum-of model)))))
-
-
-
 (defclass text-input-widget-view (html-container)
   ((x :initform ↑(text-input (:model (cell-of (x-of ¤model)))))
    (y :initform ↑(text-input (:model (cell-of (y-of ¤model)))))
@@ -41,8 +35,17 @@
 
 (defmethod set-model nconc ((view text-input-widget-view) (model text-input-widget-model))
   (with-object view
-    (list (add-input-handler ¤x #'mk-number-parser)
-          (add-input-handler ¤y #'mk-number-parser))))
+    (prog1 (list (add-input-handler ¤x #'mk-number-parser)
+                 (add-input-handler ¤y #'mk-number-parser))
+      (setf (on-feedback-event-fn-of ~¤x)
+            (lambda (c)
+              (setf (css-border-color-of ¤x)
+                    (if c :red "")))
+
+            (on-feedback-event-fn-of ~¤y)
+            (lambda (c)
+              (setf (css-border-color-of ¤y)
+                    (if c :red "")))))))
 
 
 (defmethod generate-html ((view text-input-widget-view))
@@ -52,7 +55,7 @@
           "Y: " (:sw ¤y))
 
       (:p "SQUARE-OF-X => " (:sw ¤square-of-x) :br
-          "(+ SQUARE-OF-X Y) => " (:sw ¤sum))
+          "SQUARE-OF-X + Y => " (:sw ¤sum))
 
       (:p "SQUARE-OF-X-STR => " (:sw ¤square-of-x-str)))))
 

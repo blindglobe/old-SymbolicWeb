@@ -14,7 +14,11 @@
             :initform (with1 (make-instance 'context)
                         (push (lambda (cnt)
                                 (with-sync ()
-                                  (funcall cnt)))
+                                  ;; BINGO!
+                                  (handler-bind ((mvc-input-handler-signal
+                                                  (lambda (c)
+                                                    (invoke-restart (find-restart 'sw-mvc::execute-feedback-event c)))))
+                                    (funcall cnt))))
                               (bindings-of it))))
 
    (viewport-type :accessor viewport-type-of :initarg :viewport-type

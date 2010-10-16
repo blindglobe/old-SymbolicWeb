@@ -7,6 +7,7 @@
 
 
 (defclass html-element (widget)
+  ;; TODO: Add a comment here explaining why a copy of the data in Model is kept here.
   ((html-content :accessor html-content-of
                  :documentation "
 Not meant to be manipulated directly; use the MODEL instead.")
