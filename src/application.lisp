@@ -14,7 +14,6 @@
             :initform (with1 (make-instance 'context)
                         (push (lambda (cnt)
                                 (with-sync ()
-                                  ;; BINGO!
                                   (handler-bind ((mvc-input-handler-signal
                                                   (lambda (c)
                                                     (invoke-restart (find-restart 'sw-mvc::execute-feedback-event c)))))
