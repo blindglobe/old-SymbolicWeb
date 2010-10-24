@@ -36,3 +36,8 @@ of the URL.
 
 sudo -i -u <username> "/usr/local/sbin/lighttpd -f ~/symbolicweb/data/lighttpd/lighttpd.conf"
 sudo -i -u <username> "screen -d -m ~/symbolicweb/symbolicweb.sbcl --no-userinit --load ~/symbolicweb/start.lisp"
+
+
+`setcap' from the libcap2-bin package can be used to grant Lighttpd the rights to listen on port 80 as non-root:
+
+  ~# setcap 'cap_net_bind_service=+ep' /usr/local/sbin/lighttpd
