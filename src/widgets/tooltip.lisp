@@ -32,20 +32,3 @@
                                    (dynamic-extent args))
                           (apply #'run (catstr "$('#" (id-of widget) "').tooltip('destroy');")
                                  widget args)))
-
-
-(defun add-on-feedback (view fn)
-  "FN is a function taking one argument; the FEEDBACK-EVENT value from SW-MVC."
-  #|(declare (view-base view)
-           (function fn))|#
-  (declare (ignore view fn))
-  (error "This function is deprecated; use (SETF ON-FEEDBACK-EVENT-FN-OF) instead.")
-  #|(let ((cell (cell-of ~view))
-        (old nil))
-    λI(if-let ((fe (feedback-event-of cell)))
-        (when-commit ()
-          (setf old fe)
-          (funcall fn fe))
-        (when-commit ()
-          (when old
-            (funcall fn nil)))))|#)
