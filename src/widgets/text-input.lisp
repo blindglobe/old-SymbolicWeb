@@ -98,7 +98,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
       (when (sync-on-blur-p-of text-input)
         (collect
-            (with-event (value) (on-event-enterpress text-input)
+            (with-event (value) (on-event-text-input-blur text-input)
               (if (clear-on-enterpress-p-of text-input)
                   (pulse ~model value)
                   (setf ~model value)))))
