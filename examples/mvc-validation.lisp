@@ -43,10 +43,14 @@
 
   (defmethod set-model nconc ((view mvc-validation-view) (model mvc-validation-model))
     (with-object view
-      (list (add-input-handler ¤x #'mk-number-parser)
-            (add-input-handler ¤y #'mk-number-parser)
-            (add-on-feedback ¤x (λ (fe) (fe-handler fe ¤x)))
-            (add-on-feedback ¤y (λ (fe) (fe-handler fe ¤y)))))))
+      (prog1 (list (add-input-handler ¤x #'mk-number-parser)
+                   (add-input-handler ¤y #'mk-number-parser))
+        (setf (on-feedback-event-fn-of ~¤x)
+              (lambda (c)
+                (fe-handler c ¤x))
+              (on-feedback-event-fn-of ~¤y)
+              (lambda (c)
+                (fe-handler c ¤y)))))))
 
 
 (defmethod generate-html ((view mvc-validation-view))
