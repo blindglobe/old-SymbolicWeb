@@ -81,6 +81,6 @@
          (:sw (make-instance 'text-input-widget-view :model ¤shared-model))
 
          :hr
-         (:a :href "http://gitorious.org/symbolicweb/symbolicweb/blobs/raw/master/examples/ex-text-input.lisp"
+         (:a :href "http://github.com/lnostdal/SymbolicWeb/blob/master/examples/ex-text-input.lisp"
              "source code") :br))
      :in (root))))
