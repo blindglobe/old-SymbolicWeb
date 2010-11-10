@@ -39,8 +39,9 @@
                                  (css-bottom-of it) "0"
                                  )
 
-                           (with-event (value) (on-event-enterpress it)
-                             (insert λVvalue :in (conversation-area-of app))))))
+                           (with-formula it
+                             (let ((value ~~it))
+                               (insert λVvalue :in (conversation-area-of app)))))))
     (insert
      (with1 (mk-html ()
               (:div
