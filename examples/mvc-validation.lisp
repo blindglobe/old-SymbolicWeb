@@ -17,10 +17,6 @@
   (:metaclass mvc-class))
 
 
-(defmethod initialize-instance :after ((model mvc-validation-model) &key)
-  (tf (accepts-conditions-p-of (cell-of (sum-of model)))))
-
-
 
 (defclass mvc-validation-view (html-container)
   ((x :initform ↑(with1 (text-input (:model (cell-of (x-of ¤model))))
