@@ -99,15 +99,14 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
       (when (sync-on-blur-p-of text-input)
         (collect
             (with-event (value) (on-event-text-input-blur text-input)
-              (if (clear-on-enterpress-p-of text-input)
-                  (pulse ~model value)
-                  (setf ~model value)))))
+              (setf ~model value))))
 
       ;; Model → View
       (collect
           λI(let ((value-str (value-marshaller ~model)))
               (when-commit ()
                 ;; TODO: To do this proper a maybe-update-client type thing + client side merge is needed.
+                ;; Actually; a version counter on both the client and server end is needed I think *sigh*.
                 (setf (attribute-value-of text-input) value-str)
                 (text-input-update-client-cache value-str text-input)))))))
 
