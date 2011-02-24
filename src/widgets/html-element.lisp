@@ -9,6 +9,7 @@
 (defclass html-element (widget)
   ;; TODO: Add a comment here explaining why a copy of the data in Model is kept here.
   ((html-content :accessor html-content-of
+                 :initform nil
                  :documentation "
 Not meant to be manipulated directly; use the MODEL instead.")
 
@@ -23,6 +24,13 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 
   (:default-initargs
    :model λV""))
+
+
+(defmethod initialize-instance :after ((html-element html-element) &key)
+  (with (copy-seq (id-of html-element))
+    (tg:finalize html-element
+                 (lambda ()
+                   (format t "HTML-ELEMENT GCed: ~A~%" it)))))
 
 
 (flet ((update-html (html-element new-html)
@@ -46,9 +54,11 @@ If this is NIL, HTML-ELEMENT will be renedered as HTML."))
 
 
   (defmethod set-model nconc ((html-element html-element) model)
-    (list λI(with ~model
-              (when-commit ()
-                (setf (html-content-of html-element) it))))))
+    (let ((wp-html-element (tg:make-weak-pointer html-element)))
+      (list λI(with ~model
+                (when-commit ()
+                  (setf (html-content-of ~wp-html-element) it)
+                  #|(setf (html-content-of html-element) it)|#))))))
 
 
 
