@@ -55,6 +55,7 @@
                   :documentation "
 Has the MAIN method been executed?")
 
+   ;; TODO: A problem here is multiple VIEWPORT instances all sharing the "sw-root" name/id.
    (widgets :reader widgets-of
             :type hash-table
             :initform (make-hash-table :test #'equal :weakness :value)
@@ -166,10 +167,16 @@ include the JS libraries required for SW in general."
 
       ;; TODO: Move this to a slot in APPLICATION.
       (:style :type "text/css"
+       #| Fix W3C bullshit; a border is part of the width of an element when we're thinking
+          layout. This makes it possible (or almost possible) to do "% based" layout. |#
+       "* {"
+       "  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */"
+       "  -moz-box-sizing: border-box;    /* Firefox, other Gecko */"
+       "  box-sizing: border-box;         /* Opera/IE 8+ */"
+       "}"
        "html, body, #sw-root {"
        "  position: absolute;"
        "  width: 100%; height: 100%;"
-       "  overflow: hidden;"
        "  margin: 0; padding: 0; border: 0;"
        "}"
        ".sw-hide {"
