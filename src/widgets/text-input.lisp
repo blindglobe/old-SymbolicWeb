@@ -28,7 +28,7 @@ started editing -- and a way for him to update the TEXT-INPUT and drop his own c
 
   (:default-initargs
    :element-type "input"
-   :model λV""))
+   :model λVnil))
 
 
 (defmethod initialize-instance :before ((text-input text-input) &key password-p)
