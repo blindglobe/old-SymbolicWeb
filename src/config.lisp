@@ -117,7 +117,7 @@ code root.")
               2)
     :type fixnum)
 
-;; This must be larger than *DEFAULT-LONG-POLL-FREQUENCY*
+;; This must be larger than -DEFAULT-LONG-POLL-FREQUENCY-
 (define-variable -app-visible-p-timeout-
     :value (+ 10 -default-long-poll-frequency-)
     :type fixnum)
