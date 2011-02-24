@@ -14,20 +14,22 @@
   (:documentation "This class has no VIEW-CONSTRUCTOR methods defined for it, but is otherwise \"the same\" as a CONTAINER. The point here is that while other widgets like, e.g. TAB, still having \"container like\" behavior wrt. SW-MVC type events/operations, they probably _don't_ want the CONTAINER like (specific) behavior wrt. View construction."))
 
 
-(defmethod set-model nconc ((container abstract-container) (model dlist))
-  (prog1
-      (list λI(when-let (event (event-of model))
-                (when (eq model (container-of event))
-                  (dolist (object (objects-of event))
-                    (handle-model-event object container event)))))
+(defmethod set-model nconc ((view abstract-container) (model dlist))
+  (let ((wp-view λWview))
+    (prog1
+        (list λI(when-let (event (event-of model))
+                  (when (eq model (container-of event))
+                    (when-let ((view ~wp-view))
+                      (dolist (object (objects-of event))
+                        (handle-model-event object view event))))))
 
-    ;; TODO: Uh. Is this right? (switching models..)
-    (unless (null (children-of container))
-      (remove-all container))
+      ;; TODO: Uh. Is this right? (switching models..)
+      (unless (null (children-of view))
+        (remove-all view))
 
-    (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
-        ((null dlist-node))
-      (container-insert container (view-in-context-of container ~dlist-node t)))))
+      (do ((dlist-node (head-of model) (sw-mvc:right-of dlist-node)))
+          ((null dlist-node))
+        (container-insert view (view-in-context-of view ~dlist-node t))))))
 
 
 (defmethod handle-model-event (object (container abstract-container) (event sw-mvc:container-insert))
@@ -58,7 +60,8 @@
   (container-remove-all container))
 
 
-(defmethod handle-model-event (object (container abstract-container) (event sw-mvc:container-exchange))
+(defmethod handle-model-event (object (container abstract-container)
+                                      (event sw-mvc:container-exchange))
   (container-exchange container
                       (view-in-context-of container object)
                       (view-in-context-of container (target-position-of event))))
@@ -74,21 +77,22 @@
 (defn propagate-for-add (null ((widget widget) (container container-base)))
   (setf (slot-value widget 'parent) container)
   (let* ((viewport (viewport-of container))
-         (widgets (widgets-of (application-of viewport))))
+         (app-widgets (widgets-of (application-of viewport))))
     (with-each-widget-in-tree (:root widget)
-      (with (viewport-of widget)
-        (when (and it (not (eq it viewport)))
-          (warn "SW:PROPAGATE-FOR-ADD: ~A is already part of ~A. Moving it to ~A." widget viewport it)))
-      (setf (gethash (id-of widget) widgets) widget
+      (let ((widget-viewport (viewport-of widget)))
+        (when (and widget-viewport (not (eq widget-viewport viewport)))
+          (warn "SW:PROPAGATE-FOR-ADD: ~A is already part of ~A. Moving it to ~A."
+                widget viewport widget-viewport)))
+      (setf (gethash (id-of widget) app-widgets) widget
             (viewport-of widget) viewport))))
 
 
 (defn propagate-for-remove (null ((widget widget)))
-  (let ((widgets (widgets-of (application-of (viewport-of widget)))))
+  (let ((app-widgets (widgets-of (application-of (viewport-of widget)))))
     (with-each-widget-in-tree (:root widget)
       (deletef (slot-value (the widget-base (parent-of widget)) 'children) widget)
       (nilf (slot-value widget 'parent))
-      (remhash (id-of widget) widgets)
+      (remhash (id-of widget) app-widgets)
       (nilf (viewport-of widget)))))
 
 
